@@ -38,6 +38,14 @@ node video/tools/resolve.mjs
 
 Resolves the shot layout against `video/beats.json` and regenerates the shot table.
 
+For a quick animatic of the layout (one text card per shot, flash on every cut, click track):
+
+```bash
+node video/tools/preview.mjs
+```
+
+It writes `video/renders/shots-preview.mp4`.
+
 To choose and time the music, open `video/tools/marker.html` in a browser: load candidate tracks, tap the beat,
 mark the drop, breaks, hits and ending, then copy the marks as JSON.
 
