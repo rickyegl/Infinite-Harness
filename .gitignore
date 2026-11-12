@@ -1,0 +1,31 @@
+# secrets and machine-specific config: never commit
+.env
+.env.*
+!.env.example
+harness.local.json
+plan/LOCAL.md
+secrets/
+oauth/
+*.pem
+*.key
+
+# run data and renders (large, reproducible)
+runs/
+video/renders/
+video/plates/
+video/takes/**/artifacts/
+video/audio/*.wav
+video/audio/*.mp3
+!video/audio/README.md
+
+# tooling
+node_modules/
+dist/
+.turbo/
+.vite/
+__pycache__/
+*.pyc
+.venv/
+.DS_Store
+Thumbs.db
+*.log

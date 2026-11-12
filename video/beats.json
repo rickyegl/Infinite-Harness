@@ -1,0 +1,6 @@
+{
+  "_comment": "PLACEHOLDER grid. Replace with the real track's timings. Either keep {bpm, offset} or give an explicit list: {\"beats\": [0.000, 0.469, ...]} with one entry per beat, first entry = first downbeat. Then run: node video/tools/resolve.mjs",
+  "bpm": 128,
+  "offset": 0,
+  "beatsPerBar": 4
+}

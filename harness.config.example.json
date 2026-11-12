@@ -1,0 +1,30 @@
+{
+  "_comment": "Template. Copy to harness.local.json (gitignored) and fill in real values. Code reads config only through the bridge's config loader.",
+  "bridge": { "port": 7411, "host": "127.0.0.1" },
+  "proxy": {
+    "baseUrl": "http://127.0.0.1:8317/v1",
+    "apiKeyEnv": "HARNESS_PROXY_KEY",
+    "routerModel": "<model id for the router>",
+    "imageModel": "<model id for image generation and edits>"
+  },
+  "workers": {
+    "primary": { "cmd": "<agent cli>", "args": ["<non-interactive flags>"], "mcpConfigFlag": "<flag>", "eventFormat": "<json stream flag>" },
+    "secondary": { "cmd": "<agent cli>", "args": ["<non-interactive flags>"], "mcpConfigFlag": "<flag>", "eventFormat": "<json stream flag>" }
+  },
+  "paths": {
+    "studio": "<video studio project root>",
+    "forge": "<colab asset forge project root>",
+    "proxy": "<local model proxy folder>",
+    "unityEditor": "<Unity.exe of the Unity 6 editor>",
+    "blender": "<blender executable>",
+    "ffmpeg": "ffmpeg",
+    "canvasMcp": "<course MCP server folder>",
+    "frcSim": "<FRC simulator project>",
+    "unityToRoblox": "<Unity-to-Roblox porting project>",
+    "imageToVideo": "<colab image-to-video launcher>",
+    "forecast": "<forecast script, optional>"
+  },
+  "colab": { "session": "forge", "gpu": "L4", "keepAlive": false },
+  "voice": { "envFile": "<path to the .env that holds the voice key and voice id>" },
+  "brandDenyList": ["<vendor and model names that must never appear in UI, docs or frames>"]
+}
