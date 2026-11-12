@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Track Marker</title>
+<style>
+  :root { --bg:#05060A; --panel:#0B0D14; --line:rgba(255,255,255,.10); --text:#E8ECF4; --dim:#7A8499; --accent:#3DF2FF; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:14px/1.45 system-ui, "Segoe UI", sans-serif; }
+  header, main { max-width:1280px; margin:0 auto; padding:16px; }
+  h1 { font-size:18px; margin:0 0 4px; font-weight:600; }
+  .dim { color:var(--dim); }
+  button, select, input { font:inherit; color:var(--text); background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:6px 10px; }
+  button { cursor:pointer; }
+  button:hover { border-color:var(--accent); }
+  button.primary { border-color:var(--accent); color:var(--accent); }
+  #drop { border:1px dashed var(--line); border-radius:14px; padding:22px; text-align:center; margin-top:12px; }
+  #drop.over { border-color:var(--accent); }
+  #tabs { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+  #tabs button.on { border-color:var(--accent); color:var(--accent); }
+  .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:10px 0; }
+  .time { font:600 22px ui-monospace, Consolas, monospace; min-width:150px; }
+  canvas { display:block; width:100%; background:var(--panel); border:1px solid var(--line); border-radius:10px; cursor:crosshair; }
+  #over { height:80px; margin-bottom:8px; }
+  #zoom { height:190px; }
+  .types button { display:flex; gap:6px; align-items:center; }
+  .sw { width:10px; height:10px; border-radius:50%; display:inline-block; }
+  kbd { font:12px ui-monospace, Consolas, monospace; border:1px solid var(--line); border-radius:5px; padding:0 5px; color:var(--dim); }
+  table { width:100%; border-collapse:collapse; margin-top:8px; }
+  th, td { text-align:left; padding:5px 8px; border-bottom:1px solid var(--line); white-space:nowrap; }
+  th { color:var(--dim); font-weight:500; }
+  td.mono { font-family:ui-monospace, Consolas, monospace; }
+  td input { width:100%; min-width:160px; }
+  td button { padding:2px 7px; }
+  .wrap { overflow-x:auto; }
+  #toast { position:fixed; bottom:18px; left:50%; transform:translateX(-50%); background:var(--panel); border:1px solid var(--accent); border-radius:8px; padding:8px 14px; opacity:0; pointer-events:none; }
+  #toast.show { opacity:1; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Track Marker</h1>
+  <div class="dim">Load one or more music candidates, mark the moments the film cuts to, then copy the marks.</div>
+  <div id="drop">
+    <button class="primary" id="pick">Choose audio files</button>
+    <span class="dim">&nbsp;or drop them here</span>
+    <input type="file" id="file" accept="audio/*" multiple hidden>
+  </div>
+  <div id="tabs"></div>
+</header>
+
+<main id="main" hidden>
+  <div class="row">
+    <button class="primary" id="play">Play</button>
+    <span class="time" id="time">0:00.000</span>
+    <span class="dim" id="pos"></span>
+    <span style="flex:1"></span>
+    <label class="dim">BPM <input id="bpm" type="number" step="0.01" min="40" max="240" placeholder="from taps" style="width:110px"></label>
+    <span class="dim" id="tapinfo"></span>
+  </div>
+  <canvas id="over"></canvas>
+  <canvas id="zoom"></canvas>
+  <div class="row types" id="types"></div>
+  <div class="row dim">
+    <span><kbd>Space</kbd> play / pause</span>
+    <span><kbd>&larr;</kbd><kbd>&rarr;</kbd> 1 s (<kbd>Shift</kbd> 0.1 s)</span>
+    <span><kbd>Z</kbd> undo last mark</span>
+    <span>Click either waveform to move the playhead. A mark lands where the playhead is; pause and click for exact placement, or nudge it in the list.</span>
+  </div>
+  <div class="row">
+    <button class="primary" id="copy">Copy marks (all tracks)</button>
+    <button id="save">Download this track's marks</button>
+    <button id="cleartaps">Clear taps</button>
+    <label class="dim"><input type="checkbox" id="showtaps"> show taps in the list</label>
+  </div>
+  <div class="wrap"><table>
+    <thead><tr><th>Time</th><th>Bar:beat</th><th>Type</th><th>Note</th><th>Nudge (ms)</th><th></th></tr></thead>
+    <tbody id="list"></tbody>
+  </table></div>
+</main>
+<div id="toast"></div>
+
+<script>
+const TYPES = [
+  { key: "1", id: "downbeat", label: "First downbeat", color: "#4CFFA6" },
+  { key: "2", id: "build",    label: "Build starts",   color: "#FFD166" },
+  { key: "3", id: "silence",  label: "Silence / break", color: "#9AA3B5" },
+  { key: "4", id: "drop",     label: "Drop",           color: "#FF2E63" },
+  { key: "5", id: "hit",      label: "Big hit",        color: "#FF8A3D" },
+  { key: "6", id: "riser",    label: "Riser starts",   color: "#B388FF" },
+  { key: "7", id: "end",      label: "Music ends",     color: "#FFFFFF" },
+  { key: "t", id: "beat",     label: "Tap beat",       color: "#3DF2FF" },
+];
+const typeOf = (id) => TYPES.find((x) => x.id === id);
+const $ = (id) => document.getElementById(id);
+const ZOOM_SECONDS = 6;
+const tracks = [];
+let cur = null;
+
+const fmt = (t) => `${Math.floor(t / 60)}:${(t % 60).toFixed(3).padStart(6, "0")}`;
+const storeKey = (tr) => `marks:${tr.name}:${tr.size}`;
+function toast(msg) { const el = $("toast"); el.textContent = msg; el.classList.add("show"); clearTimeout(toast.h); toast.h = setTimeout(() => el.classList.remove("show"), 1600); }
+
+// ---------- loading ----------
+async function addFiles(files) {
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  for (const f of files) {
+    let buf;
+    try { buf = await ctx.decodeAudioData(await f.arrayBuffer()); }
+    catch { toast(`Could not read ${f.name}`); continue; }
+    const mono = new Float32Array(buf.length);
+    for (let c = 0; c < buf.numberOfChannels; c++) { const d = buf.getChannelData(c); for (let i = 0; i < d.length; i++) mono[i] += d[i] / buf.numberOfChannels; }
+    const audio = new Audio(URL.createObjectURL(f));
+    const tr = { name: f.name, size: f.size, duration: buf.duration, sr: buf.sampleRate, mono, audio, marks: [], bpm: null, peaks: null };
+    try { const saved = JSON.parse(localStorage.getItem(storeKey(tr)) || "null"); if (saved) { tr.marks = saved.marks || []; tr.bpm = saved.bpm ?? null; } } catch {}
+    audio.addEventListener("ended", () => { $("play").textContent = "Play"; });
+    tracks.push(tr);
+  }
+  ctx.close();
+  if (tracks.length) select(cur ?? tracks[0]);
+}
+function select(tr) {
+  if (cur && cur !== tr) cur.audio.pause();
+  cur = tr;
+  $("main").hidden = false;
+  $("bpm").value = tr.bpm ?? "";
+  $("play").textContent = "Play";
+  renderTabs(); renderList();
+}
+function renderTabs() {
+  $("tabs").replaceChildren(...tracks.map((tr) => {
+    const b = document.createElement("button");
+    b.textContent = `${tr.name} (${fmt(tr.duration).slice(0, -4)})`;
+    if (tr === cur) b.className = "on";
+    b.onclick = () => select(tr);
+    return b;
+  }));
+}
+
+// ---------- tempo ----------
+function tapBpm(tr) {
+  const taps = tr.marks.filter((m) => m.type === "beat").map((m) => m.t).sort((a, b) => a - b);
+  const gaps = [];
+  for (let i = 1; i < taps.length; i++) { const g = taps[i] - taps[i - 1]; if (g > 0.2 && g < 2) gaps.push(g); }
+  if (gaps.length < 3) return { bpm: null, n: taps.length };
+  gaps.sort((a, b) => a - b);
+  return { bpm: 60 / gaps[Math.floor(gaps.length / 2)], n: taps.length };
+}
+function bpmOf(tr) { return tr.bpm || tapBpm(tr).bpm; }
+function refTime(tr) {
+  const d = tr.marks.filter((m) => m.type === "downbeat").sort((a, b) => a.t - b.t)[0];
+  return d ? d.t : null;
+}
+function barBeat(tr, t) {
+  const bpm = bpmOf(tr), ref = refTime(tr);
+  if (!bpm || ref === null) return "";
+  const beats = (t - ref) * bpm / 60;
+  if (beats < -0.05) return "before";
+  const b = Math.max(0, beats);
+  return `${Math.floor(b / 4) + 1}:${(b % 4 + 1).toFixed(2)}`;
+}
+
+// ---------- marks ----------
+function persist() { try { if (cur) localStorage.setItem(storeKey(cur), JSON.stringify({ marks: cur.marks, bpm: cur.bpm })); } catch {} }
+function addMark(type) {
+  if (!cur) return;
+  cur.marks.push({ t: +cur.audio.currentTime.toFixed(3), type, note: "", id: Date.now() + Math.random() });
+  cur.marks.sort((a, b) => a.t - b.t);
+  cur.lastAdded = cur.marks.find((m) => m.t === +cur.audio.currentTime.toFixed(3) && m.type === type);
+  persist(); renderList();
+}
+function renderList() {
+  if (!cur) return;
+  const showTaps = $("showtaps").checked;
+  const rows = cur.marks.filter((m) => showTaps || m.type !== "beat").map((m) => {
+    const tr = document.createElement("tr");
+    const td = (cls) => { const c = document.createElement("td"); if (cls) c.className = cls; tr.append(c); return c; };
+    td("mono").textContent = fmt(m.t);
+    td("mono").textContent = barBeat(cur, m.t);
+    const sel = document.createElement("select");
+    for (const ty of TYPES) { const o = new Option(ty.label, ty.id); sel.add(o); }
+    sel.value = m.type; sel.style.borderColor = typeOf(m.type).color;
+    sel.onchange = () => { m.type = sel.value; persist(); renderList(); };
+    td().append(sel);
+    const note = document.createElement("input");
+    note.value = m.note || ""; note.placeholder = "optional note";
+    note.oninput = () => { m.note = note.value; persist(); };
+    td().append(note);
+    const nud = td();
+    for (const d of [-50, -10, 10, 50]) {
+      const b = document.createElement("button"); b.textContent = (d > 0 ? "+" : "") + d;
+      b.onclick = () => { m.t = +Math.max(0, Math.min(cur.duration, m.t + d / 1000)).toFixed(3); cur.marks.sort((a, b2) => a.t - b2.t); persist(); renderList(); };
+      nud.append(b, " ");
+    }
+    const act = td();
+    const go = document.createElement("button"); go.textContent = "Play from 1 s before";
+    go.onclick = () => { cur.audio.currentTime = Math.max(0, m.t - 1); cur.audio.play(); $("play").textContent = "Pause"; };
+    const del = document.createElement("button"); del.textContent = "Delete";
+    del.onclick = () => { cur.marks = cur.marks.filter((x) => x !== m); persist(); renderList(); };
+    act.append(go, " ", del);
+    return tr;
+  });
+  $("list").replaceChildren(...rows);
+  const tb = tapBpm(cur);
+  $("tapinfo").textContent = tb.n ? `${tb.n} taps` + (tb.bpm ? ` = ${tb.bpm.toFixed(1)} BPM` : " (tap at least 4 beats)") : "press T on each beat for tempo";
+}
+function exportTrack(tr) {
+  const bpm = bpmOf(tr);
+  return {
+    file: tr.name, duration: +tr.duration.toFixed(3),
+    bpm: bpm ? +bpm.toFixed(2) : null, bpmSource: tr.bpm ? "typed" : bpm ? "taps" : null,
+    marks: tr.marks.filter((m) => m.type !== "beat").map((m) => ({ t: m.t, type: m.type, bar: barBeat(tr, m.t) || undefined, note: m.note || undefined })),
+    taps: tr.marks.filter((m) => m.type === "beat").map((m) => m.t),
+  };
+}
+
+// ---------- drawing ----------
+function fit(c) {
+  const dpr = window.devicePixelRatio || 1, w = Math.round(c.clientWidth * dpr), h = Math.round(c.clientHeight * dpr);
+  if (c.width !== w || c.height !== h) { c.width = w; c.height = h; return true; }
+  return false;
+}
+function wave(g, tr, t0, t1, w, h) {
+  g.fillStyle = "#3A4358";
+  const s0 = t0 * tr.sr, per = (t1 - t0) * tr.sr / w, mid = h / 2;
+  for (let x = 0; x < w; x++) {
+    const a = Math.max(0, Math.floor(s0 + x * per)), b = Math.min(tr.mono.length, Math.floor(s0 + (x + 1) * per));
+    if (b <= a) continue;
+    let lo = 1, hi = -1; const step = Math.max(1, Math.floor((b - a) / 64));
+    for (let i = a; i < b; i += step) { const v = tr.mono[i]; if (v < lo) lo = v; if (v > hi) hi = v; }
+    g.fillRect(x, mid - hi * mid * 0.95, 1, Math.max(1, (hi - lo) * mid * 0.95));
+  }
+}
+function marksOn(g, tr, t0, t1, w, h, labels) {
+  const dpr = window.devicePixelRatio || 1;
+  g.font = `${11 * dpr}px ui-monospace, Consolas, monospace`;
+  for (const m of tr.marks) {
+    if (m.t < t0 || m.t > t1) continue;
+    const ty = typeOf(m.type), x = (m.t - t0) / (t1 - t0) * w;
+    g.fillStyle = ty.color; g.globalAlpha = m.type === "beat" ? 0.45 : 1;
+    g.fillRect(x, 0, m.type === "beat" ? 1 : 2 * dpr, h);
+    if (labels && m.type !== "beat") g.fillText(ty.label, x + 4 * dpr, 13 * dpr);
+    g.globalAlpha = 1;
+  }
+}
+function draw() {
+  requestAnimationFrame(draw);
+  if (!cur) return;
+  const t = cur.audio.currentTime;
+  $("time").textContent = fmt(t);
+  $("pos").textContent = barBeat(cur, t) ? `bar ${barBeat(cur, t)}` : "";
+  const over = $("over"), zoom = $("zoom");
+  if (!over.clientWidth || !over.clientHeight) return; // not laid out yet
+  if (fit(over) || cur.peaks?.w !== over.width || cur.peaks?.tr !== cur) {
+    const off = document.createElement("canvas"); off.width = over.width; off.height = over.height;
+    wave(off.getContext("2d"), cur, 0, cur.duration, off.width, off.height);
+    cur.peaks = { w: over.width, tr: cur, img: off };
+  }
+  let g = over.getContext("2d");
+  g.clearRect(0, 0, over.width, over.height); g.drawImage(cur.peaks.img, 0, 0);
+  marksOn(g, cur, 0, cur.duration, over.width, over.height, false);
+  g.fillStyle = "#3DF2FF"; g.fillRect(t / cur.duration * over.width, 0, 2, over.height);
+
+  fit(zoom); g = zoom.getContext("2d");
+  const t0 = t - ZOOM_SECONDS / 2, t1 = t + ZOOM_SECONDS / 2;
+  g.clearRect(0, 0, zoom.width, zoom.height);
+  wave(g, cur, t0, t1, zoom.width, zoom.height);
+  marksOn(g, cur, t0, t1, zoom.width, zoom.height, true);
+  g.fillStyle = "#3DF2FF"; g.fillRect(zoom.width / 2, 0, 2, zoom.height);
+}
+
+// ---------- input ----------
+function toggle() {
+  if (!cur) return;
+  if (cur.audio.paused) { cur.audio.play(); $("play").textContent = "Pause"; } else { cur.audio.pause(); $("play").textContent = "Play"; }
+}
+function seek(t) { if (cur) cur.audio.currentTime = Math.max(0, Math.min(cur.duration, t)); }
+$("types").replaceChildren(...TYPES.map((ty) => {
+  const b = document.createElement("button");
+  b.innerHTML = `<span class="sw" style="background:${ty.color}"></span>${ty.label} <kbd>${ty.key.toUpperCase()}</kbd>`;
+  b.onclick = () => addMark(ty.id);
+  return b;
+}));
+$("play").onclick = toggle;
+$("pick").onclick = () => $("file").click();
+$("file").onchange = (e) => addFiles([...e.target.files]);
+$("over").onclick = (e) => seek(e.offsetX / e.target.clientWidth * cur.duration);
+$("zoom").onclick = (e) => seek(cur.audio.currentTime + (e.offsetX / e.target.clientWidth - 0.5) * ZOOM_SECONDS);
+$("bpm").oninput = (e) => { cur.bpm = parseFloat(e.target.value) || null; persist(); renderList(); };
+$("showtaps").onchange = renderList;
+$("cleartaps").onclick = () => { cur.marks = cur.marks.filter((m) => m.type !== "beat"); persist(); renderList(); };
+$("copy").onclick = async () => {
+  const text = JSON.stringify({ tracks: tracks.map(exportTrack) }, null, 1);
+  try { await navigator.clipboard.writeText(text); toast("Marks copied. Paste them into the chat."); }
+  catch { window.prompt("Copy this:", text); }
+};
+$("save").onclick = () => {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(exportTrack(cur), null, 1)], { type: "application/json" }));
+  a.download = cur.name.replace(/\.[^.]+$/, "") + ".marks.json"; a.click();
+};
+const drop = $("drop");
+for (const ev of ["dragenter", "dragover"]) addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add("over"); });
+for (const ev of ["dragleave", "drop"]) addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove("over"); });
+addEventListener("drop", (e) => addFiles([...e.dataTransfer.files].filter((f) => f.type.startsWith("audio/") || /\.(mp3|wav|m4a|ogg|flac)$/i.test(f.name))));
+addEventListener("keydown", (e) => {
+  if (!cur || e.ctrlKey || e.metaKey || e.altKey) return;
+  if (["INPUT", "SELECT", "TEXTAREA"].includes(document.activeElement.tagName) && document.activeElement.type !== "checkbox") return;
+  const k = e.key.toLowerCase();
+  if (k === " ") { e.preventDefault(); toggle(); }
+  else if (k === "arrowleft") { e.preventDefault(); seek(cur.audio.currentTime - (e.shiftKey ? 0.1 : 1)); }
+  else if (k === "arrowright") { e.preventDefault(); seek(cur.audio.currentTime + (e.shiftKey ? 0.1 : 1)); }
+  else if (k === "z") { if (cur.lastAdded) { cur.marks = cur.marks.filter((m) => m !== cur.lastAdded); cur.lastAdded = null; persist(); renderList(); } }
+  else { const ty = TYPES.find((x) => x.key === k); if (ty) { e.preventDefault(); addMark(ty.id); } }
+});
+window.__marker = { addFiles, tracks, exportTrack };
+requestAnimationFrame(draw);
+</script>
+</body>
+</html>

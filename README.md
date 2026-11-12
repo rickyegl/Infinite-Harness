@@ -38,4 +38,7 @@ node video/tools/resolve.mjs
 
 Resolves the shot layout against `video/beats.json` and regenerates the shot table.
 
+To choose and time the music, open `video/tools/marker.html` in a browser: load candidate tracks, tap the beat,
+mark the drop, breaks, hits and ending, then copy the marks as JSON.
+
 Built with AI.
