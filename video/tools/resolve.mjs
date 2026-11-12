@@ -5,31 +5,21 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { makeGrid } from "./grid.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (f) => JSON.parse(readFileSync(join(root, f), "utf8"));
 const { meta, shots, rain } = read("shots.json");
 const grid = read("beats.json");
-const bpb = grid.beatsPerBar ?? 4;
+const { bpb, beatTime } = makeGrid(grid); // beat index (0-based) -> seconds
 const problems = [];
-
-// beat index (0-based, may run past the list) -> seconds
-function beatTime(i) {
-  if (Array.isArray(grid.beats)) {
-    const b = grid.beats;
-    if (i < b.length) return b[i];
-    const step = b[b.length - 1] - b[b.length - 2]; // extrapolate with the last interval
-    return b[b.length - 1] + step * (i - b.length + 1);
-  }
-  return (grid.offset ?? 0) + (i * 60) / grid.bpm;
-}
 
 let expected = 0;
 const rows = shots.map((s) => {
   const startBeat = (s.bar - 1) * bpb + ((s.beat ?? 1) - 1);
   if (startBeat !== expected) problems.push(`${s.id}: starts at beat ${startBeat}, previous shot ends at ${expected}`);
   expected = startBeat + s.beats;
-  const start = beatTime(startBeat);
+  const start = startBeat === 0 ? 0 : beatTime(startBeat); // the film starts at 0 even if the music's first beat is later
   const end = beatTime(startBeat + s.beats);
   const words = s.say.replace(/\[[^\]]*\]/g, "x").split(/\s+/).filter(Boolean).length;
   const wps = words ? words / (end - start) : 0;
@@ -37,7 +27,7 @@ const rows = shots.map((s) => {
   return { ...s, startBeat, start: +start.toFixed(3), end: +end.toFixed(3), dur: +(end - start).toFixed(3), words, wps: +wps.toFixed(2) };
 });
 
-const total = rows.at(-1).end - beatTime(0);
+const total = rows.at(-1).end;
 const drift = total - meta.targetSeconds;
 if (Math.abs(drift) > 1.5) {
   const elastic = rows.filter((r) => r.elastic).map((r) => r.id).join(", ");

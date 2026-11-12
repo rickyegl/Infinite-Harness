@@ -2,10 +2,11 @@
 // Barebones animatic of video/shots.json: one text card per shot, a flash on every cut, a beat dot,
 // a progress bar and a click track. Needs ffmpeg on PATH (or FFMPEG=<path>).
 // Usage: node video/tools/preview.mjs   ->  video/renders/shots-preview.mp4
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
+import { makeGrid } from "./grid.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const here = dirname(fileURLToPath(import.meta.url));
@@ -17,14 +18,8 @@ const res = spawnSync(process.execPath, [join(here, "resolve.mjs")], { stdio: "i
 if (res.status !== 0) console.log("(layout has problems, rendering anyway)");
 
 const { grid, shots } = JSON.parse(readFileSync(join(root, "timeline.json"), "utf8"));
-const bpb = grid.beatsPerBar ?? 4;
-const beatTime = (i) => {
-  if (Array.isArray(grid.beats)) {
-    const b = grid.beats;
-    return i < b.length ? b[i] : b[b.length - 1] + (b[b.length - 1] - b[b.length - 2]) * (i - b.length + 1);
-  }
-  return (grid.offset ?? 0) + (i * 60) / grid.bpm;
-};
+const { bpb, beatTime } = makeGrid(grid);
+const music = (grid.music ?? []).filter((m) => existsSync(join(root, m.file)));
 const totalBeats = shots.at(-1).startBeat + shots.at(-1).beats;
 const total = shots.at(-1).end;
 
@@ -80,7 +75,8 @@ writeFileSync(join(out, "shots-preview.ass"), ass);
 // ---------- click track (WAV) ----------
 const sr = 44100, n = Math.ceil(total * sr), pcm = new Int16Array(n);
 for (let i = 0; i < totalBeats; i++) {
-  const down = i % bpb === 0, f = down ? 1500 : 900, amp = down ? 0.5 : 0.22, s0 = Math.round(beatTime(i) * sr);
+  const covered = music.some((m) => beatTime(i) >= m.at && beatTime(i) < (m.until ?? Infinity)); // quieter under music
+  const down = i % bpb === 0, f = down ? 1500 : 900, amp = (down ? 0.5 : 0.22) * (covered ? 0.3 : 1), s0 = Math.round(beatTime(i) * sr);
   for (let k = 0; k < sr * 0.04 && s0 + k < n; k++) pcm[s0 + k] = Math.sin((2 * Math.PI * f * k) / sr) * amp * 32767 * (1 - k / (sr * 0.04));
 }
 const wav = Buffer.alloc(44 + n * 2);
@@ -92,14 +88,23 @@ writeFileSync(join(out, "shots-preview-click.wav"), wav);
 
 // ---------- render ----------
 const d = total.toFixed(3);
+// music entries from beats.json: placed at `at`, cut at `until` with a fade, mixed over the click track
+const musicIn = music.flatMap((m) => ["-i", join(root, m.file)]);
+const musicFx = music.map((m, k) => {
+  const len = (m.until ?? total) - m.at, fade = m.fadeOut ?? 0;
+  return `[${3 + k}:a]atrim=0:${len.toFixed(3)},afade=t=out:st=${(len - fade).toFixed(3)}:d=${fade || 0.01},adelay=${Math.round(m.at * 1000)}:all=1[m${k}]`;
+});
+const mix = music.length
+  ? `;${musicFx.join(";")};[2:a]${music.map((_, k) => `[m${k}]`).join("")}amix=inputs=${music.length + 1}:normalize=0:duration=first[au]`
+  : ";[2:a]anull[au]";
 const r = spawnSync(process.env.FFMPEG || "ffmpeg", [
   "-y", "-v", "error",
   "-f", "lavfi", "-i", `color=c=0x05060A:s=${W}x${H}:r=30:d=${d}`,
   "-f", "lavfi", "-i", `color=c=0x3DF2FF:s=${W}x6:r=30:d=${d}`,
-  "-i", "shots-preview-click.wav",
-  "-filter_complex", `[0:v]ass=shots-preview.ass[a];[a][1:v]overlay=x='-W+W*t/${d}':y=${H - 6}[v]`,
-  "-map", "[v]", "-map", "2:a", "-c:v", "libx264", "-preset", "veryfast", "-crf", "23", "-pix_fmt", "yuv420p",
-  "-c:a", "aac", "-b:a", "128k", "-t", d, "shots-preview.mp4",
+  "-i", "shots-preview-click.wav", ...musicIn,
+  "-filter_complex", `[0:v]ass=shots-preview.ass[a];[a][1:v]overlay=x='-W+W*t/${d}':y=${H - 6}[v]${mix}`,
+  "-map", "[v]", "-map", "[au]", "-c:v", "libx264", "-preset", "veryfast", "-crf", "23", "-pix_fmt", "yuv420p",
+  "-c:a", "aac", "-b:a", "160k", "-t", d, "shots-preview.mp4",
 ], { cwd: out, stdio: "inherit" }); // cwd = renders so the ass filter gets a path without a drive colon
 if (r.status !== 0) { console.error("ffmpeg failed"); process.exit(1); }
-console.log(`wrote video/renders/shots-preview.mp4 (${shots.length} shots, ${d} s)`);
+console.log(`wrote video/renders/shots-preview.mp4 (${shots.length} shots, ${d} s, ${music.length ? "music: " + music.map((m) => m.file).join(", ") : "click track only"})`);
