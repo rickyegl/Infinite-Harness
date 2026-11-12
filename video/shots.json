@@ -3,7 +3,7 @@
     "title": "Infinite Harness: demo film",
     "format": { "width": 1920, "height": 1080, "fps": 60 },
     "targetSeconds": 180,
-    "grid": { "bars": 95, "source": "video/beats.json" },
+    "grid": { "bars": 96, "source": "video/beats.json" },
     "note": "Positions are bars and beats, never seconds. video/tools/resolve.mjs turns them into seconds from video/beats.json. 'elastic' shots absorb the difference when the real track has more or fewer bars."
   },
   "views": {
@@ -155,7 +155,7 @@
     { "id": "S27", "act": 4, "bar": 50, "beats": 4, "view": "prompt", "source": "ui",
       "say": "I'm not done.",
       "screen": "The wordmark glitches and rewinds. The text box slams back to center.",
-      "camera": "Punch in.", "fx": "Author's 1.5 s sound effect. Music returns harder on the next downbeat." },
+      "camera": "Punch in.", "fx": "Author's 1.5 s sound effect. Track B's fade-in riser plays under it; its first hit is the next downbeat." },
 
     { "id": "S28", "act": 5, "bar": 51, "beats": 8, "view": "banner", "source": "replay", "take": "house.image", "module": "IMAGE",
       "say": "Show me a house.",
@@ -185,63 +185,63 @@
       "say": "Make it a video.",
       "screen": "The render comes alive as a short clip.", "camera": "Locked.", "fx": "" },
 
-    { "id": "S35", "act": 5, "bar": 62, "beats": 16, "view": "banner", "source": "replay", "take": "study", "module": "STUDY",
+    { "id": "S35", "act": 5, "bar": 62, "beats": 20, "view": "banner", "source": "replay", "take": "study", "module": "STUDY",
       "say": "Check all presentations on Canvas and make a study guide for every... single... test.",
       "screen": "Course decks fan out. On 'every', 'single', 'test': one guide, a row of guides, a wall of guides.",
       "camera": "Pull back one step on each of the three words.", "fx": "Three hits on three consecutive downbeats." },
 
-    { "id": "S36", "act": 5, "bar": 66, "beats": 8, "view": "banner", "source": "replay", "take": "cad", "module": "CAD",
+    { "id": "S36", "act": 5, "bar": 67, "beats": 8, "view": "banner", "source": "replay", "take": "cad", "module": "CAD",
       "say": "CAD a drum shooter FRC robot prototype.",
-      "screen": "SurfaceCAD assembly builds piece by piece: frame, drum, flywheel, hood.", "camera": "Slow orbit.", "fx": "One part per beat." },
+      "screen": "SurfaceCAD assembly builds piece by piece: frame, drum, flywheel, hood.", "camera": "Slow orbit.", "fx": "Starts on Track B's big hit (bar 67). One part per beat." },
 
-    { "id": "S37", "act": 5, "bar": 68, "beats": 8, "view": "banner", "source": "supplied", "take": "cad.sim", "module": "SIM",
+    { "id": "S37", "act": 5, "bar": 69, "beats": 8, "view": "banner", "source": "supplied", "take": "cad.sim", "module": "SIM",
       "say": "",
       "screen": "The robot shooting inside the FRC simulator.", "camera": "As supplied.", "fx": "" },
 
-    { "id": "S38", "act": 5, "bar": 70, "beats": 8, "view": "banner", "source": "replay", "take": "pcb", "module": "PCB",
+    { "id": "S38", "act": 5, "bar": 71, "beats": 8, "view": "banner", "source": "replay", "take": "pcb", "module": "PCB",
       "say": "Make a [board to be decided] PCB.",
       "screen": "Board layout: traces route themselves, then the board flips to a 3D view.", "camera": "Locked, flip on the second bar.", "fx": "" },
 
-    { "id": "S39", "act": 5, "bar": 72, "beats": 8, "view": "banner", "source": "replay", "take": "forecast", "module": "FORECAST",
+    { "id": "S39", "act": 5, "bar": 73, "beats": 8, "view": "banner", "source": "replay", "take": "forecast", "module": "FORECAST",
       "say": "Forecast demand.",
       "screen": "History line draws, then the forecast and its band extend to the right.", "camera": "Locked.", "fx": "" },
 
-    { "id": "S40", "act": 5, "bar": 74, "beats": 4, "view": "banner", "source": "replay", "take": "anomaly", "module": "ANOMALY",
+    { "id": "S40", "act": 5, "bar": 75, "beats": 4, "view": "banner", "source": "replay", "take": "anomaly", "module": "ANOMALY",
       "say": "Detect anomaly.",
-      "screen": "Same chart: red markers snap onto the outliers.", "camera": "Locked.", "fx": "Markers on beats." },
+      "screen": "Same chart: red markers snap onto the outliers.", "camera": "Locked.", "fx": "On Track B's hit (bar 75). Markers on beats." },
 
-    { "id": "S41", "act": 5, "bar": 75, "beats": 8, "view": "banner", "source": "replay", "take": "car.house", "module": "3D",
+    { "id": "S41", "act": 5, "bar": 76, "beats": 8, "view": "banner", "source": "replay", "take": "car.house", "module": "3D",
       "say": "Put the car on the house.",
       "screen": "The kart from the game lands on the roof of the house in Blender.", "camera": "Locked.", "fx": "Impact on the second bar's downbeat." },
 
-    { "id": "S42", "act": 5, "bar": 77, "beats": 16, "view": "banner", "source": "clip", "take": "house.game", "module": "GAME",
+    { "id": "S42", "act": 5, "bar": 78, "beats": 20, "view": "banner", "source": "clip", "take": "house.game", "module": "GAME",
       "say": "Put the house on the game.",
       "screen": "The house, kart still on its roof, stands beside the Unity track as racers fight past it.", "camera": "Hold, then begin a very slow zoom out.", "fx": "", "elastic": true },
 
-    { "id": "S43", "act": 6, "bar": 81, "beats": 16, "view": "rain", "source": "ui", "elastic": true,
+    { "id": "S43", "act": 6, "bar": 83, "beats": 16, "view": "rain", "source": "ui", "elastic": true,
       "say": "",
       "screen": "Slow zoom out. The graph now holds every cell from the film. Evidence fades. Prompts swipe through the text box, one per beat.",
-      "camera": "Continuous zoom out.", "fx": "" },
+      "camera": "Continuous zoom out.", "fx": "Starts on the hit at bar 83, full energy." },
 
-    { "id": "S44", "act": 6, "bar": 85, "beats": 12, "view": "rain", "source": "ui",
+    { "id": "S44", "act": 6, "bar": 87, "beats": 16, "view": "rain", "source": "ui",
       "say": "",
       "screen": "Prompts every half beat. Title word above: 'everything...'",
-      "camera": "Continuous zoom out.", "fx": "" },
+      "camera": "Continuous zoom out.", "fx": "The track's breakdown (bars 87-90); it swells at the end of bar 90." },
 
-    { "id": "S45", "act": 6, "bar": 88, "beats": 8, "view": "rain", "source": "ui",
+    { "id": "S45", "act": 6, "bar": 91, "beats": 8, "view": "rain", "source": "ui",
       "say": "",
       "screen": "Prompts every quarter beat, blurring. Title: 'and anything...'",
-      "camera": "Continuous zoom out.", "fx": "Riser to the title hit." },
+      "camera": "Continuous zoom out.", "fx": "The beat drops out (bars 91-92)." },
 
-    { "id": "S46", "act": 7, "bar": 90, "beats": 16, "view": "title", "source": "ui", "elastic": true,
+    { "id": "S46", "act": 7, "bar": 93, "beats": 8, "view": "title", "source": "ui", "elastic": true,
       "say": "",
       "screen": "Every cell implodes into the wordmark: Infinite Harness.",
-      "camera": "Locked.", "fx": "Big hit on the downbeat." },
+      "camera": "Locked.", "fx": "Track B's final impact (bar 93)." },
 
-    { "id": "S47", "act": 7, "bar": 94, "beats": 8, "view": "title", "source": "ui",
+    { "id": "S47", "act": 7, "bar": 95, "beats": 8, "view": "title", "source": "ui",
       "say": "",
-      "screen": "'Built with AI' under the wordmark. Cut to black on the last beat.",
-      "camera": "Locked.", "fx": "Final hit." }
+      "screen": "'Built with AI' under the wordmark. Fade to black.",
+      "camera": "Locked.", "fx": "The music fades out under it." }
   ],
   "rain": [
     "write the launch email", "translate it to Spanish", "dub the trailer", "add a boss fight", "make a leaderboard",

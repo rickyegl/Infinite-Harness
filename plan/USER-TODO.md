@@ -31,8 +31,8 @@ Fill these into `harness.local.json` / `plan/LOCAL.md`, or tell the agent.
 
 | # | Item | Blocks |
 |---|---|---|
-| 13 | Music: Track A is in (`video/audio/trackA.m4a`). Still needed: pick Track B -> `video/audio/trackB.*` | 09 |
-| 14 | Beat timings: measured from the tracks automatically. Nothing to do for Track A. | 08 (retiming), 09 |
+| 13 | Music: done. Track A and Track B are in `video/audio/`. | 09 |
+| 14 | Beat timings: measured from the tracks automatically. Nothing to do. | 08 (retiming), 09 |
 | 15 | Voice lines recorded fast, one file per line named by shot (`S02.wav` ...) or one take -> `video/audio/voice/` | 08 (typing sync), 09 |
 | 16 | "I'm not done" 1.5 s effect -> `video/audio/sfx/not_done.*` | 09 |
 | 17 | 4 s of the chosen song -> `video/audio/song4s.*` and the full song -> `assets/music/` | 04 (Music), 09 |

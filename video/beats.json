@@ -1,11 +1,12 @@
 {
-  "_comment": "Music grid. Track A is measured from the audio (beat 0.4710 s, first beat at 0.108 s; bar 1 is a pickup bar, the first hit is bar 2). Track B is NOT chosen yet: bars 51-95 continue at Track A's tempo as a placeholder. When Track B is picked, set its bpm, and its music entry. After any change run: node video/tools/resolve.mjs",
+  "_comment": "Music grid, measured from the audio. Track A: beat 0.4710 s, first beat at 0.108 s (bar 1 is a pickup bar, the first hit is bar 2). Track B: beat 0.4648 s; its file opens with a 1.8 s fade-in riser, so the file starts in bar 50 and its first hit is the bar-51 downbeat. After any change run: node video/tools/resolve.mjs",
   "beatsPerBar": 4,
   "segments": [
     { "name": "Track A", "fromBar": 1, "bpm": 127.389, "at": 0.108 },
-    { "name": "Track B (placeholder tempo)", "fromBar": 51, "bpm": 127.389, "at": 94.308 }
+    { "name": "Track B", "fromBar": 51, "bpm": 129.088, "at": 94.308 }
   ],
   "music": [
-    { "file": "audio/trackA.m4a", "at": 0, "until": 94.3, "fadeOut": 1.2 }
+    { "file": "audio/trackA.m4a", "at": 0, "until": 93.7, "fadeOut": 1.2 },
+    { "file": "audio/trackB.m4a", "at": 92.506, "until": 179.83, "fadeOut": 3.2 }
   ]
 }
