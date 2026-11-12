@@ -30,8 +30,8 @@ needs to, "make no mistakes" is a real Verifier cell, and "show the process on a
    then re-checks. One retry, then it reports honestly.
 6. **`modules/recorder`** (tool). Produces a short "process video" of a run: uses director mode on the run's
    own events (plan 01) with an automatic camera (wide, then visit the three busiest cells, then the wall),
-   captures frames with Playwright and encodes with ffmpeg. This is the same machinery plan 09 uses for the
-   film, so build it as `video/tools/capture.mjs` and let the module call it.
+   captures frames and encodes with `video/tools/capture.mjs` from plan 01 (reuse it; add only the automatic
+   camera).
 7. **Session cleanup.** `pnpm stop` closes tunnels, editors the harness opened (never ones the author opened),
    and reminds about a running Colab runtime.
 

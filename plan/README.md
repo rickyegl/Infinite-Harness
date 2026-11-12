@@ -6,7 +6,7 @@ also read `00-contract.md`.
 | # | File | Result | Day |
 |---|---|---|---|
 | 00 | [00-contract.md](00-contract.md) | Shared design: layout, event protocol, module contract, rules. Not a task. | - |
-| 01 | [01-ui-stage.md](01-ui-stage.md) | All eight views rendering from fixture events on a seekable clock. | 1 |
+| 01 | [01-ui-stage.md](01-ui-stage.md) | All eight views rendering from fixture events on a seekable clock, click-to-zoom, and a rough cut of the whole film. | 1 |
 | 02 | [02-bridge-core.md](02-bridge-core.md) | Bridge, router, CLI workers, harness MCP, live mode, takes. | 1 |
 | 03 | [03-game-agents.md](03-game-agents.md) | Game orchestrator, Unity and Roblox sub-orchestrators, live direction, crossplay. | 2 |
 | 04 | [04-assets.md](04-assets.md) | Image, edit, cutout, 3D, video, voice, music, and handoff into the games. | 2 |
@@ -14,7 +14,7 @@ also read `00-contract.md`.
 | 06 | [06-host-verify-record.md](06-host-verify-record.md) | Public links, site online, Verifier, Recorder. | 2 |
 | 07 | [07-long-tail-modules.md](07-long-tail-modules.md) | Act 5 modules: drafting, Blender, study, CAD, PCB, forecast, anomaly. | 3 |
 | 08 | [08-capture-takes.md](08-capture-takes.md) | Real takes and direction files for every shot. | 3 |
-| 09 | [09-film-assembly.md](09-film-assembly.md) | The 3-minute film. | 3 |
+| 09 | [09-film-assembly.md](09-film-assembly.md) | The final cut of the 3-minute film. | 3 |
 | 10 | [10-submission.md](10-submission.md) | README, docs, clean-up, fresh-clone test. | 3 |
 
 Also here: [USER-TODO.md](USER-TODO.md) (things only the author can do, with when they block),

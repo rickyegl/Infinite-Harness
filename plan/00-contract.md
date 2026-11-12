@@ -45,6 +45,11 @@ The bridge emits an append-only event stream per run. The web app keeps no hidde
 is a pure function of the events with `event.t <= t`. That single rule gives live mode (clock = now, events from
 the WebSocket) and director mode (clock = seeked, events from a file) for free, and makes the film reshootable.
 
+**Second input: the view.** Where the camera looks and which cell is in focus is not in the event stream. It is
+a separate `ViewState` (camera target, focused node, active view). In live mode the viewer sets it: clicking a
+cell zooms into its focus view, Escape or clicking outside zooms back. In director mode the shot's direction
+file sets it. The picture is `f(events, t, view)`.
+
 **Rendering rule:** no CSS transitions, no CSS keyframes, no `setTimeout`-driven visuals. All motion comes from
 one seekable GSAP master timeline built from the events, or from plain functions of `(t - event.t)`. Fonts and
 icons are bundled locally. Video inside the UI goes through one `FrameClip` component (live: `<video>`; director
@@ -85,8 +90,13 @@ protocol package in the same commit.
   "summary": "Generate or edit an image from a prompt.",                             // read by the router
   "accepts": ["text", "image"], "produces": ["image"],
   "runtime": "script",                                                               // "script" | "cli-agent"
-  "needs": ["proxy"], "mock": true }
+  "needs": ["proxy"], "mock": true,
+  "allow": { "tools": ["harness.*"], "write": ["$RUN"], "network": ["proxy"] } }      // enforced, see below
 ```
+
+`allow` is a hard limit applied by the worker adapter, not a suggestion in a prompt: which MCP servers and tools
+the worker may call, which folders it may write, which hosts it may reach. Workers run unattended, so anything
+not listed is denied. Examples: `study` gets only read tools of the course server; `publish` gets no network.
 
 ```ts
 // run.ts
@@ -152,6 +162,9 @@ Their own rules still apply and are binding here:
 3. Finish with the plan's verification command passing, then update `plan/STATUS.md` (done, how verified, open
    problems, next file) and the affected docs, then commit and push. Git is not the point: one commit per plan
    file is fine, messages short.
+   **The film must always exist.** From plan 01 on, `pnpm film:rough` renders the whole 180 s film from whatever
+   is there (fixtures at first). It must still pass when you finish. Each plan swaps fixtures for real takes,
+   shot by shot, so there is a showable film at the end of every day.
 4. Behind schedule? Cut in this order: polish, then live runs of long-tail modules (keep their mock), then
    long-tail modules themselves. Never cut director mode, the game flow or the film assembly.
 5. Blocked on something only the author can do (a sign-in, an install, a recording)? Add it to

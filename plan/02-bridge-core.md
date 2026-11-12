@@ -28,7 +28,10 @@ address).
    module.
 6. **Worker adapter.** `ctx.agent(prompt, opts)` spawns a headless agent CLI from `workers.<name>` in config
    (command, args template, how to pass an MCP config, how to get JSON event output), parses its event stream
-   and maps tool calls to `node.step`, files written to facts, and final text to `node.done`. Two adapters, one
+   and maps tool calls to `node.step`, files written to facts, and final text to `node.done`. It enforces the
+   module's `allow` block (contract): only the listed MCP servers and tools are passed to the worker, writes are
+   confined to the listed folders, and anything else is denied by the CLI's own permission settings, not by
+   prompt wording. Test: a worker for a module without network access cannot fetch a URL. Two adapters, one
    per installed CLI; pick per module with `opts.worker`. Each worker gets a fresh working directory inside the
    run unless the module names a project folder.
 7. **Harness MCP server.** stdio MCP server started by the bridge per worker, carrying the caller's node id in

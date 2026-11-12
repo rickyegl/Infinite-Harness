@@ -33,16 +33,26 @@ with no backend. When this is done, any shot in the film can be previewed by URL
      `title`.
 5. **Camera.** One world transform (x, y, zoom) tweened on the master timeline. Camera targets: a node id, a
    bounding box of nodes, or "all".
+   In live mode clicking a cell tweens the camera into its `focus` view; Escape or a click outside returns to
+   the graph (the `ViewState` input in the contract). The same tween is what the film's zoom-ins use.
 6. **Director.** `?director=1&shot=S11` loads `video/timeline.json`, the shot's take
    (`video/takes/<take>/events.jsonl`, falling back to `apps/web/fixtures/<take>.jsonl`) and a per-shot
    direction file `video/direction/<shot>.json` (view, camera targets by beat, which events to show and how fast).
    `?director=1&from=S09&to=S20` plays a range.
+   Write `video/tools/direct.mjs`: generates a **draft** direction file for every shot from `shots.json`
+   (its view, a default camera for that view, events spread evenly over the shot's beats). Hand-tune the drafts
+   for the Act 2 shots; plan 08 finalises all of them against real takes.
 7. **Fixtures.** Hand-write `apps/web/fixtures/main.jsonl` (about 150 events covering the Act 2 tree: game
    orchestrator, two engine sub-orchestrators with subtrees, an asset request and delivery, trailer, campaign,
    voice, host, recorder, verifier) and one small fixture per Act 5 take, with placeholder images. Fixtures are
    the only hand-written event files allowed; real takes replace them in plan 08.
 8. **Contact sheet.** `pnpm shots:sheet` uses Playwright to open every shot at 25%, 50% and 75% of its duration
    and tiles the screenshots into `video/renders/sheet_*.png`.
+9. **Rough cut, today.** `video/tools/capture.mjs`: opens a shot in director mode, steps
+   `window.__harness.seek(t)` frame by frame at 60 fps, screenshots, encodes with ffmpeg. `pnpm film:rough`
+   captures all 47 shots (30 fps and half resolution is fine for the rough), concatenates them on the timeline
+   and lays a click track generated from `beats.json` (or the music file if it is there) under them:
+   `video/renders/rough.mp4`, 180 s. This is the film from day 1; every later plan makes it more real.
 
 ## Verify first
 
@@ -54,6 +64,8 @@ with no backend. When this is done, any shot in the film can be previewed by URL
 - `pnpm --filter web dev` then `/?director=1&shot=S10` (and every other shot id) renders without a backend.
 - Seeking to the same `t` twice gives pixel-identical screenshots (test: two captures, byte compare).
 - `pnpm shots:sheet` produces sheets where all 47 shots are recognisable against the table in `SHOTS.md`.
+- `pnpm film:rough` writes a 180 s mp4 (check duration with ffprobe) in which cuts fall on the click track.
+- Live mode with a fixture: clicking a cell zooms into its focus view and Escape returns (Playwright test).
 - No vendor or model name appears anywhere in `apps/web` (`pnpm lint:brand` greps a deny-list read from
   `harness.local.json`, so the list itself is not in the repo).
 

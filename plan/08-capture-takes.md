@@ -34,7 +34,8 @@ Needs the author present (approvals, the voice, and looking at results).
    times (for example "all `node.spawn` of the first ring: one per beat starting bar 13"). It may drop events,
    reorder nothing within a node, and compress time. It must refuse to add events that are not in the source
    run. Output: `video/takes/<take>/events.film.jsonl`.
-4. **Direction files** `video/direction/<shot>.json` for all 47 shots: view, camera keyframes in beats, which
+4. **Direction files**: finalise the drafts from plan 01 against the real takes.
+   `video/direction/<shot>.json` for all 47 shots: view, camera keyframes in beats, which
    node is in focus, which evidence items appear on which beat, typed text and its word timings (from the
    voice recordings, see below), flashes and shakes in beats.
 5. **Clips to frames.** `video/tools/frames.mjs`: every video the film shows becomes numbered JPEG frames at

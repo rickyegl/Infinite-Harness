@@ -1,7 +1,8 @@
-# 09. Assemble the film
+# 09. The final cut
 
 **Goal:** `video/renders/infinite-harness-demo.mp4`: 1920x1080, 60 fps, 180 s, every cut on the beat, voice,
-music and effects mixed.
+music and effects mixed. A rough cut (`pnpm film:rough`) has existed since plan 01; this plan replaces it with
+full-quality plates, film-level layers in HyperFrames and the real mix.
 
 **Read first:** [00-contract.md](00-contract.md), `plan/STATUS.md`, [video/SHOTS.md](../video/SHOTS.md), and
 the HyperFrames notes in `paths.studio` (`explainers/howto/visuals.md` and the HyperFrames project guide next
@@ -13,7 +14,7 @@ the beat, flash + shake + punch-in on the drop, slower and dimmer before it.
 1. **Real beat grid.** Put the author's timings in `video/beats.json` (explicit `beats` list), run
    `node video/tools/resolve.mjs`. Fix what it reports by adding or removing bars in elastic shots in
    `shots.json`. Re-run retime for affected takes.
-2. **Plates.** `video/tools/capture.mjs` (from plan 06): for each shot, open
+2. **Plates.** `video/tools/capture.mjs` (from plan 01), now at full quality: for each shot, open
    `/?director=1&shot=<id>`, step `window.__harness.seek(t)` frame by frame at 60 fps, screenshot, encode to
    `video/plates/<id>.mp4` (visually lossless) with 12 frames of handle at both ends. Parallelise across shots.
    Capture transparent-background variants for shots composited over others (S30).
