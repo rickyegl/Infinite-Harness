@@ -9,6 +9,8 @@ Audio files are not committed (see `.gitignore`). Put them here:
 | `voice/S02.wav` ... | One recording per spoken shot, named by shot id, or `voice/take.wav` for a single take. |
 | `voice/words.json` | Word timestamps, generated in plan 08. |
 | `sfx/not_done.*` | The 1.5 s "I'm not done" effect (S27). |
-| `song4s.*` | Four seconds of the chosen song (S24). |
 
 The tempo is fixed in `../beats.json`.
+
+The one committed exception is `../makeasong.mp3`: the chosen song's clip for S24 "Add music" (about 2 s),
+mixed into `score.wav` at bar 36.

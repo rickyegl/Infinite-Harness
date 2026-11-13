@@ -411,7 +411,7 @@ def build():
             x[:n] *= np.linspace(0, 1, n, dtype=np.float32)[:, None] ** 2
         place(music, fade_edges(x, 3), t_of(b0), c.get("gain", 0))
 
-    # the rewind (bar 41): the last four bars of music, reversed and squeezed into one bar
+    # the rewind: the last four bars of music, reversed and squeezed into one bar
     for f in spec["fx"]:
         if f["do"] == "rewind":
             t0 = t_of(*f["at"])
@@ -453,6 +453,14 @@ def build():
             r = s_of(0.01)
             mix[a - r:a] *= np.linspace(1, 0, r, dtype=np.float32)[:, None]
             mix[a:b] = 0
+    # clips: finished audio dropped in at a beat, at the score's own level
+    ref = np.sqrt(np.mean(music[music != 0] ** 2)) + 1e-9
+    for cl in spec.get("clips", []):
+        y = load(os.path.join(ROOT, cl["file"]))
+        y = y * (ref / (np.sqrt(np.mean(y ** 2)) + 1e-9)) * db(cl.get("gain", 0))
+        a = s_of(t_of(*cl["at"]))
+        y = y[: N - a]
+        mix[a:a + len(y)] += y
     # loudness: one gain for the whole film, a soft limiter, then a peak ceiling
     rms = np.sqrt(np.mean(mix[mix != 0] ** 2)) + 1e-9
     mix *= 0.16 / rms

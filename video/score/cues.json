@@ -1,73 +1,590 @@
 {
-  "_comment": "The film's score, built to the grid in beats.json. 'takes' are generated recordings (instrumental, 128 BPM, one key), saved as video/audio/takes/<id>.wav. 'cues' cut whole bars out of those takes onto film bars; 'fx' are synthesized on exact beats. Bars and beats are 1-based film positions. 'seed' is the candidate kept. Build with: python video/tools/score.py",
+  "_comment": "The film's score, built to the grid in beats.json. 'takes' are generated recordings (instrumental, 128 BPM, one key), saved as video/audio/takes/<id>.wav. 'cues' cut whole bars out of those takes onto film bars; 'fx' are synthesized on exact beats. 'clips' are finished audio files dropped in at a beat (the score ducks under them by a 'duck' colour). Bars and beats are 1-based film positions. 'seed' is the candidate kept. Build with: python video/tools/score.py",
   "bpm": 128,
   "key": "A minor",
   "palette": "dark cinematic electronic, hard synthwave hardware-reveal trailer, punchy kick, distorted reese bass, bright supersaw stabs, glitchy arpeggios, huge reverb, A minor, 128 BPM, instrumental",
   "takes": {
-    "intro":  { "seed": 1, "seconds": 30, "caption": "minimal intro, a single soft sub-bass pulse on every beat and a quiet filtered arpeggio, lots of empty space, no drums, no melody" },
-    "build":  { "seed": 1, "seconds": 40, "caption": "rising build-up, a new layer joins every two bars, snare roll accelerating, filter opening, white noise riser, tension climbing the whole time, never drops" },
-    "drop":   { "seed": 2, "seconds": 60, "caption": "full energy drop, driving four-on-the-floor kick, distorted reese bass, supersaw stabs, mechanical and relentless, no breaks" },
-    "break":  { "seed": 2, "seconds": 20, "caption": "breakdown, drums out, only ticking hi-hats and a soft dark pad, quiet and focused" },
-    "drop2":  { "seed": 1, "seconds": 90, "caption": "second drop, harder and busier than the first, double-time hi-hats, aggressive distorted bass, layered supersaws, glitch stutters, maximum energy the whole time" }
+    "intro": {
+      "seed": 1,
+      "seconds": 30,
+      "caption": "minimal intro, a single soft sub-bass pulse on every beat and a quiet filtered arpeggio, lots of empty space, no drums, no melody"
+    },
+    "build": {
+      "seed": 1,
+      "seconds": 40,
+      "caption": "rising build-up, a new layer joins every two bars, snare roll accelerating, filter opening, white noise riser, tension climbing the whole time, never drops"
+    },
+    "drop": {
+      "seed": 2,
+      "seconds": 60,
+      "caption": "full energy drop, driving four-on-the-floor kick, distorted reese bass, supersaw stabs, mechanical and relentless, no breaks"
+    },
+    "break": {
+      "seed": 2,
+      "seconds": 20,
+      "caption": "breakdown, drums out, only ticking hi-hats and a soft dark pad, quiet and focused"
+    },
+    "drop2": {
+      "seed": 1,
+      "seconds": 90,
+      "caption": "second drop, harder and busier than the first, double-time hi-hats, aggressive distorted bass, layered supersaws, glitch stutters, maximum energy the whole time"
+    }
   },
   "cues": [
-    { "id": 1,  "name": "The empty box",       "bars": [1, 5],   "take": "intro", "from": "middle", "gain": -6,  "fadeInBars": 1 },
-    { "id": 2,  "name": "The ask piles up",    "bars": [6, 12],  "take": "build", "from": 5,    "gain": -3,  "muteBeats": [[12, 4, 1]] },
-    { "id": 3,  "name": "The graph blooms",    "bars": [13, 24], "take": "drop",  "from": "middle", "gain": 0 },
-    { "id": 4,  "name": "Verified",            "bars": [25, 26], "take": "break", "from": "middle", "gain": -4 },
-    { "id": 4.5,"name": "Verified: gameplay",  "bars": [27, 28], "take": "drop",  "from": "start",  "gain": 0 },
-    { "id": 5,  "name": "Direct it",           "bars": [29, 37], "take": "drop",  "from": "end",    "gain": 0,
+    {
+      "id": 1,
+      "name": "The empty box",
+      "bars": [
+        1,
+        5
+      ],
+      "take": "intro",
+      "from": "middle",
+      "gain": -6,
+      "fadeInBars": 1
+    },
+    {
+      "id": 2,
+      "name": "The ask piles up",
+      "bars": [
+        6,
+        12
+      ],
+      "take": "build",
+      "from": 5,
+      "gain": -3,
+      "muteBeats": [
+        [
+          12,
+          4,
+          1
+        ]
+      ]
+    },
+    {
+      "id": 3,
+      "name": "The graph blooms",
+      "bars": [
+        13,
+        24
+      ],
+      "take": "drop",
+      "from": "middle",
+      "gain": 0
+    },
+    {
+      "id": 4,
+      "name": "Verified",
+      "bars": [
+        25,
+        26
+      ],
+      "take": "break",
+      "from": "middle",
+      "gain": -4
+    },
+    {
+      "id": 4.5,
+      "name": "Verified: gameplay",
+      "bars": [
+        27,
+        28
+      ],
+      "take": "drop",
+      "from": "start",
+      "gain": 0
+    },
+    {
+      "id": 5,
+      "name": "Direct it",
+      "bars": [
+        29,
+        37
+      ],
+      "take": "drop",
+      "from": "end",
+      "gain": 0,
       "colour": [
-        { "bars": [30, 30], "do": "dark" },
-        { "bars": [32, 32], "do": "pingpong" },
-        { "bars": [34, 34], "do": "wide" },
-        { "bars": [36, 37], "do": "duck" }
-      ] },
-    { "id": 6,  "name": "Fake ending",         "bars": [38, 38], "take": "drop",  "from": "middle", "gain": 0, "do": "close" },
-    { "id": 8,  "name": "Everything",          "bars": [42, 63], "take": "drop2", "from": "middle", "gain": 0,
-      "steps": [50, 54, 58] },
-    { "id": 9,  "name": "Anything",            "bars": [64, 69], "take": "drop2", "from": "end",    "gain": 0,
-      "stutter": [ { "bars": [66, 67], "every": 0.5 }, { "bars": [68, 68], "every": 0.25 }, { "bars": [69, 69], "every": 0.125 } ],
-      "muteBeats": [[69, 4, 1]] }
+        {
+          "bars": [
+            30,
+            30
+          ],
+          "do": "dark"
+        },
+        {
+          "bars": [
+            32,
+            32
+          ],
+          "do": "pingpong"
+        },
+        {
+          "bars": [
+            34,
+            34
+          ],
+          "do": "wide"
+        },
+        {
+          "bars": [
+            36,
+            36
+          ],
+          "do": "duck"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Fake ending",
+      "bars": [
+        38,
+        38
+      ],
+      "take": "drop",
+      "from": "middle",
+      "gain": 0,
+      "do": "close"
+    },
+    {
+      "id": 8,
+      "name": "Everything",
+      "bars": [
+        41,
+        62
+      ],
+      "take": "drop2",
+      "from": "middle",
+      "gain": 0,
+      "steps": [
+        49,
+        53,
+        57
+      ]
+    },
+    {
+      "id": 9,
+      "name": "Anything",
+      "bars": [
+        63,
+        68
+      ],
+      "take": "drop2",
+      "from": "end",
+      "gain": 0,
+      "stutter": [
+        {
+          "bars": [
+            65,
+            66
+          ],
+          "every": 0.5
+        },
+        {
+          "bars": [
+            67,
+            67
+          ],
+          "every": 0.25
+        },
+        {
+          "bars": [
+            68,
+            68
+          ],
+          "every": 0.125
+        }
+      ],
+      "muteBeats": [
+        [
+          68,
+          4,
+          1
+        ]
+      ]
+    }
   ],
   "fx": [
-    { "at": [1, 1],  "do": "pulse", "every": 1, "until": [1, 4], "gain": -12 },
-    { "at": [3, 1],  "do": "blip" },
-    { "at": [4, 1],  "do": "blip" },
-    { "at": [4, 3],  "do": "hit", "gain": -8 },
-    { "at": [5, 1],  "do": "blip" },
-    { "at": [6, 1],  "do": "blip" },
-    { "at": [8, 1],  "do": "blip" },
-    { "at": [9, 1],  "do": "blip" },
-    { "at": [12, 1], "do": "ring" },
-    { "at": [13, 1], "do": "swell", "bars": 1, "gain": -2 },
-    { "at": [13, 1], "do": "impact", "gain": 0 },
-    { "at": [13, 2], "do": "tick", "every": 1, "until": [14, 4], "gain": -10 },
-    { "at": [19, 1], "do": "hit", "gain": -4 },
-    { "at": [21, 1], "do": "hit", "gain": -4 },
-    { "at": [25, 1], "do": "tick", "every": 0.25, "until": [25, 4.75], "gain": -12 },
-    { "at": [27, 1], "do": "swell", "bars": 1, "gain": -6 },
-    { "at": [27, 1], "do": "hit", "gain": -3 },
-    { "at": [30, 1], "do": "hit", "gain": -5 },
-    { "at": [32, 1], "do": "hit", "gain": -5 },
-    { "at": [34, 1], "do": "hit", "gain": -5 },
-    { "at": [36, 1], "do": "hit", "gain": -5 },
-    { "at": [38, 1], "do": "swell", "bars": 2, "gain": -6 },
-    { "at": [39, 1], "do": "chord", "bars": 2 },
-    { "at": [41, 1], "do": "rewind", "bars": 1 },
-    { "at": [42, 1], "do": "impact", "gain": 0 },
-    { "at": [43, 1], "do": "whoosh" }, { "at": [44, 1], "do": "whoosh" }, { "at": [45, 1], "do": "whoosh" },
-    { "at": [46, 1], "do": "whoosh" }, { "at": [47, 1], "do": "whoosh" }, { "at": [48, 1], "do": "whoosh" },
-    { "at": [52, 1], "do": "hit", "gain": -1 },
-    { "at": [52, 3], "do": "hit", "gain": -1 },
-    { "at": [53, 1], "do": "impact", "gain": -2 },
-    { "at": [54, 1], "do": "whoosh" }, { "at": [56, 1], "do": "whoosh" }, { "at": [57, 1], "do": "whoosh" },
-    { "at": [58, 1], "do": "whoosh" }, { "at": [59, 1], "do": "whoosh" },
-    { "at": [61, 1], "do": "impact", "gain": -3 },
-    { "at": [62, 1], "do": "whoosh" },
-    { "at": [64, 1], "do": "hit", "gain": -3 },
-    { "at": [66, 1], "do": "riser", "bars": 4, "gain": -4 },
-    { "at": [70, 1], "do": "impact", "gain": 2 },
-    { "at": [70, 1], "do": "chord", "bars": 4 }
+    {
+      "at": [
+        1,
+        1
+      ],
+      "do": "pulse",
+      "every": 1,
+      "until": [
+        1,
+        4
+      ],
+      "gain": -12
+    },
+    {
+      "at": [
+        3,
+        1
+      ],
+      "do": "blip"
+    },
+    {
+      "at": [
+        4,
+        1
+      ],
+      "do": "blip"
+    },
+    {
+      "at": [
+        4,
+        3
+      ],
+      "do": "hit",
+      "gain": -8
+    },
+    {
+      "at": [
+        5,
+        1
+      ],
+      "do": "blip"
+    },
+    {
+      "at": [
+        6,
+        1
+      ],
+      "do": "blip"
+    },
+    {
+      "at": [
+        8,
+        1
+      ],
+      "do": "blip"
+    },
+    {
+      "at": [
+        9,
+        1
+      ],
+      "do": "blip"
+    },
+    {
+      "at": [
+        12,
+        1
+      ],
+      "do": "ring"
+    },
+    {
+      "at": [
+        13,
+        1
+      ],
+      "do": "swell",
+      "bars": 1,
+      "gain": -2
+    },
+    {
+      "at": [
+        13,
+        1
+      ],
+      "do": "impact",
+      "gain": 0
+    },
+    {
+      "at": [
+        13,
+        2
+      ],
+      "do": "tick",
+      "every": 1,
+      "until": [
+        14,
+        4
+      ],
+      "gain": -10
+    },
+    {
+      "at": [
+        19,
+        1
+      ],
+      "do": "hit",
+      "gain": -4
+    },
+    {
+      "at": [
+        21,
+        1
+      ],
+      "do": "hit",
+      "gain": -4
+    },
+    {
+      "at": [
+        25,
+        1
+      ],
+      "do": "tick",
+      "every": 0.25,
+      "until": [
+        25,
+        4.75
+      ],
+      "gain": -12
+    },
+    {
+      "at": [
+        27,
+        1
+      ],
+      "do": "swell",
+      "bars": 1,
+      "gain": -6
+    },
+    {
+      "at": [
+        27,
+        1
+      ],
+      "do": "hit",
+      "gain": -3
+    },
+    {
+      "at": [
+        30,
+        1
+      ],
+      "do": "hit",
+      "gain": -5
+    },
+    {
+      "at": [
+        32,
+        1
+      ],
+      "do": "hit",
+      "gain": -5
+    },
+    {
+      "at": [
+        34,
+        1
+      ],
+      "do": "hit",
+      "gain": -5
+    },
+    {
+      "at": [
+        36,
+        1
+      ],
+      "do": "hit",
+      "gain": -5
+    },
+    {
+      "at": [
+        38,
+        1
+      ],
+      "do": "swell",
+      "bars": 2,
+      "gain": -6
+    },
+    {
+      "at": [
+        39,
+        1
+      ],
+      "do": "chord",
+      "bars": 1,
+      "gain": 12
+    },
+    {
+      "at": [
+        40,
+        1
+      ],
+      "do": "rewind",
+      "bars": 1
+    },
+    {
+      "at": [
+        41,
+        1
+      ],
+      "do": "impact",
+      "gain": 0
+    },
+    {
+      "at": [
+        42,
+        1
+      ],
+      "do": "whoosh"
+    },
+    {
+      "at": [
+        43,
+        1
+      ],
+      "do": "whoosh"
+    },
+    {
+      "at": [
+        44,
+        1
+      ],
+      "do": "whoosh"
+    },
+    {
+      "at": [
+        45,
+        1
+      ],
+      "do": "whoosh"
+    },
+    {
+      "at": [
+        46,
+        1
+      ],
+      "do": "whoosh"
+    },
+    {
+      "at": [
+        47,
+        1
+      ],
+      "do": "whoosh"
+    },
+    {
+      "at": [
+        51,
+        1
+      ],
+      "do": "hit",
+      "gain": -1
+    },
+    {
+      "at": [
+        51,
+        3
+      ],
+      "do": "hit",
+      "gain": -1
+    },
+    {
+      "at": [
+        52,
+        1
+      ],
+      "do": "impact",
+      "gain": -2
+    },
+    {
+      "at": [
+        53,
+        1
+      ],
+      "do": "whoosh"
+    },
+    {
+      "at": [
+        55,
+        1
+      ],
+      "do": "whoosh"
+    },
+    {
+      "at": [
+        56,
+        1
+      ],
+      "do": "whoosh"
+    },
+    {
+      "at": [
+        57,
+        1
+      ],
+      "do": "whoosh"
+    },
+    {
+      "at": [
+        58,
+        1
+      ],
+      "do": "whoosh"
+    },
+    {
+      "at": [
+        60,
+        1
+      ],
+      "do": "impact",
+      "gain": -3
+    },
+    {
+      "at": [
+        61,
+        1
+      ],
+      "do": "whoosh"
+    },
+    {
+      "at": [
+        63,
+        1
+      ],
+      "do": "hit",
+      "gain": -3
+    },
+    {
+      "at": [
+        65,
+        1
+      ],
+      "do": "riser",
+      "bars": 4,
+      "gain": -4
+    },
+    {
+      "at": [
+        69,
+        1
+      ],
+      "do": "impact",
+      "gain": 2
+    },
+    {
+      "at": [
+        69,
+        1
+      ],
+      "do": "chord",
+      "bars": 4
+    },
+    {
+      "at": [
+        37,
+        1
+      ],
+      "do": "hit",
+      "gain": -3
+    }
+  ],
+  "clips": [
+    {
+      "file": "makeasong.mp3",
+      "at": [
+        36,
+        1
+      ],
+      "gain": 0,
+      "_comment": "S24 'Add music': the chosen song"
+    }
   ]
 }

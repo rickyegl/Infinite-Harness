@@ -10,7 +10,7 @@ because a shot needs it.
   fails loudly if the film runs past 3:00 or a voice line is too fast to say.
 - **Preview:** `node video/tools/preview.mjs` renders a text-card animatic with a click track, plus any music
   listed in `beats.json` (`video/renders/shots-preview.mp4`).
-- **Format:** 1920x1080, 60 fps, 2:16 on the current grid (73 bars). Vertical reels appear *inside* the frame as deliverables.
+- **Format:** 1920x1080, 60 fps, 2:15 on the current grid (72 bars). Vertical reels appear *inside* the frame as deliverables.
 
 ## Look
 
@@ -40,11 +40,11 @@ the film the clock is the beat grid and events come from recorded runs.
 |---|---|---|
 | 1. The ask | 1-12 | One spoken prompt, 18-20 s. Each phrase becomes a chip. "Make no mistakes." Enter on the drop. |
 | 2. Orchestration | 13-28 | The graph blooms. Zoom into the game orchestrator and its two engine sub-orchestrators, an asset handoff across the tree, trailer, campaign, hosting, verification, gameplay. |
-| 3. Direct it | 29-40 | Four spoken changes, each landing on a downbeat: night, crossplay, realistic, music. Deliverables wall. Fake ending. |
-| 4. "I'm not done." | 41 | 1.5 s sound effect. The text box slams back. |
-| 5. Everything | 42-63 | Rapid prompts, module name on top, mostly one bar each: image, edit, cutout, drafting, 3D, render, video, study guides, CAD, sim, PCB, forecast, anomaly, then the car on the house and the house in the game. |
-| 6. Anything | 64-69 | Zoom out, evidence stops, prompts swipe in faster and faster. "everything..." "and anything..." |
-| 7. Title | 70-73 | Infinite Harness. Built with AI. |
+| 3. Direct it | 29-39 | Four spoken changes, each landing on a downbeat: night, crossplay, realistic, music. Deliverables wall. Fake ending. |
+| 4. "I'm not done." | 40 | 1.5 s sound effect. The text box slams back. |
+| 5. Everything | 41-62 | Rapid prompts, module name on top, mostly one bar each: image, edit, cutout, drafting, 3D, render, video, study guides, CAD, sim, PCB, forecast, anomaly, then the car on the house and the house in the game. |
+| 6. Anything | 63-68 | Zoom out, evidence stops, prompts swipe in faster and faster. "everything..." "and anything..." |
+| 7. Title | 69-72 | Infinite Harness. Built with AI. |
 
 ## Music cues
 
@@ -67,12 +67,12 @@ sounds a beat late.
 | 2. The ask piles up | S05-S08 | 6-12 | 0:09 | A new layer joins with every request, so the build is the prompt growing. One silent beat, then Enter. |
 | 3. The graph blooms | S09-S17 | 13-24 | 0:22 | Full drop, mechanical and driving. One hit per cell. Accents when the asset request fires (bar 19) and lands (bar 21). |
 | 4. Verified | S18-S20 | 25-28 | 0:45 | Thins to ticks while the tree goes green, then lifts into two bars of gameplay. |
-| 5. Direct it | S21-S24 | 29-37 | 0:52 | Two bars per command, the change on the second downbeat, each with its own colour: darker for night, call-and-response for crossplay, wider for realistic, ducking under the song. |
-| 6. Fake ending | S25-S26 | 38-40 | 1:09 | A real cadence and a real stop. |
-| 7. "I'm not done" | S27 | 41 | 1:15 | Rewind effect only. |
-| 8. Everything | S28-S42 | 42-63 | 1:16 | Harder and busier than the first drop, stepping up at bars 50, 54 and 58. Hits on "every", "single", "test" (bars 52-53). |
-| 9. Anything | S43-S45 | 64-69 | 1:58 | The rhythm itself doubles every two bars with the prompts, then cuts out. |
-| 10. Title | S46-S47 | 70-73 | 2:09 | One impact, a tail, a clean end. |
+| 5. Direct it | S21-S24 | 29-37 | 0:52 | Two bars per command, the change on the second downbeat, each with its own colour: darker for night, call-and-response for crossplay, wider for realistic, ducking under the song (`video/makeasong.mp3`, one bar from bar 36), slamming back on bar 37. |
+| 6. Fake ending | S25-S26 | 38-39 | 1:09 | A real cadence and a real stop: the wall bar, then one bar of ringing chord (under 8 beats of stillness). |
+| 7. "I'm not done" | S27 | 40 | 1:13 | Rewind effect only. |
+| 8. Everything | S28-S42 | 41-62 | 1:15 | Harder and busier than the first drop, stepping up at bars 49, 53 and 57. Hits on "every", "single", "test" (bars 51-52). |
+| 9. Anything | S43-S45 | 63-68 | 1:56 | The rhythm itself doubles every two bars with the prompts, then cuts out. |
+| 10. Title | S46-S47 | 69-72 | 2:08 | One impact, a tail, a clean end. |
 
 ## Shot table
 
@@ -104,30 +104,30 @@ Generated from `shots.json` by `video/tools/resolve.mjs`. Do not edit between th
 | S21 | 29-30 | 0:52.5-0:56.3 | split |  | "Make it night." | Roblox premise ad (vertical) with the game behind it. Flips from day to night on the second downbeat. A 'Lighting' cell flashes in the mini-graph. | Locked. Line in the first bar. Day-to-night as a single-frame match cut. | replay | night |
 | S22 | 31-32 | 0:56.3-1:00.0 | split |  | "Add crossplay." | Roblox and Unity windows side by side. A Roblox racer appears in the Unity window and a Unity racer in the Roblox window. 'Relay' cell flashes. | Locked. Line in the first bar. A line links the two windows on the second downbeat. | replay | crossplay |
 | S23 | 33-34 | 1:00.0-1:03.8 | split |  | "Make it realistic." | Unity window wipes left to right into the upgraded look: post-processing, reflections, lighting. 'Shaders' cell flashes. | Slow push on the Unity window. Line in the first bar. The wipe starts on the second downbeat and lasts exactly 2 beats. | replay | realistic |
-| S24 | 35-37 | 1:03.8-1:09.4 | split |  | "Add music." | 'Music' cell flashes. The chosen song plays for two bars (about 4 seconds) with its waveform across the bottom while gameplay continues. | Locked. Line in the first bar. The score ducks under the song clip, then slams back. | replay | music |
+| S24 | 35-37 | 1:03.8-1:09.4 | split |  | "Add music." | 'Music' cell flashes. The chosen song plays for one bar (about 2 seconds) with its waveform across the bottom while gameplay continues. | Locked. Line in the first bar. The song lands on the next downbeat and the score ducks under it, then slams back on the bar after. | replay | music |
 | S25 | 38 | 1:09.4-1:11.3 | wall |  |  | Deliverables wall assembles instantly: Play-in-browser link, Roblox link, trailer (2 s), three reels (1 s each), ad image. | Slow drift across the wall. The music resolves. One tile per half beat. | replay | main |
-| S26 | 39-40 | 1:11.3-1:15.0 | title |  |  | Fake ending. The wall dims, a small wordmark fades up, the music resolves and tails into silence. | Locked. Fade toward black. A real final chord: the beat stops and only its tail rings on. | ui (elastic) |  |
-| S27 | 41 | 1:15.0-1:16.9 | prompt |  | "I'm not done." | The wordmark glitches and rewinds. The text box slams back to center. | Punch in. Author's 1.5 s sound effect over a rewind riser. The music returns harder on the next downbeat. | ui |  |
-| S28 | 42 | 1:16.9-1:18.8 | banner | IMAGE | "Show me a house." | Generated house image resolves full-bleed. | Locked. | replay | house.image |
-| S29 | 43 | 1:18.8-1:20.6 | banner | IMAGE EDIT | "Make the walls red." | Same house, same framing, walls red. | Locked. Match cut on the downbeat. | replay | house.red |
-| S30 | 44 | 1:20.6-1:22.5 | banner | CUTOUT | "Transparent background." | Background drops away; the dimmed graph shows through behind the house. | Locked. | replay | house.cutout |
-| S31 | 45 | 1:22.5-1:24.4 | banner | DRAFTING | "Design the house." | Floor plan drawing: walls, doors and dimensions draw line by line. | Slow push. Lines draw to the hi-hat. | replay | house.plan |
-| S32 | 46 | 1:24.4-1:26.3 | banner | 3D | "Build it on Blender." | Blender viewport screenshots: the house rising from the plan. | Locked. One build step per beat. | replay | house.blender |
-| S33 | 47 | 1:26.3-1:28.1 | banner | RENDER | "Render it." | Realistic render resolves from noise. | Locked. | replay | house.render |
-| S34 | 48-49 | 1:28.1-1:31.9 | banner | VIDEO | "Make it a video." | The render comes alive as a short clip. | Locked. | clip | house.video |
-| S35 | 50-53 | 1:31.9-1:39.4 | banner | STUDY | "Check all presentations on Canvas and make a study guide for every... single... test." | Course decks fan out. On 'every', 'single', 'test': one guide, a row of guides, a wall of guides. | Pull back one step on each of the three words. Sentence over the first two bars. Hits on 'every' (third bar, beat 1), 'single' (third bar, beat 3) and 'test' (fourth downbeat). | replay | study |
-| S36 | 54-55 | 1:39.4-1:43.1 | banner | CAD | "CAD a drum shooter FRC robot prototype." | SurfaceCAD assembly builds piece by piece: frame, drum, flywheel, hood. | Slow orbit. One part per beat in the second bar. | replay | cad |
-| S37 | 56 | 1:43.1-1:45.0 | banner | SIM |  | The robot shooting inside the FRC simulator. | As supplied. | supplied | cad.sim |
-| S38 | 57 | 1:45.0-1:46.9 | banner | PCB | "Make a [board to be decided] PCB." | Board layout: traces route themselves, then the board flips to a 3D view. | Locked, flip on beat 3. | replay | pcb |
-| S39 | 58 | 1:46.9-1:48.8 | banner | FORECAST | "Forecast demand." | History line draws, then the forecast and its band extend to the right. | Locked. | replay | forecast |
-| S40 | 59 | 1:48.8-1:50.6 | banner | ANOMALY | "Detect anomaly." | Same chart: red markers snap onto the outliers. | Locked. Markers on beats. | replay | anomaly |
-| S41 | 60-61 | 1:50.6-1:54.4 | banner | 3D | "Put the car on the house." | The kart from the game lands on the roof of the house in Blender. | Locked. Impact on the second bar's downbeat. | replay | car.house |
-| S42 | 62-63 | 1:54.4-1:58.1 | banner | GAME | "Put the house on the game." | The house, kart still on its roof, stands beside the Unity track as racers fight past it. | Hold, then begin a very slow zoom out. | clip (elastic) | house.game |
-| S43 | 64-65 | 1:58.1-2:01.9 | rain |  |  | Slow zoom out. The graph now holds every cell from the film. Evidence fades. Prompts swipe through the text box, one per beat. | Continuous zoom out. Full energy. The rhythm doubles with the prompts in each of the next two shots. | ui (elastic) |  |
-| S44 | 66-67 | 2:01.9-2:05.6 | rain |  |  | Prompts every half beat. Title word above: 'everything...' | Continuous zoom out. The rhythm doubles. | ui |  |
-| S45 | 68-69 | 2:05.6-2:09.4 | rain |  |  | Prompts every quarter beat, blurring. Title: 'and anything...' | Continuous zoom out. The rhythm doubles again, then cuts to silence on the last beat. | ui |  |
-| S46 | 70-71 | 2:09.4-2:13.1 | title |  |  | Every cell implodes into the wordmark: Infinite Harness. | Locked. One final impact on the downbeat. | ui (elastic) |  |
-| S47 | 72-73 | 2:13.1-2:16.9 | title |  |  | 'Built with AI' under the wordmark. Fade to black. | Locked. The impact's tail rings out and ends. | ui |  |
+| S26 | 39 | 1:11.3-1:13.1 | title |  |  | Fake ending. The wall dims, a small wordmark fades up, the music resolves and tails into silence. | Locked. Fade toward black. A real final chord: the beat stops and only its tail rings on. | ui (elastic) |  |
+| S27 | 40 | 1:13.1-1:15.0 | prompt |  | "I'm not done." | The wordmark glitches and rewinds. The text box slams back to center. | Punch in. Author's 1.5 s sound effect over a rewind riser. The music returns harder on the next downbeat. | ui |  |
+| S28 | 41 | 1:15.0-1:16.9 | banner | IMAGE | "Show me a house." | Generated house image resolves full-bleed. | Locked. | replay | house.image |
+| S29 | 42 | 1:16.9-1:18.8 | banner | IMAGE EDIT | "Make the walls red." | Same house, same framing, walls red. | Locked. Match cut on the downbeat. | replay | house.red |
+| S30 | 43 | 1:18.8-1:20.6 | banner | CUTOUT | "Transparent background." | Background drops away; the dimmed graph shows through behind the house. | Locked. | replay | house.cutout |
+| S31 | 44 | 1:20.6-1:22.5 | banner | DRAFTING | "Design the house." | Floor plan drawing: walls, doors and dimensions draw line by line. | Slow push. Lines draw to the hi-hat. | replay | house.plan |
+| S32 | 45 | 1:22.5-1:24.4 | banner | 3D | "Build it on Blender." | Blender viewport screenshots: the house rising from the plan. | Locked. One build step per beat. | replay | house.blender |
+| S33 | 46 | 1:24.4-1:26.3 | banner | RENDER | "Render it." | Realistic render resolves from noise. | Locked. | replay | house.render |
+| S34 | 47-48 | 1:26.3-1:30.0 | banner | VIDEO | "Make it a video." | The render comes alive as a short clip. | Locked. | clip | house.video |
+| S35 | 49-52 | 1:30.0-1:37.5 | banner | STUDY | "Check all presentations on Canvas and make a study guide for every... single... test." | Course decks fan out. On 'every', 'single', 'test': one guide, a row of guides, a wall of guides. | Pull back one step on each of the three words. Sentence over the first two bars. Hits on 'every' (third bar, beat 1), 'single' (third bar, beat 3) and 'test' (fourth downbeat). | replay | study |
+| S36 | 53-54 | 1:37.5-1:41.3 | banner | CAD | "CAD a drum shooter FRC robot prototype." | SurfaceCAD assembly builds piece by piece: frame, drum, flywheel, hood. | Slow orbit. One part per beat in the second bar. | replay | cad |
+| S37 | 55 | 1:41.3-1:43.1 | banner | SIM |  | The robot shooting inside the FRC simulator. | As supplied. | supplied | cad.sim |
+| S38 | 56 | 1:43.1-1:45.0 | banner | PCB | "Make a [board to be decided] PCB." | Board layout: traces route themselves, then the board flips to a 3D view. | Locked, flip on beat 3. | replay | pcb |
+| S39 | 57 | 1:45.0-1:46.9 | banner | FORECAST | "Forecast demand." | History line draws, then the forecast and its band extend to the right. | Locked. | replay | forecast |
+| S40 | 58 | 1:46.9-1:48.8 | banner | ANOMALY | "Detect anomaly." | Same chart: red markers snap onto the outliers. | Locked. Markers on beats. | replay | anomaly |
+| S41 | 59-60 | 1:48.8-1:52.5 | banner | 3D | "Put the car on the house." | The kart from the game lands on the roof of the house in Blender. | Locked. Impact on the second bar's downbeat. | replay | car.house |
+| S42 | 61-62 | 1:52.5-1:56.3 | banner | GAME | "Put the house on the game." | The house, kart still on its roof, stands beside the Unity track as racers fight past it. | Hold, then begin a very slow zoom out. | clip (elastic) | house.game |
+| S43 | 63-64 | 1:56.3-2:00.0 | rain |  |  | Slow zoom out. The graph now holds every cell from the film. Evidence fades. Prompts swipe through the text box, one per beat. | Continuous zoom out. Full energy. The rhythm doubles with the prompts in each of the next two shots. | ui (elastic) |  |
+| S44 | 65-66 | 2:00.0-2:03.8 | rain |  |  | Prompts every half beat. Title word above: 'everything...' | Continuous zoom out. The rhythm doubles. | ui |  |
+| S45 | 67-68 | 2:03.8-2:07.5 | rain |  |  | Prompts every quarter beat, blurring. Title: 'and anything...' | Continuous zoom out. The rhythm doubles again, then cuts to silence on the last beat. | ui |  |
+| S46 | 69-70 | 2:07.5-2:11.3 | title |  |  | Every cell implodes into the wordmark: Infinite Harness. | Locked. One final impact on the downbeat. | ui (elastic) |  |
+| S47 | 71-72 | 2:11.3-2:15.0 | title |  |  | 'Built with AI' under the wordmark. Fade to black. | Locked. The impact's tail rings out and ends. | ui |  |
 <!-- shots:end -->
 
 `Source`: **ui** = interface animation only, **replay** = a real recorded run replayed on the beat clock,
