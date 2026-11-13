@@ -1,6 +1,6 @@
 # 09. The final cut
 
-**Goal:** `video/renders/infinite-harness-demo.mp4`: 1920x1080, 60 fps, 180 s, every cut on the beat, voice,
+**Goal:** `video/renders/infinite-harness-demo.mp4`: 1920x1080, 60 fps, as long as `total` in `video/timeline.json` (180 s at most), every cut on the beat, voice,
 music and effects mixed. A rough cut (`pnpm film:rough`) has existed since plan 01; this plan replaces it with
 full-quality plates, film-level layers in HyperFrames and the real mix.
 
@@ -18,7 +18,7 @@ the beat, flash + shake + punch-in on the drop, slower and dimmer before it.
    `/?director=1&shot=<id>`, step `window.__harness.seek(t)` frame by frame at 60 fps, screenshot, encode to
    `video/plates/<id>.mp4` (visually lossless) with 12 frames of handle at both ends. Parallelise across shots.
    Capture transparent-background variants for shots composited over others (S30).
-3. **HyperFrames project** `video/film/`: one composition, 1920x1080, 180 s.
+3. **HyperFrames project** `video/film/`: one composition, 1920x1080, `total` seconds long.
    - A track of plates placed from `timeline.json` with `LEAD = 0.03` s.
    - Film-level layers that are not part of the product UI: beat flashes, shake, punch-ins, the fake-ending
      fade (S26), the glitch/rewind (S27), act-6 title words, the final wordmark (S46-S47), safe margins.
@@ -38,7 +38,7 @@ the beat, flash + shake + punch-in on the drop, slower and dimmer before it.
 
 ## Verify first
 
-- HyperFrames can place external mp4 plates frame-accurately and render 180 s at 60 fps in one pass here; if
+- HyperFrames can place external mp4 plates frame-accurately and render the whole film at 60 fps in one pass here; if
   not, render per act and concatenate with ffmpeg (stream copy at act boundaries on beats).
 - Whether HyperFrames can drive the app page directly (skip plates). Only switch if it works on the first try.
 - The music file's sample rate and that the beat list's first entry matches its first downbeat.

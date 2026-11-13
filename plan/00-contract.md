@@ -9,7 +9,7 @@ wins; if this file is wrong, fix it here in the same commit so the next agent in
 you watch them work as a living graph instead of a chat. The showcase is building the same game in Unity and
 Roblox at once, with trailers, ad reels, generated assets, CAD, and more hanging off the same tree.
 
-The deliverable that matters most is a **3-minute demo film** ([video/SHOTS.md](../video/SHOTS.md)). The UI is
+The deliverable that matters most is a **demo film of at most 3 minutes** ([video/SHOTS.md](../video/SHOTS.md)). The UI is
 designed for how it looks in that film. Deadline: 3 days. Most module internals already exist in the author's
 other projects, so module work is "wrap what exists", not "write from scratch".
 
@@ -162,7 +162,7 @@ Their own rules still apply and are binding here:
 3. Finish with the plan's verification command passing, then update `plan/STATUS.md` (done, how verified, open
    problems, next file) and the affected docs, then commit and push. Git is not the point: one commit per plan
    file is fine, messages short.
-   **The film must always exist.** From plan 01 on, `pnpm film:rough` renders the whole 180 s film from whatever
+   **The film must always exist.** From plan 01 on, `pnpm film:rough` renders the whole film (its length is `total` in `video/timeline.json`, never over 180 s) from whatever
    is there (fixtures at first). It must still pass when you finish. Each plan swaps fixtures for real takes,
    shot by shot, so there is a showable film at the end of every day.
 4. Behind schedule? Cut in this order: polish, then live runs of long-tail modules (keep their mock), then

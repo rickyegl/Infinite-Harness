@@ -14,7 +14,7 @@ also read `00-contract.md`.
 | 06 | [06-host-verify-record.md](06-host-verify-record.md) | Public links, site online, Verifier, Recorder. | 2 |
 | 07 | [07-long-tail-modules.md](07-long-tail-modules.md) | Act 5 modules: drafting, Blender, study, CAD, PCB, forecast, anomaly. | 3 |
 | 08 | [08-capture-takes.md](08-capture-takes.md) | Real takes and direction files for every shot. | 3 |
-| 09 | [09-film-assembly.md](09-film-assembly.md) | The final cut of the 3-minute film. | 3 |
+| 09 | [09-film-assembly.md](09-film-assembly.md) | The final cut of the film. | 3 |
 | 10 | [10-submission.md](10-submission.md) | README, docs, clean-up, fresh-clone test. | 3 |
 
 Also here: [USER-TODO.md](USER-TODO.md) (things only the author can do, with when they block),

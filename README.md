@@ -26,7 +26,7 @@ prompt -> router -> module cells (agents, tools, sub-orchestrators) -> event str
 
 | Path | What |
 |---|---|
-| [video/SHOTS.md](video/SHOTS.md) | The 3-minute demo film, shot by shot, keyed to the music's beats. The product is designed from it. |
+| [video/SHOTS.md](video/SHOTS.md) | The demo film (3 minutes at most), shot by shot, keyed to the music's beats. The product is designed from it. |
 | [plan/](plan/README.md) | Ordered build plan, one file per agent session. |
 | `harness.config.example.json` | Configuration template. |
 

@@ -52,7 +52,7 @@ with no backend. When this is done, any shot in the film can be previewed by URL
    `window.__harness.seek(t)` frame by frame at 60 fps, screenshots, encodes with ffmpeg. `pnpm film:rough`
    captures all 47 shots (30 fps and half resolution is fine for the rough), concatenates them on the timeline
    and lays a click track generated from `beats.json` (or the music file if it is there) under them:
-   `video/renders/rough.mp4`, 180 s. This is the film from day 1; every later plan makes it more real.
+   `video/renders/rough.mp4`, as long as `total` in `video/timeline.json`. This is the film from day 1; every later plan makes it more real.
 
 ## Verify first
 
@@ -64,7 +64,7 @@ with no backend. When this is done, any shot in the film can be previewed by URL
 - `pnpm --filter web dev` then `/?director=1&shot=S10` (and every other shot id) renders without a backend.
 - Seeking to the same `t` twice gives pixel-identical screenshots (test: two captures, byte compare).
 - `pnpm shots:sheet` produces sheets where all 47 shots are recognisable against the table in `SHOTS.md`.
-- `pnpm film:rough` writes a 180 s mp4 (check duration with ffprobe) in which cuts fall on the click track.
+- `pnpm film:rough` writes an mp4 whose duration matches `total` in `video/timeline.json` (check with ffprobe) in which cuts fall on the click track.
 - Live mode with a fixture: clicking a cell zooms into its focus view and Escape returns (Playwright test).
 - No vendor or model name appears anywhere in `apps/web` (`pnpm lint:brand` greps a deny-list read from
   `harness.local.json`, so the list itself is not in the repo).

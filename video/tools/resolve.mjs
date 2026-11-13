@@ -28,10 +28,10 @@ const rows = shots.map((s) => {
 });
 
 const total = rows.at(-1).end;
-const drift = total - meta.targetSeconds;
-if (Math.abs(drift) > 1.5) {
+const max = meta.maxSeconds ?? 180; // a limit, not a target: the film may be any length up to it
+if (total > max) {
   const elastic = rows.filter((r) => r.elastic).map((r) => r.id).join(", ");
-  problems.push(`film runs ${total.toFixed(1)} s vs target ${meta.targetSeconds} s (${drift > 0 ? "+" : ""}${drift.toFixed(1)} s). Add or remove bars in elastic shots: ${elastic}`);
+  problems.push(`film runs ${total.toFixed(1)} s, ${(total - max).toFixed(1)} s over the ${max} s limit. Remove bars, starting with the elastic shots: ${elastic}`);
 }
 
 const mmss = (t) => `${Math.floor(t / 60)}:${(t % 60).toFixed(1).padStart(4, "0")}`;
@@ -58,7 +58,8 @@ if (!check) {
 }
 
 const spoken = rows.filter((r) => r.words);
-console.log(`${rows.length} shots, ${expected} beats (${expected / bpb} bars), ${total.toFixed(1)} s, ${spoken.reduce((n, r) => n + r.words, 0)} spoken words in ${spoken.length} lines`);
+const fastest = spoken.reduce((a, r) => (r.wps > a.wps ? r : a), spoken[0]);
+console.log(`${rows.length} shots, ${expected} beats (${expected / bpb} bars), ${total.toFixed(1)} s, ${spoken.reduce((n, r) => n + r.words, 0)} spoken words in ${spoken.length} lines, fastest ${fastest.id} at ${fastest.wps} words/s`);
 if (problems.length) {
   console.log("\nPROBLEMS:\n" + problems.map((p) => " - " + p).join("\n"));
   process.exit(1);
