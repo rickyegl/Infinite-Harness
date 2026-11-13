@@ -180,8 +180,13 @@ Their own rules still apply and are binding here:
    shot by shot, so there is a showable film at the end of every day.
 4. Behind schedule? Cut in this order: polish, then live runs of long-tail modules (keep their mock), then
    long-tail modules themselves. Never cut director mode, the game flow or the film assembly.
-5. Blocked on something only the author can do (a sign-in, an install, a recording)? Add it to
-   `plan/USER-TODO.md`, keep the mock path working and continue.
+5. Blocked on something only the author can do?
+   - **Needed now** (open a program, start or connect the Colab runtime, an API or sign-in, an unanswered
+     question, any other blocker): you may stop and ask. Say the exact action or question, what it unblocks and
+     what you will do next, and write it under "Waiting on the author" in `plan/STATUS.md` (see `AGENTS.md`
+     rule 5). Do not report a mock as the real thing.
+   - **Slow** (an install, a recording): add it to `plan/USER-TODO.md`, keep the mock path working and
+     continue with other work.
 
 ## ASSUMED (author can overrule)
 

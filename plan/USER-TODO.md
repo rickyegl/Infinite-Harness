@@ -1,7 +1,9 @@
 # Things only the author can do
 
-Agents add items here instead of stopping. Tick them off as you go. "Blocks" says which plan cannot finish for
-real (its mock path still works) until the item is done.
+Agents add slow items here (installs, recordings, files to supply) and carry on with other work. Tick them off
+as you go. "Blocks" says which plan cannot finish for real (its mock path still works) until the item is done.
+For something needed right now (a program to open, a runtime to start, a sign-in, a question), an agent may
+stop and ask you directly: see `AGENTS.md` rule 5 and "Waiting on the author" in `plan/STATUS.md`.
 
 ## Installs and sign-ins
 

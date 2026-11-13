@@ -15,8 +15,16 @@ what the next agent should know. Keep it short; replace stale lines instead of a
 - **Done (plan 01):** the stage. `apps/web` renders all 48 shots from fixture events and a clock, with no
   backend: eight views, camera, director and live modes, fixtures for every take, draft and hand-tuned direction
   files, contact sheets, the rough cut, determinism and live tests. Details under "The stage" below.
+  The author looked at it and liked it (2026-11-12).
 - **Next:** the plans that make takes real (02-07), then plan 08 replaces fixtures with recorded takes and
   finalises the draft direction files (S37-S40, S42-S47).
+
+## Waiting on the author
+
+Agents write here what they stopped for (a program to open, a runtime to start, a sign-in, a question) and
+remove the line when it is answered. See `AGENTS.md` rule 5.
+
+- Nothing right now.
 
 ## Verified
 
