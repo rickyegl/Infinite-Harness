@@ -103,14 +103,14 @@
     "forecast",
     "anomaly"
   ],
-  "backend": "worker",
-  "modelKey": "workers.secondary",
-  "ms": 5767,
-  "recordedAt": "2026-11-13T05:00:28.910Z",
+  "backend": "proxy",
+  "modelKey": "proxy.testModel",
+  "ms": 3039,
+  "recordedAt": "2026-11-13T05:37:32.352Z",
   "plan": {
     "nodes": [
       {
-        "id": "study-guides",
+        "id": "study",
         "module": "study",
         "label": "Study guides",
         "prompt": "Check all presentations on Canvas and make a study guide for every single test.",

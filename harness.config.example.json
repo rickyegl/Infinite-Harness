@@ -4,7 +4,10 @@
   "proxy": {
     "baseUrl": "http://127.0.0.1:8317/v1",
     "apiKeyEnv": "HARNESS_PROXY_KEY",
+    "keyFile": "<the proxy's own config file, read by path when the variable is not set>",
+    "keyField": "api-keys",
     "routerModel": "<model id for the router>",
+    "testModel": "<model id the tests and record:router route with>",
     "imageModel": "<model id for image generation and edits>",
     "signInUrl": "<the proxy's own sign-in page>",
     "timeoutMs": 30000

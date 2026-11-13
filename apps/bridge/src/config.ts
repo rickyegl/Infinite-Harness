@@ -32,6 +32,12 @@ export type HarnessConfig = {
     baseUrl: string;
     apiKeyEnv: string;
     routerModel: string;
+    /** the router model the tests and record:router use instead of routerModel (cheaper, faster) */
+    testModel?: string;
+    /** a file that holds the proxy key (the proxy's own config), read when the env variable is not set */
+    keyFile?: string;
+    /** the field in keyFile; default "api-keys" */
+    keyField?: string;
     imageModel: string;
     /** the proxy's own sign-in page, opened by "Connect your AI subscription" */
     signInUrl: string;
@@ -83,7 +89,25 @@ export function loadConfig(root = repoRoot, env: NodeJS.ProcessEnv = process.env
     w.args ??= [];
     w.timeoutMs ??= 30 * 60_000;
   }
+  // the proxy key: from the environment, else read by path from the proxy's own config file (never copied,
+  // printed or logged; it only lives in this process's environment, where the router reads it)
+  const kf = c.proxy.keyFile;
+  if (!env[c.proxy.apiKeyEnv] && kf && !isPlaceholder(kf)) {
+    const key = readKeyFile(abs(kf, root), c.proxy.keyField ?? "api-keys");
+    if (key) env[c.proxy.apiKeyEnv] = key;
+  }
   return c;
+}
+
+/** The first value of `field` in a TOML/env-style file: `field = "k"`, `field = ["k", ...]` or `field=k`. */
+export function readKeyFile(file: string, field: string): string | null {
+  if (!existsSync(file)) return null;
+  const esc = field.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const m = new RegExp(`^\\s*${esc}\\s*[=:]\\s*(.+)$`, "m").exec(readFileSync(file, "utf8"));
+  if (!m) return null;
+  const v = m[1].trim();
+  const q = /["']([^"']+)["']/.exec(v);
+  return q ? q[1] : v.replace(/^\[|\]$/g, "").trim() || null;
 }
 
 /** Absolute path for a config path that may be relative to the repo. */
@@ -100,4 +124,10 @@ export function config(): HarnessConfig {
 /** tests: replace the cached config */
 export function setConfig(c: HarnessConfig | null): void {
   cached = c;
+}
+
+/** The config the tests route with: proxy.testModel, when set, stands in for proxy.routerModel. */
+export function withTestModel(c: HarnessConfig): HarnessConfig {
+  const m = c.proxy.testModel;
+  return m && !isPlaceholder(m) ? { ...c, proxy: { ...c.proxy, routerModel: m } } : c;
 }

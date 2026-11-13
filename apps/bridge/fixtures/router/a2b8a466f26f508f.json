@@ -88,17 +88,17 @@
     "forecast",
     "anomaly"
   ],
-  "backend": "worker",
-  "modelKey": "workers.secondary",
-  "ms": 6856,
-  "recordedAt": "2026-11-13T05:00:23.142Z",
+  "backend": "proxy",
+  "modelKey": "proxy.testModel",
+  "ms": 4154,
+  "recordedAt": "2026-11-13T05:37:29.312Z",
   "plan": {
     "nodes": [
       {
         "id": "house-blender",
         "module": "blender",
-        "label": "House model",
-        "prompt": "Build the house in Blender using the architectural drawings from house-plan and the existing house images as references.",
+        "label": "3D house model",
+        "prompt": "Build the house from the architectural plans on Blender.",
         "after": [],
         "under": "house-plan"
       }

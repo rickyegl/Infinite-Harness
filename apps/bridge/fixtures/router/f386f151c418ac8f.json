@@ -73,17 +73,17 @@
     "forecast",
     "anomaly"
   ],
-  "backend": "worker",
-  "modelKey": "workers.secondary",
-  "ms": 6097,
-  "recordedAt": "2026-11-13T05:00:16.286Z",
+  "backend": "proxy",
+  "modelKey": "proxy.testModel",
+  "ms": 2724,
+  "recordedAt": "2026-11-13T05:37:24.268Z",
   "plan": {
     "nodes": [
       {
-        "id": "red-walls",
+        "id": "house-edit",
         "module": "assets.image.edit",
-        "label": "Wall recoloring",
-        "prompt": "Edit the existing house image to make the walls red. Keep the framing and other details unchanged.",
+        "label": "Image edit",
+        "prompt": "Make the walls red.",
         "after": [],
         "under": "house"
       }

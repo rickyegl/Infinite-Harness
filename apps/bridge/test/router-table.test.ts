@@ -3,8 +3,8 @@
 // model proxy is up.
 
 import { describe, expect, it } from "vitest";
-import { config, isPlaceholder } from "../src/config.ts";
-import { checkPlan, loadRecorded, promptKey, viaProxy, type Plan } from "../src/router.ts";
+import { config, isPlaceholder, withTestModel } from "../src/config.ts";
+import { checkPlan, loadRecorded, parseJsonAnswer, promptKey, viaProxy, type Plan } from "../src/router.ts";
 import { ACT1, CASES, CATALOG, type Case } from "./router-cases.ts";
 
 const recorded = loadRecorded();
@@ -55,7 +55,7 @@ describe("router table (recorded outputs)", () => {
   });
 });
 
-const cfg = config();
+const cfg = withTestModel(config());
 async function proxyUp(): Promise<boolean> {
   if (isPlaceholder(cfg.proxy.routerModel) || !process.env[cfg.proxy.apiKeyEnv]) return false;
   try {
@@ -69,6 +69,15 @@ async function proxyUp(): Promise<boolean> {
   }
 }
 const up = await proxyUp();
+
+describe("parseJsonAnswer", () => {
+  it("reads plain JSON, fenced JSON and JSON inside prose", () => {
+    expect(parseJsonAnswer('{"nodes":[]}')).toEqual({ nodes: [] });
+    expect(parseJsonAnswer("```json\n{\"nodes\":[]}\n```")).toEqual({ nodes: [] });
+    expect(parseJsonAnswer('Here is the plan: {"nodes":[{"id":"a"}]} done')).toEqual({ nodes: [{ id: "a" }] });
+    expect(() => parseJsonAnswer("no plan")).toThrow(/no JSON/);
+  });
+});
 
 describe("router live", () => {
   it.skipIf(!up)("routes Act 1 through the proxy", { timeout: 120000 }, async () => {

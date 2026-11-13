@@ -123,19 +123,19 @@
     "forecast",
     "anomaly"
   ],
-  "backend": "worker",
-  "modelKey": "workers.secondary",
-  "ms": 5057,
-  "recordedAt": "2026-11-13T05:00:33.968Z",
+  "backend": "proxy",
+  "modelKey": "proxy.testModel",
+  "ms": 3947,
+  "recordedAt": "2026-11-13T05:37:39.574Z",
   "plan": {
     "nodes": [
       {
-        "id": "detect-anomaly",
+        "id": "anomaly",
         "module": "anomaly",
         "label": "Anomaly detection",
-        "prompt": "Detect anomalies and outliers in the history data used for the existing forecast cell.",
+        "prompt": "Detect anomaly.",
         "after": [],
-        "under": "forecast"
+        "under": null
       }
     ]
   }

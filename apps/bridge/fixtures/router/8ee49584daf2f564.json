@@ -128,17 +128,17 @@
     "forecast",
     "anomaly"
   ],
-  "backend": "worker",
-  "modelKey": "workers.secondary",
-  "ms": 5503,
-  "recordedAt": "2026-11-13T05:00:34.452Z",
+  "backend": "proxy",
+  "modelKey": "proxy.testModel",
+  "ms": 11053,
+  "recordedAt": "2026-11-13T05:37:46.881Z",
   "plan": {
     "nodes": [
       {
         "id": "house-car",
         "module": "blender",
-        "label": "Scene arrangement",
-        "prompt": "Put the car from the existing racing game on top of the house in the existing house-3d Blender scene.",
+        "label": "3D scene edit",
+        "prompt": "Put the car on the house.",
         "after": [],
         "under": "house-3d"
       }

@@ -30,13 +30,7 @@ what the next agent should know. Keep it short; replace stale lines instead of a
 Agents write here what they stopped for (a program to open, a runtime to start, a sign-in, a question) and
 remove the line when it is answered. See `AGENTS.md` rule 5.
 
-- (plan 02) **Start the local model proxy** (port in `proxy.baseUrl`) and confirm `proxy.routerModel` in
-  `harness.local.json` and the `HARNESS_PROXY_KEY` variable. Unblocks: the router's first-choice route (it falls
-  back to a worker, about 5-6 s per prompt, until then), the "AI subscription: Connected" line in the settings
-  sheet, and the live router test. Next: re-run `pnpm --filter bridge record:router` and record the proxy latency here.
-- (plan 02) **Sign the `primary` worker CLI in again** (its session expired). Unblocks: an end-to-end run of
-  the `stream-json` adapter and its no-network probe in `pnpm --filter bridge test`. Next: run both and fix
-  whatever the adapter gets wrong.
+- Nothing right now.
 
 ## Verified
 
@@ -63,13 +57,20 @@ remove the line when it is answered. See `AGENTS.md` rule 5.
     React commit with its orbit angle computed from the evidence's age, never in its own animation loop.
 
 - Plan 02 (2026-11-12), all on this machine:
-  - `pnpm typecheck` clean; `pnpm test`: protocol 13, web 7, bridge 33 passed and 2 skipped (the live proxy
-    router call: proxy down; the `primary` no-network probe: sign-in expired). Bridge tests: store (seq and t
+  - `pnpm typecheck` clean; `pnpm test`: protocol 13, web 7, bridge 36, none skipped, with no key in the
+    environment (read by path). Bridge tests: store (seq and t
     monotone, restart closes open cells, torn last line, reopen keeps seq), server (401 without the token,
     WebSocket events equal events.jsonl, replay from seq 0 and from seq 10, artifacts, dotfiles and traversal
-    refused), router table (16 recorded plans), allow (vocabulary, grants, adapter arguments).
-  - No-network probe, real `secondary` worker with no network grant asked to fetch a local URL: the local server
-    got zero requests and the answer did not contain the secret word.
+    refused), router table (16 plans recorded through the proxy with the test model, plus Act 1 routed live),
+    JSON answer parsing, allow (vocabulary, grants, adapter arguments).
+  - No-network probe, both real workers (`primary` and `secondary`) with no network grant asked to fetch a local
+    URL: the local server got zero requests and neither answer contained the secret word.
+  - Real router model through the proxy: "say hello three ways" and Act 1 give valid plans (Act 1: game, two
+    voice cells for trailer and campaign, trailer, campaign, host, verify, recorder). `/proxy/status` answers
+    connected, so the settings sheet shows the subscription as connected.
+  - `primary` worker end to end (run 20261112-233932, `stream-json` adapter, routed by the real router model in
+    1.4 s): `report_step`, then `spawn_task` three times through the harness MCP server; each child wrote its
+    file and attached it; all five cells done in 40 s.
   - Real worker run (`pnpm smoke`, "say hello three ways", run 20261112-231406): the router (worker fallback)
     planned one agent cell; the worker called `report_step` and `spawn_task` three times through the harness MCP
     server; the three child cells appeared with their evidence. That run is take `smoke`.
@@ -112,19 +113,21 @@ Modules so far: `mock.echo`, `mock.agent` (fixture `hello`, recorded from a real
   - `workers.primary`, adapter `stream-json`: `<cli> -p --output-format stream-json --verbose
     --no-session-persistence --strict-mcp-config --mcp-config <cell>/.mcp-servers.json --restricted --tools
     <granted built-ins> --allowedTools <granted tools> --permission-mode acceptEdits --add-dir <write grants>
-    [--model <id>] [--json-schema <schema>]` (prompt on stdin). Built and unit-tested; not yet run end to end.
-- Router model id key: `proxy.routerModel` (proxy route, first choice). Fallback worker: `router.worker`
-  (currently `secondary`). Recorded plans say which backend and key produced them.
-- Router latency (worker fallback; the proxy was down): 4.8-8.3 s per prompt, median about 5.8 s; the Act 1
-  prompt 15.8 s. The proxy route is not measured yet.
+    [--model <id>] [--json-schema <schema>]` (prompt on stdin). Verified end to end (see "Verified").
+- Router model id keys: `proxy.routerModel` for real runs, `proxy.testModel` for the tests and
+  `record:router` (the real model ids are in `plan/LOCAL.md`). Fallback worker: `router.worker` (currently
+  `secondary`). Recorded plans say which backend and key produced them. The proxy key is read by path
+  (`proxy.keyFile`) when `HARNESS_PROXY_KEY` is not set, so `pnpm dev` needs no exported variable.
+- Router latency, proxy route: real model 1.4-2.9 s for short prompts, 9.3 s for Act 1 (it refuses the proxy's
+  JSON mode, so each call is a 400 then a retry with the schema in the instructions; the 400 is under 1 s).
+  Test model 2.4-11 s per prompt, 16-20 s for Act 1. Worker fallback: 4.8-8.3 s, Act 1 15.8 s.
 - What the adapters cannot observe or enforce:
   - Reads. `allow` has no read list; a worker can read any file the user can.
   - Hosts. `network` names other than `*` are not enforced per host; only "no shell and no web" (no way to reach
     a host) or `*`. On this machine the sandbox does not cut the network for shell commands, which is why
     `shell` requires `network: ["*"]`.
   - What an MCP server from the CLI's own config does on its side (only the call and its result are seen).
-  - Built-in tool calls appear as steps only as far as each CLI's event stream reports them; the `stream-json`
-    adapter's mapping is unverified until the primary worker is signed in again.
+  - Built-in tool calls appear as steps only as far as each CLI's event stream reports them.
 
 ## The stage (plan 01)
 
@@ -252,7 +255,10 @@ before falling back to the fixture (checked: the full film has 20, one per take,
 - ASSUMED (plan 02): the PCB board is not decided yet (S38); the router table uses "a motor driver PCB".
 - ASSUMED (plan 02): the pairing token lives in `runs/.bridge-token` (gitignored, never printed by the bridge);
   the site keeps it in localStorage. `pnpm pair` prints a pairing link only when run in a terminal.
-- ASSUMED (plan 02): the router's worker fallback stays on `secondary` (the only signed-in worker today).
+- ASSUMED (plan 02): the router's worker fallback and `defaultWorker` stay on `secondary`; `primary` is
+  verified and can be chosen per module (`AgentOptions.worker`) or in `harness.local.json`.
+- ASSUMED (plan 02): the author named a "high" effort model for the tests; the proxy lists only its "xhigh"
+  variant, so `proxy.testModel` is that one (ids in `plan/LOCAL.md`).
 
 ## Open problems
 
@@ -269,7 +275,7 @@ before falling back to the fixture (checked: the full film has 20, one per take,
 | Plan | State | Verified by | Notes |
 |---|---|---|---|
 | 01 | done | typecheck, unit tests, determinism 96/96, live test, sheets, rough cut duration, lint:brand | See "The stage". Drafts S37-S40, S42-S47 left for plan 08. |
-| 02 | done, two parts unverified | typecheck, unit tests, `pnpm dev`, real worker smoke run, no-network probe, prompt.md module run, test:bridge, test:live, determinism, film:rough, lint:brand | See "The bridge". The proxy route of the router and the `stream-json` adapter have not run for real (proxy down, primary sign-in expired); see "Waiting on the author". |
+| 02 | done | typecheck, unit tests (none skipped), `pnpm dev`, real runs on both workers, no-network probes, proxy routing with both models, prompt.md module run, test:bridge, test:live, determinism, film:rough, lint:brand | See "The bridge". |
 | 03 | not started | | |
 | 04 | not started | | |
 | 05 | not started | | |

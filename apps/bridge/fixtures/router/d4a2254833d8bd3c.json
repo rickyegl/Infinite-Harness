@@ -118,17 +118,17 @@
     "forecast",
     "anomaly"
   ],
-  "backend": "worker",
-  "modelKey": "workers.secondary",
-  "ms": 5956,
-  "recordedAt": "2026-11-13T05:00:33.848Z",
+  "backend": "proxy",
+  "modelKey": "proxy.testModel",
+  "ms": 2447,
+  "recordedAt": "2026-11-13T05:37:36.016Z",
   "plan": {
     "nodes": [
       {
-        "id": "demand-forecast",
+        "id": "forecast",
         "module": "forecast",
         "label": "Demand forecast",
-        "prompt": "Forecast demand from historical demand data.",
+        "prompt": "Forecast demand.",
         "after": [],
         "under": null
       }

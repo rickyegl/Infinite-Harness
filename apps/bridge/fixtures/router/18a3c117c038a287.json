@@ -83,19 +83,19 @@
     "forecast",
     "anomaly"
   ],
-  "backend": "worker",
-  "modelKey": "workers.secondary",
-  "ms": 8302,
-  "recordedAt": "2026-11-13T05:00:24.026Z",
+  "backend": "proxy",
+  "modelKey": "proxy.testModel",
+  "ms": 8442,
+  "recordedAt": "2026-11-13T05:37:32.712Z",
   "plan": {
     "nodes": [
       {
         "id": "house-design",
         "module": "drafting",
-        "label": "House design",
-        "prompt": "Design the house shown in the existing house image. Produce architectural drawings with floor plans, elevations and dimensions.",
+        "label": "Architectural drawings",
+        "prompt": "Design the house with architectural drawings including floor plans, elevations, and dimensions.",
         "after": [],
-        "under": "house"
+        "under": "house-cutout"
       }
     ]
   }

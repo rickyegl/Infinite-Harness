@@ -100,24 +100,44 @@ export async function viaProxy(cfg: HarnessConfig, prompt: string, modules: Modu
   const p = cfg.proxy;
   if (isPlaceholder(p.routerModel)) throw new Error("proxy.routerModel is not set");
   const key = process.env[p.apiKeyEnv];
-  const res = await fetch(`${p.baseUrl}/chat/completions`, {
-    method: "POST",
-    headers: { "content-type": "application/json", ...(key ? { authorization: `Bearer ${key}` } : {}) },
-    signal: AbortSignal.any([AbortSignal.timeout(cfg.router.timeoutMs), ...(signal ? [signal] : [])]),
-    body: JSON.stringify({
-      model: p.routerModel,
-      messages: [
-        { role: "system", content: readFileSync(ROUTER_MD, "utf8") },
-        { role: "user", content: userMessage(prompt, modules, existing) },
-      ],
-      response_format: { type: "json_schema", json_schema: { name: "plan", strict: true, schema: PLAN_SCHEMA } },
-    }),
-  });
+  const ask = (schemaInPrompt: boolean) =>
+    fetch(`${p.baseUrl}/chat/completions`, {
+      method: "POST",
+      headers: { "content-type": "application/json", ...(key ? { authorization: `Bearer ${key}` } : {}) },
+      signal: AbortSignal.any([AbortSignal.timeout(cfg.router.timeoutMs), ...(signal ? [signal] : [])]),
+      body: JSON.stringify({
+        model: p.routerModel,
+        messages: [
+          {
+            role: "system",
+            content: readFileSync(ROUTER_MD, "utf8") + (schemaInPrompt ? `\n\nAnswer with only one JSON object that matches this JSON schema:\n\n${JSON.stringify(PLAN_SCHEMA)}` : ""),
+          },
+          { role: "user", content: userMessage(prompt, modules, existing) },
+        ],
+        ...(schemaInPrompt ? {} : { response_format: { type: "json_schema", json_schema: { name: "plan", strict: true, schema: PLAN_SCHEMA } } }),
+      }),
+    });
+  // first the proxy's json_schema; some models refuse it (the proxy turns it into a forced tool call), so a 400
+  // retries once with the schema in the instructions. checkPlan validates either answer.
+  let res = await ask(false);
+  if (res.status === 400) res = await ask(true);
   if (!res.ok) throw new Error(`proxy answered ${res.status}`);
   const j = (await res.json()) as { choices?: { message?: { content?: string } }[] };
   const text = j.choices?.[0]?.message?.content;
   if (!text) throw new Error("proxy returned no content");
-  return JSON.parse(text) as Plan;
+  return parseJsonAnswer(text) as Plan;
+}
+
+/** The JSON object in a model's answer: the whole text, or the span from the first { to the last } (fences, prose). */
+export function parseJsonAnswer(text: string): unknown {
+  try {
+    return JSON.parse(text);
+  } catch {
+    const a = text.indexOf("{");
+    const b = text.lastIndexOf("}");
+    if (a < 0 || b <= a) throw new Error("the answer holds no JSON object");
+    return JSON.parse(text.slice(a, b + 1));
+  }
 }
 
 export async function viaWorker(cfg: HarnessConfig, prompt: string, modules: ModuleSummary[], existing: Existing[], workDir: string, signal?: AbortSignal): Promise<Plan> {

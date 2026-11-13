@@ -113,16 +113,16 @@
     "forecast",
     "anomaly"
   ],
-  "backend": "worker",
-  "modelKey": "workers.secondary",
-  "ms": 4839,
-  "recordedAt": "2026-11-13T05:00:30.861Z",
+  "backend": "proxy",
+  "modelKey": "proxy.testModel",
+  "ms": 3115,
+  "recordedAt": "2026-11-13T05:37:35.828Z",
   "plan": {
     "nodes": [
       {
-        "id": "motor-pcb",
+        "id": "pcb",
         "module": "pcb",
-        "label": "PCB design",
+        "label": "Circuit board design",
         "prompt": "Make a motor driver PCB.",
         "after": [],
         "under": null

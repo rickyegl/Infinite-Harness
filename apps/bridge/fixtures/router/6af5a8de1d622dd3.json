@@ -93,17 +93,17 @@
     "forecast",
     "anomaly"
   ],
-  "backend": "worker",
-  "modelKey": "workers.secondary",
-  "ms": 5090,
-  "recordedAt": "2026-11-13T05:00:21.983Z",
+  "backend": "proxy",
+  "modelKey": "proxy.testModel",
+  "ms": 2673,
+  "recordedAt": "2026-11-13T05:37:28.643Z",
   "plan": {
     "nodes": [
       {
         "id": "house-render",
         "module": "blender.render",
         "label": "Realistic render",
-        "prompt": "Render the existing house 3D scene from house-3d to a realistic image.",
+        "prompt": "Render the 3D house scene to a realistic image.",
         "after": [],
         "under": "house-3d"
       }

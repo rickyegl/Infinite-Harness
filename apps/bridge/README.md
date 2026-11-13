@@ -19,7 +19,9 @@ Environment overrides: `HARNESS_MOCK=1|0`, `HARNESS_MOCK_SPEED`, `HARNESS_PORT`,
 | Key | Meaning |
 |---|---|
 | `bridge.port`, `bridge.host`, `bridge.runsDir`, `bridge.tokenFile` | Where it listens and stores runs. Host is always loopback. |
-| `proxy.baseUrl`, `proxy.apiKeyEnv`, `proxy.routerModel`, `proxy.signInUrl` | The local model proxy. The key is read from the env variable named by `apiKeyEnv`, never from a file in this repo. |
+| `proxy.baseUrl`, `proxy.routerModel`, `proxy.signInUrl` | The local model proxy, the model real runs route with, and its sign-in page. |
+| `proxy.testModel` | The model the tests and `record:router` route with instead of `routerModel` (cheaper, faster). |
+| `proxy.apiKeyEnv`, `proxy.keyFile`, `proxy.keyField` | The key comes from the env variable named by `apiKeyEnv`; when it is not set, it is read by path from `keyFile` (the proxy's own config, field `keyField`, default `api-keys`). Never copied into this repo, printed or logged. |
 | `router.worker`, `router.timeoutMs` | The worker the router falls back to when the proxy is down or returns a bad plan. |
 | `workers.<name>` | `{ adapter, cmd, args, model?, timeoutMs }`. `adapter` is `exec-jsonl` or `stream-json`. |
 | `defaultWorker` | Worker for `ctx.agent` and `spawn_task` sub-agents when a module does not choose. |
@@ -47,9 +49,10 @@ Every request carries the token: `Authorization: Bearer <token>`, `?token=`, or 
 
 - **Store.** Append plus fsync per event. On start, a run a previous process left `running` is closed: every open
   cell gets `node.error`, then `run.done`, and the run is marked failed. A torn last line is cut off.
-- **Router.** `router.md` is the prompt. First choice: the proxy with a JSON schema (`proxy.routerModel`).
-  Fallback: one call to `router.worker` with the same schema. In mock mode, recorded plans in
-  `fixtures/router/` are used first. `pnpm --filter bridge record:router` re-records them.
+- **Router.** `router.md` is the prompt. First choice: the proxy with a JSON schema (`proxy.routerModel`); a
+  model that refuses the proxy's JSON mode (HTTP 400) is asked again with the schema in its instructions, and
+  either answer must pass `checkPlan`. Fallback: one call to `router.worker` with the same schema. In mock
+  mode, recorded plans in `fixtures/router/` are used first. `pnpm --filter bridge record:router` re-records them.
 - **Modules.** `modules/*/module.json` is validated at start. The maker icon comes from the manifest only.
   A module without `run.ts` runs as one worker with its `prompt.md`. With `HARNESS_MOCK=1` each module
   replays `modules/<id>/fixtures/*.jsonl`.

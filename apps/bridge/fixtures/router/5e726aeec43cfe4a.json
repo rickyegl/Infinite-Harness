@@ -108,16 +108,16 @@
     "forecast",
     "anomaly"
   ],
-  "backend": "worker",
-  "modelKey": "workers.secondary",
-  "ms": 4921,
-  "recordedAt": "2026-11-13T05:00:28.949Z",
+  "backend": "proxy",
+  "modelKey": "proxy.testModel",
+  "ms": 3275,
+  "recordedAt": "2026-11-13T05:37:35.627Z",
   "plan": {
     "nodes": [
       {
-        "id": "robot-cad",
+        "id": "shooter-cad",
         "module": "cad",
-        "label": "Robot prototype",
+        "label": "Robot CAD design",
         "prompt": "CAD a drum shooter FRC robot prototype.",
         "after": [],
         "under": null

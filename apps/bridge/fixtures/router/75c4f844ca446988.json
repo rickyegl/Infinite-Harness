@@ -133,17 +133,17 @@
     "forecast",
     "anomaly"
   ],
-  "backend": "worker",
-  "modelKey": "workers.secondary",
-  "ms": 5911,
-  "recordedAt": "2026-11-13T05:00:36.773Z",
+  "backend": "proxy",
+  "modelKey": "proxy.testModel",
+  "ms": 6488,
+  "recordedAt": "2026-11-13T05:37:42.504Z",
   "plan": {
     "nodes": [
       {
         "id": "game-house",
         "module": "game",
-        "label": "Game update",
-        "prompt": "Put the existing house on the existing racing game. Use the house 3D model from house-3d and integrate it into the game.",
+        "label": "Update game",
+        "prompt": "Put the house on the game.",
         "after": [],
         "under": "game"
       }

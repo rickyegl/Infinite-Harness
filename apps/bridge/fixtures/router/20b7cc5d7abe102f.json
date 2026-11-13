@@ -6,17 +6,17 @@
     "mock.asset",
     "mock.echo"
   ],
-  "backend": "worker",
-  "modelKey": "workers.secondary",
-  "ms": 4800,
-  "recordedAt": "2026-11-13T05:00:38.649Z",
+  "backend": "proxy",
+  "modelKey": "proxy.testModel",
+  "ms": 2835,
+  "recordedAt": "2026-11-13T05:37:42.410Z",
   "plan": {
     "nodes": [
       {
         "id": "hello",
         "module": "mock.agent",
-        "label": "Greeting Variations",
-        "prompt": "Say hello three ways.",
+        "label": "Say hello",
+        "prompt": "say hello three ways",
         "after": [],
         "under": null
       }

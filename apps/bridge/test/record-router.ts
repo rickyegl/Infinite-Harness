@@ -4,12 +4,12 @@
 
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { abs, config } from "../src/config.ts";
+import { abs, config, isPlaceholder, withTestModel } from "../src/config.ts";
 import { loadModules, summaries } from "../src/modules.ts";
 import { checkPlan, promptKey, RECORDED, route, type Recorded } from "../src/router.ts";
 import { CASES, CATALOG } from "./router-cases.ts";
 
-const cfg = config();
+const cfg = withTestModel(config());
 const filter = process.argv[2]?.toLowerCase();
 const installed = summaries(loadModules().values());
 const cases = CASES.filter((c) => !filter || c.name.toLowerCase().includes(filter));
@@ -25,7 +25,7 @@ const next = async (): Promise<void> => {
     const r = await route(cfg, c.prompt, catalog, { existing: c.existing, workDir: join(work, String(i)) });
     const rec: Recorded = {
       prompt: c.prompt, existing: c.existing, catalog: catalog.map((m) => m.id), backend: r.backend as "proxy" | "worker",
-      modelKey: r.backend === "proxy" ? "proxy.routerModel" : `workers.${cfg.router.worker}`, ms: r.ms,
+      modelKey: r.backend === "proxy" ? (cfg.proxy.testModel && !isPlaceholder(cfg.proxy.testModel) ? "proxy.testModel" : "proxy.routerModel") : `workers.${cfg.router.worker}`, ms: r.ms,
       recordedAt: new Date().toISOString(), plan: r.plan,
     };
     writeFileSync(join(RECORDED, `${promptKey(c.prompt, c.existing)}.json`), JSON.stringify(rec, null, 2) + "\n");

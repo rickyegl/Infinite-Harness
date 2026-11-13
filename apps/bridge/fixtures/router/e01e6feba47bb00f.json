@@ -78,17 +78,17 @@
     "forecast",
     "anomaly"
   ],
-  "backend": "worker",
-  "modelKey": "workers.secondary",
-  "ms": 6702,
-  "recordedAt": "2026-11-13T05:00:16.892Z",
+  "backend": "proxy",
+  "modelKey": "proxy.testModel",
+  "ms": 3614,
+  "recordedAt": "2026-11-13T05:37:25.158Z",
   "plan": {
     "nodes": [
       {
         "id": "house-cutout",
         "module": "assets.cutout",
-        "label": "Background removal",
-        "prompt": "Remove the background from the edited house image in house-red, leaving the house on a transparent background.",
+        "label": "Background cutout",
+        "prompt": "Remove the background so the subject is on a transparent background.",
         "after": [],
         "under": "house-red"
       }

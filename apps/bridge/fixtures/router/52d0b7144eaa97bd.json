@@ -98,17 +98,17 @@
     "forecast",
     "anomaly"
   ],
-  "backend": "worker",
-  "modelKey": "workers.secondary",
-  "ms": 5909,
-  "recordedAt": "2026-11-13T05:00:27.892Z",
+  "backend": "proxy",
+  "modelKey": "proxy.testModel",
+  "ms": 4925,
+  "recordedAt": "2026-11-13T05:37:33.569Z",
   "plan": {
     "nodes": [
       {
         "id": "house-video",
         "module": "assets.video",
-        "label": "House video",
-        "prompt": "Turn the existing house render from cell house-render into a short video that brings it to life.",
+        "label": "Animate image",
+        "prompt": "Make the rendered house image into a short video clip.",
         "after": [],
         "under": "house-render"
       }
