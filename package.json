@@ -1,0 +1,25 @@
+{
+  "name": "infinite-harness",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.28.0",
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck",
+    "lint:brand": "node tools/lint-brand.mjs",
+    "shots:direct": "node video/tools/direct.mjs",
+    "shots:sheet": "node video/tools/sheet.mjs",
+    "film:rough": "node video/tools/rough.mjs",
+    "test:live": "node apps/web/test/live.mjs",
+    "test:determinism": "node apps/web/test/determinism.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.58.2"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}
