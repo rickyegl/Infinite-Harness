@@ -6,9 +6,9 @@ what the next agent should know. Keep it short; replace stale lines instead of a
 ## Now
 
 - **Done:** repository created; film shot layout (`video/SHOTS.md`, `video/shots.json`, resolver script);
-  plan files 00-10; music marker tool; text-card preview render; **film re-cut faster on one steady tempo**
-  (128 BPM, 72 bars, 2:15). 3:00 is a limit, not a target. **First score** built from generated takes and
-  in the preview (`video/tools/score.py`, `video/score/cues.json`).
+  plan files 00-10; text-card preview render; **film re-cut faster on one steady tempo**
+  (128 BPM, 72 bars, 2:15). 3:00 is a limit, not a target. **Score approved** by the author (2026-11-12):
+  built from generated takes plus the chosen song (`video/tools/score.py`, `video/score/cues.json`).
 - **Next:** author reviews `video/SHOTS.md` and `plan/USER-TODO.md`, then plan 01.
 - **Not started:** all application code.
 
@@ -18,7 +18,7 @@ what the next agent should know. Keep it short; replace stale lines instead of a
 - `node video/tools/preview.mjs` renders `video/renders/shots-preview.mp4` with `score.wav` (duration checked
   with ffprobe against `timeline.json`).
 - `python video/tools/score.py`: every take measured at 128.0 BPM; each cue's span within 8 ms of the grid.
-  Not yet checked by ear.
+  The author listened to the preview and approved it.
 
 ## Decisions by the author (2026-11-11)
 
@@ -36,10 +36,11 @@ Nothing beyond that list yet.
 
 ## Open problems
 
-- The score is unheard by its author: beat 1 is detected, not confirmed, for each take (the second drop was
-  moved two beats on the detector's evidence). `video/tools/marker.html` still offers the old two-track marks.
 - The opening line no longer asks for a cloned voice, but the Voice cell still appears in S09 and S16.
-- Audio files are not in git (`video/audio/` is ignored).
+- Audio files are not in git (`video/audio/` is ignored), except `video/makeasong.mp3`. `score.wav` and its
+  takes live only on this machine; keep them. Regenerating from the seeds in `cues.json` may not give
+  identical takes.
+- `video/tools/marker.html` (the old two-track marker) is no longer used.
 - Unity automation path on this machine is unconfirmed (USER-TODO 6).
 - `cloudflared` is not installed (USER-TODO 2). Unity 6 has no WebGL module yet (USER-TODO 1).
 

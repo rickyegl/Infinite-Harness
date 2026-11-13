@@ -31,11 +31,11 @@ Fill these into `harness.local.json` / `plan/LOCAL.md`, or tell the agent.
 
 | # | Item | Blocks |
 |---|---|---|
-| 13 | Music: a first score is built (`video/audio/score.wav`, in the preview). Listen and say which cue is wrong; each is retuned in `video/score/cues.json`. | 09 |
+| 13 | ~~Music~~: done. The score is approved (2026-11-12). Changes later are retuned in `video/score/cues.json`. | |
 | 14 | Beat timings: fixed at 128 BPM. Nothing to do. | 08 (retiming), 09 |
 | 15 | Voice lines recorded fast, one file per line named by shot (`S02.wav` ...) or one take -> `video/audio/voice/` | 08 (typing sync), 09 |
-| 16 | "I'm not done" 1.5 s effect -> `video/audio/sfx/not_done.*` | 09 |
-| 17 | 4 s of the chosen song -> `video/audio/song4s.*` and the full song -> `assets/music/` | 04 (Music), 09 |
+| 16 | "I'm not done" 1.5 s effect -> `video/audio/sfx/not_done.*` (the score has a rewind there until then) | 09 |
+| 17 | ~~Chosen song~~: done, `video/makeasong.mp3`. Optional: a longer version in `assets/music/` for the games. | |
 | 18 | Read `video/SHOTS.md` and change any shot, order or line you want before plan 01 starts. | 01 |
 
 ## Approvals agents will ask for (never assumed)

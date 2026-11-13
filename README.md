@@ -46,7 +46,8 @@ node video/tools/preview.mjs
 
 It writes `video/renders/shots-preview.mp4`.
 
-To choose and time the music, open `video/tools/marker.html` in a browser: load candidate tracks, tap the beat,
-mark the drop, breaks, hits and ending, then copy the marks as JSON.
+The music is scored to the film in short cues on the 128 BPM grid. `video/score/cues.json` lists the takes and
+which bars play where; `python video/tools/score.py` builds `video/audio/score.wav` from locally generated
+takes and checks every cue against the grid.
 
 Built with AI.

@@ -16,7 +16,7 @@ orchestrators receive real assets from them through `request_asset`.
 | `assets.model3d` | 3D Model | Forge `mesh` pipeline over its REST API: concept, cutout, shape, texture, decimate, export, optional rig. Each forge step becomes a `node.step` with its preview image. Auto-approve review gates. | step previews, final `model3d` (GLB) |
 | `assets.video` | Video | Image-to-video job on the Colab runtime (the author's existing notebook or launcher; path in local config). | `video` |
 | `voice` | Voice | Studio narration tool with the cloned voice id from the studio's `.env`. Returns audio + word timings. | `audio` waveform |
-| `music` | Music | Picks from `assets/music/` supplied by the author (the chosen song first). No generation API is assumed. | `audio` |
+| `music` | Music | Returns the chosen song, `video/makeasong.mp3` (or a longer version the author puts in `assets/music/`). No generation API is assumed. | `audio` |
 
 1. Each module: `module.json`, `run.ts`, fixtures recorded from one real run, README with the exact commands it
    calls.

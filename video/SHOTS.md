@@ -139,11 +139,11 @@ or remove bars.
 
 | Item | Where | Needed by |
 |---|---|---|
-| Music | scored to the film in cues (see Music cues) -> `video/audio/` | Assembly |
+| Music | done: scored to the film in cues (see Music cues), built locally into `video/audio/score.wav` | Assembly |
 | Beat timings | fixed: 128 BPM in `video/beats.json` | Before capture |
 | Voice lines (one recording per line, or one take) | `video/audio/voice/` | Assembly; word timings drive the typing in the text box |
 | "I'm not done" sound effect (1.5 s) | `video/audio/sfx/not_done.*` | S27 |
-| 4 s of the chosen song | `video/audio/song4s.*` | S24 |
+| The chosen song | done: `video/makeasong.mp3` | S24 |
 | FRC simulator clip of the CAD robot | `video/takes/cad.sim/` | S37 |
 | Which PCB, which company's demand data | `shots.json` S38-S40 | Take capture |
 
@@ -154,7 +154,7 @@ or remove bars.
 - Act 2 has 16 bars. The two engine close-ups, the asset landing, trailer, campaign, hosting and verification are
   one bar each; the bloom, the sub-orchestrators, the handoff and the gameplay get two.
 - Act 3 gives each change two bars: the line in the first, the change on the second downbeat. "Add music" has a
-  third bar so the song clip runs about 4 s.
+  third bar: the song plays for one bar, then the score slams back.
 - Act 5 gives every prompt one bar, except video, CAD, the car on the house and the house in the game (two bars)
   and the study-guide line (four bars: the sentence over two, then "every", "single", "test").
 - There is no minimum length. To slow a moment down, add bars to that shot and re-run the resolver; the limit is
