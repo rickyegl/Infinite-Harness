@@ -1,0 +1,25 @@
+{
+  "id": "game.unity.ui",
+  "label": "UI",
+  "icon": "layout",
+  "kind": "agent",
+  "summary": "Part of the Unity game: draws the HUD (lap, place, speed, minimap, hit feed) and attaches editor shots.",
+  "accepts": [
+    "text"
+  ],
+  "produces": [
+    "frames"
+  ],
+  "runtime": "script",
+  "needs": [
+    "unity"
+  ],
+  "hidden": true,
+  "mock": true,
+  "allow": {
+    "write": [
+      "$RUN",
+      "$paths.unityProject"
+    ]
+  }
+}

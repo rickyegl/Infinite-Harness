@@ -1,0 +1,6 @@
+{"t":1,"type":"node.state","node":".","state":"running"}
+{"t":14,"type":"node.step","node":".","title":"Switching to night","detail":"dark sky, low moon, lamps and glowing edges on, light fog","icon":"moon"}
+{"t":198,"type":"node.step","node":".","title":"Rebuilt the Roblox place","detail":"Flags.luau updated, place.rbxlx in 0.2 s","icon":"box"}
+{"t":201,"type":"node.step","node":".","title":"The running build picks it up within 2 s","detail":"StreamingAssets/harness.json","icon":"check"}
+{"t":706,"type":"node.evidence","node":".","kind":"frames","uri":"./default/chase.jpg","caption":"Night","meta":{"frames":["./default/chase.jpg","./default/loop.jpg"],"fps":1,"loop":true,"fit":"cover"}}
+{"t":708,"type":"node.done","node":".","summary":"Night in 0.7 s, live in the running build"}

@@ -1,0 +1,28 @@
+{
+  "id": "game.unity.build",
+  "label": "Build",
+  "icon": "hammer",
+  "kind": "agent",
+  "summary": "Part of the Unity game: race-tests on autopilot, records 10 s of play to mp4 and builds the player.",
+  "accepts": [
+    "text"
+  ],
+  "produces": [
+    "frames",
+    "video",
+    "doc",
+    "link"
+  ],
+  "runtime": "script",
+  "needs": [
+    "unity"
+  ],
+  "hidden": true,
+  "mock": true,
+  "allow": {
+    "write": [
+      "$RUN",
+      "$paths.unityProject"
+    ]
+  }
+}

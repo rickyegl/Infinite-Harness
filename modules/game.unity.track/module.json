@@ -1,0 +1,25 @@
+{
+  "id": "game.unity.track",
+  "label": "Track",
+  "icon": "road",
+  "kind": "agent",
+  "summary": "Part of the Unity game: lays the track (loops, twists, banks, drop, hover sections) from the design and attaches editor shots.",
+  "accepts": [
+    "text"
+  ],
+  "produces": [
+    "frames"
+  ],
+  "runtime": "script",
+  "needs": [
+    "unity"
+  ],
+  "hidden": true,
+  "mock": true,
+  "allow": {
+    "write": [
+      "$RUN",
+      "$paths.unityProject"
+    ]
+  }
+}

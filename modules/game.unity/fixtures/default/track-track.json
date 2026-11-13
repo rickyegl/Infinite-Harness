@@ -1,0 +1,15 @@
+{
+"track": {
+  "shape": "wavy",
+  "length": 960,
+  "width": 18,
+  "hills": 3,
+  "seed": 7319,
+  "loops": 2,
+  "twists": 2,
+  "bank": 0.95,
+  "drop": 22,
+  "hover": true,
+  "loopRadius": 16
+}
+}

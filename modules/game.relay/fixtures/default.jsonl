@@ -1,0 +1,9 @@
+{"t":1,"type":"node.state","node":".","state":"running"}
+{"t":8,"type":"node.step","node":".","title":"Opening the relay room","detail":"http://127.0.0.1:7411/relay/20261113-014545","icon":"link"}
+{"t":166,"type":"node.step","node":".","title":"Relay works both ways","detail":"WebSocket received the HTTP state: yes; HTTP received the WebSocket state: yes","icon":"check"}
+{"t":333,"type":"node.step","node":".","title":"Rebuilt the Roblox place","detail":"Flags.luau updated, place.rbxlx in 0.2 s","icon":"box"}
+{"t":336,"type":"node.evidence","node":".","kind":"doc","uri":"./default/relay.md","caption":"Relay"}
+{"t":338,"type":"node.output","node":".","name":"Crossplay room","uri":"./default/relay.md","kind":"link","href":"http://127.0.0.1:7411/relay/20261113-014545"}
+{"t":339,"type":"node.step","node":".","title":"Racing a stand-in Roblox rider","detail":"the editor plays the game while this cell posts a rider's states to the room","icon":"play"}
+{"t":1121,"type":"node.evidence","node":".","kind":"frames","uri":"./default/frame_00002.jpg","caption":"Ghost from the other engine","meta":{"frames":["./default/frame_00002.jpg","./default/frame_00003.jpg"],"fps":1,"loop":true,"fit":"cover"}}
+{"t":1214,"type":"node.done","node":".","summary":"Crossplay on in 1.2 s: room 20261113-014545, checked both ways"}

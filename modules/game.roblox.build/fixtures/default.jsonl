@@ -1,0 +1,9 @@
+{"t":1,"type":"node.state","node":".","state":"running"}
+{"t":7,"type":"node.step","node":".","title":"Linting the Luau","detail":"selene, Roblox standard library","icon":"check"}
+{"t":219,"type":"node.step","node":".","title":"0 errors, 0 warnings","detail":"selene src","icon":"check"}
+{"t":221,"type":"node.step","node":".","title":"Building the place","detail":"rojo build -o place.rbxlx","icon":"hammer"}
+{"t":398,"type":"node.step","node":".","title":"place.rbxlx, 58 KB in 0.2 s","detail":"not opened in Studio","icon":"box"}
+{"t":401,"type":"node.evidence","node":".","kind":"code","uri":"./default/build.log","caption":"Lint and build","meta":{"lines":[[" ","$ selene src"],["+","0 errors, 0 warnings"],[" ","$ rojo build -o place.rbxlx"],["+","Built project to place.rbxlx (58 KB, 0.2 s)"]]}}
+{"t":403,"type":"node.evidence","node":".","kind":"doc","uri":"./default/build.md","caption":"Roblox place"}
+{"t":404,"type":"node.output","node":".","name":"Roblox place","uri":"./default/place.rbxlx","kind":"file"}
+{"t":407,"type":"node.done","node":".","summary":"place.rbxlx built (58 KB, lint clean); not opened in Studio"}

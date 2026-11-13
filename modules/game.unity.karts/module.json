@@ -1,0 +1,25 @@
+{
+  "id": "game.unity.karts",
+  "label": "Karts",
+  "icon": "game",
+  "kind": "agent",
+  "summary": "Part of the Unity game: puts the arcade karts on the grid from the design and attaches editor shots.",
+  "accepts": [
+    "text"
+  ],
+  "produces": [
+    "frames"
+  ],
+  "runtime": "script",
+  "needs": [
+    "unity"
+  ],
+  "hidden": true,
+  "mock": true,
+  "allow": {
+    "write": [
+      "$RUN",
+      "$paths.unityProject"
+    ]
+  }
+}

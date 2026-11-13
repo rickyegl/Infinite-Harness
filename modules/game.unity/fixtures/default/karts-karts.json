@@ -1,0 +1,29 @@
+{
+"karts": {
+  "count": 6,
+  "topSpeed": 32,
+  "accel": 11,
+  "grip": 8,
+  "steer": 10,
+  "colors": [
+    "#ff6046",
+    "#24bddd",
+    "#ffd447",
+    "#925ce6",
+    "#52cd70",
+    "#ef73ba",
+    "#e8463c",
+    "#3c8ee8"
+  ],
+  "names": [
+    "Zibbo",
+    "Vemli",
+    "Pogrin",
+    "Dazzu",
+    "Wiblet",
+    "Tufflo",
+    "Blaze",
+    "Volt"
+  ]
+}
+}

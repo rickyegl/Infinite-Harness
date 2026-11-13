@@ -1,0 +1,4 @@
+# the versions installed on the build machine (aftman reads this file when rojo or selene run in this folder)
+[tools]
+rojo = "rojo-rbx/rojo@7.4.4"
+selene = "Kampfkarren/selene@0.32.0"

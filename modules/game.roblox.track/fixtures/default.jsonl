@@ -1,0 +1,6 @@
+{"t":1,"type":"node.state","node":".","state":"running"}
+{"t":9,"type":"node.step","node":".","title":"Asking the Unity editor for the centre line","detail":"the same generator, so both games race on one track","icon":"cube"}
+{"t":2283,"type":"node.step","node":".","title":"320 samples, 1198 m lap","detail":"2 loop, 2 twist, 49% hover, 3 studs per metre","icon":"road"}
+{"t":2286,"type":"node.evidence","node":".","kind":"image","uri":"./default/track-top.svg","caption":"Track from above","meta":{"fit":"contain"}}
+{"t":2288,"type":"node.evidence","node":".","kind":"image","uri":"./default/track-profile.svg","caption":"Height along the lap","meta":{"fit":"contain"}}
+{"t":2289,"type":"node.done","node":".","summary":"1198 m lap (3594 studs) with twist, loop, loop, twist, written to TrackData.luau"}

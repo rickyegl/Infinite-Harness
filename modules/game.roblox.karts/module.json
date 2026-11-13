@@ -1,0 +1,26 @@
+{
+  "id": "game.roblox.karts",
+  "label": "Karts",
+  "icon": "game",
+  "kind": "agent",
+  "summary": "Part of the Roblox game: writes the karts section: part-built karts that drive in track space, players plus AI; draws the grid.",
+  "accepts": [
+    "text"
+  ],
+  "produces": [
+    "image",
+    "code"
+  ],
+  "runtime": "script",
+  "needs": [
+    "roblox"
+  ],
+  "hidden": true,
+  "mock": true,
+  "allow": {
+    "write": [
+      "$RUN",
+      "$paths.robloxProject"
+    ]
+  }
+}

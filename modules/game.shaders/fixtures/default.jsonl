@@ -1,0 +1,7 @@
+{"t":1,"type":"node.state","node":".","state":"running"}
+{"t":8,"type":"node.step","node":".","title":"Before","detail":"the chase camera with the current look","icon":"camera"}
+{"t":262,"type":"node.step","node":".","title":"Turning on the realistic look","detail":"post-processing volume, bloom, tone mapping, reflections, soft shadows, rougher asphalt","icon":"sun"}
+{"t":427,"type":"node.step","node":".","title":"Rebuilt the Roblox place","detail":"Flags.luau updated, place.rbxlx in 0.2 s","icon":"box"}
+{"t":681,"type":"node.evidence","node":".","kind":"image","uri":"./default/chase.jpg","caption":"Before"}
+{"t":682,"type":"node.evidence","node":".","kind":"image","uri":"./default/chase.jpg","caption":"Realistic","meta":{"before":"./default/chase.jpg","reveal":"wipe","wipeBeats":2}}
+{"t":684,"type":"node.done","node":".","summary":"Realistic look in 0.7 s, live in the running build"}

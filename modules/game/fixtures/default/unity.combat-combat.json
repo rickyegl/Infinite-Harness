@@ -1,0 +1,10 @@
+{
+"combat": {
+  "range": 5,
+  "cooldown": 1.4,
+  "knock": 7,
+  "slow": 0.65,
+  "aiAggression": 0.8,
+  "hitColor": "#fff084"
+}
+}

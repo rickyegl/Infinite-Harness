@@ -1,0 +1,25 @@
+{
+  "id": "game.relay",
+  "label": "Relay",
+  "icon": "link",
+  "kind": "agent",
+  "summary": "Live follow-up on a game this run already built: turns on crossplay through the bridge's relay room, so Unity and Roblox players race each other as ghost riders. Use for requests like 'add crossplay' or 'multiplayer'.",
+  "accepts": [
+    "text"
+  ],
+  "produces": [
+    "doc",
+    "link"
+  ],
+  "runtime": "script",
+  "needs": [
+    "unity"
+  ],
+  "mock": true,
+  "allow": {
+    "write": [
+      "$RUN",
+      "$paths.unityProject"
+    ]
+  }
+}

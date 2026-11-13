@@ -1,4 +1,4 @@
-// HTTP + WebSocket on 127.0.0.1. Every request carries the pairing token: `Authorization: Bearer <token>`,
+﻿// HTTP + WebSocket on 127.0.0.1. Every request carries the pairing token: `Authorization: Bearer <token>`,
 // `?token=<token>`, or a `/t/<token>/` path prefix (used for artifact URLs, so <img src> works).
 //
 //   POST /runs {prompt}            -> {id, startedAt}
@@ -13,6 +13,8 @@
 //   GET  /proxy/status             -> {up, connected, models}  (connected = the proxy lists at least one model)
 //   GET  /proxy/signin             -> {url} of the proxy's own sign-in page
 //   POST /internal/tool            -> harness MCP calls from workers
+//   /relay/<room>                  -> crossplay relay (relay.ts); no token
+//   GET  /runs/:id/artifacts/webgl/... -> a game build; no token, so the plain build link opens in any browser
 
 import { timingSafeEqual } from "node:crypto";
 import { createReadStream, existsSync, statSync } from "node:fs";
@@ -20,6 +22,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from "node:ht
 import { extname, join, normalize, sep } from "node:path";
 import { WebSocketServer, type WebSocket } from "ws";
 import { isPlaceholder, type HarnessConfig } from "./config.ts";
+import { createRelay } from "./relay.ts";
 import type { LoadedModule } from "./modules.ts";
 import type { Runner } from "./runner.ts";
 import type { RunLog, RunStore } from "./store.ts";
@@ -29,7 +32,12 @@ const TYPES: Record<string, string> = {
   ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp", ".gif": "image/gif", ".glb": "model/gltf-binary",
   ".gltf": "model/gltf+json", ".mp4": "video/mp4", ".webm": "video/webm", ".wav": "audio/wav", ".mp3": "audio/mpeg",
   ".txt": "text/plain; charset=utf-8", ".md": "text/plain; charset=utf-8", ".html": "text/plain; charset=utf-8",
+  ".css": "text/plain; charset=utf-8", ".js": "text/plain; charset=utf-8", ".wasm": "application/wasm", ".ogg": "audio/ogg",
+  ".ico": "image/x-icon", ".data": "application/octet-stream",
 };
+/** a game build is a web page: its own files are served as what they are (everywhere else html and js are text) */
+const BUILD = /^\/runs\/[A-Za-z0-9_-]+\/artifacts\/webgl(\/|$)/;
+const BUILD_TYPES: Record<string, string> = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8" };
 
 export type ServerDeps = { cfg: HarnessConfig; store: RunStore; runner: Runner; mods: Map<string, LoadedModule>; token: string };
 
@@ -38,6 +46,7 @@ const ORIGIN_OK = /^https?:\/\/(127\.0\.0\.1|localhost|\[::1\])(:\d+)?$/;
 
 export function startServer(d: ServerDeps): Promise<{ url: string; close: () => Promise<void> }> {
   const wss = new WebSocketServer({ noServer: true });
+  const relay = createRelay();
 
   /** strips a /t/<token>/ prefix; returns the path and whether the request is authorized */
   const auth = (req: IncomingMessage): { path: string; url: URL; ok: boolean } => {
@@ -103,9 +112,14 @@ export function startServer(d: ServerDeps): Promise<{ url: string; close: () => 
     cors(req, res);
     if (req.method === "OPTIONS") return res.end();
     const { path, url, ok } = auth(req);
-    if (!ok) return json(res, 401, { error: "pairing token missing or wrong" });
+    const build = req.method === "GET" && BUILD.test(path);
+    if (!ok && !build && !path.startsWith("/relay/")) return json(res, 401, { error: "pairing token missing or wrong" });
     const parts = path.split("/").filter(Boolean);
     try {
+      if (path.startsWith("/relay/")) {
+        if (await relay.http(req, res, path, url)) return;
+        return json(res, 404, { error: "not found" });
+      }
       if (req.method === "GET" && path === "/health") {
         return json(res, 200, { ok: true, mock: d.cfg.mock.enabled, active: [...d.runner.runs.keys()], modules: d.mods.size });
       }
@@ -154,10 +168,20 @@ export function startServer(d: ServerDeps): Promise<{ url: string; close: () => 
         }
         if (req.method === "GET") {
           const root = d.store.dir(id);
-          const file = normalize(join(root, ...parts.slice(2)));
+          let file = normalize(join(root, ...parts.slice(2)));
           if (!file.startsWith(root + sep) || parts.slice(2).some((p) => p.startsWith("."))) return json(res, 403, { error: "forbidden" });
+          if (build && existsSync(file) && statSync(file).isDirectory()) {
+            // the build folder itself: open its page (with a trailing slash, so its relative links resolve)
+            if (!path.endsWith("/")) {
+              res.statusCode = 302;
+              res.setHeader("Location", `${url.pathname}/${url.search}`);
+              return res.end();
+            }
+            file = join(file, "index.html");
+          }
           if (!existsSync(file) || !statSync(file).isFile()) return json(res, 404, { error: "not found" });
-          res.setHeader("Content-Type", TYPES[extname(file).toLowerCase()] ?? "application/octet-stream");
+          const ext = extname(file).toLowerCase();
+          res.setHeader("Content-Type", (build && BUILD_TYPES[ext]) || TYPES[ext] || "application/octet-stream");
           res.setHeader("Cache-Control", "no-cache");
           return createReadStream(file).pipe(res);
         }
@@ -170,6 +194,7 @@ export function startServer(d: ServerDeps): Promise<{ url: string; close: () => 
 
   server.on("upgrade", (req, socket, head) => {
     const { path, url, ok } = auth(req);
+    if (relay.upgrade(req, socket, head, path)) return;
     const m = /^\/runs\/([A-Za-z0-9_-]+)\/events$/.exec(path);
     const o = req.headers.origin;
     if (!ok || !m || (o && !ORIGIN_OK.test(o)) || !d.store.meta(m[1])) {
@@ -215,6 +240,7 @@ export function startServer(d: ServerDeps): Promise<{ url: string; close: () => 
         url: `http://${d.cfg.bridge.host}:${port}`,
         close: () => new Promise((r) => {
           for (const c of wss.clients) c.terminate();
+          relay.close();
           server.close(() => r());
           server.closeAllConnections();
         }),

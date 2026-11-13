@@ -1,0 +1,8 @@
+{"t":1,"type":"node.state","node":".","state":"running"}
+{"t":7,"type":"node.step","node":".","title":"Asking for a music loop","detail":"add music: make a music loop and put it in the game so it plays during the race, in both the Unity and Roblox builds.","icon":"music"}
+{"t":9,"type":"node.request","node":".","to":"assets","what":"add music: make a music loop and put it in the game so it plays during the race, in both the Unity and Roblox builds.","requestId":"q1"}
+{"t":10,"type":"node.state","node":".","state":"waiting"}
+{"t":75,"type":"node.state","node":".","state":"running"}
+{"t":79,"type":"node.step","node":".","title":"Playing in the running build","detail":"StreamingAssets/music.wav","icon":"check"}
+{"t":80,"type":"node.evidence","node":".","kind":"audio","uri":"./default/music.wav","caption":"Race music"}
+{"t":82,"type":"node.done","node":".","summary":"Music on in 0.1 s, live in the running build"}

@@ -1,0 +1,26 @@
+{
+  "id": "game.roblox.build",
+  "label": "Build",
+  "icon": "hammer",
+  "kind": "agent",
+  "summary": "Part of the Roblox game: lints the Luau with selene and builds place.rbxlx with rojo; not opened in Studio.",
+  "accepts": [
+    "text"
+  ],
+  "produces": [
+    "code",
+    "doc"
+  ],
+  "runtime": "script",
+  "needs": [
+    "roblox"
+  ],
+  "hidden": true,
+  "mock": true,
+  "allow": {
+    "write": [
+      "$RUN",
+      "$paths.robloxProject"
+    ]
+  }
+}

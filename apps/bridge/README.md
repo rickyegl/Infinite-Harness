@@ -44,6 +44,10 @@ Every request carries the token: `Authorization: Bearer <token>`, `?token=`, or 
 | `POST /runs/<id>/cancel` | Aborts every cell; they end in `node.error`. |
 | `GET /modules`, `GET /health` | Installed modules; status. |
 | `GET /proxy/status`, `GET /proxy/signin` | Whether the model proxy answers; its sign-in page for "Connect your AI subscription". |
+| `GET /runs/<id>/artifacts/webgl/...` | A game's browser build. No token, so the plain build link opens in any browser. |
+| `WS /relay/<room>` | Crossplay relay for a game build: send `{state}`, receive the other clients' states. No token. |
+| `POST /relay/<room> {state}` or `{states}` | The same over HTTP (for a Roblox server); answers `{seq, states}` of the other clients. |
+| `GET /relay/<room>?since=N` | Long poll for states newer than `N`. A state goes stale after 5 s. |
 
 ## Runs, routing, modules
 

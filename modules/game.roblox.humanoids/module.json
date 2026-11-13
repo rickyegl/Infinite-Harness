@@ -1,0 +1,26 @@
+{
+  "id": "game.roblox.humanoids",
+  "label": "Humanoids",
+  "icon": "person",
+  "kind": "agent",
+  "summary": "Part of the Roblox game: switches on the part-built riders and their weapons; draws a rider.",
+  "accepts": [
+    "text"
+  ],
+  "produces": [
+    "image",
+    "code"
+  ],
+  "runtime": "script",
+  "needs": [
+    "roblox"
+  ],
+  "hidden": true,
+  "mock": true,
+  "allow": {
+    "write": [
+      "$RUN",
+      "$paths.robloxProject"
+    ]
+  }
+}

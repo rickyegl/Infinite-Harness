@@ -1,0 +1,24 @@
+{
+  "id": "game.lighting",
+  "label": "Lighting",
+  "icon": "moon",
+  "kind": "agent",
+  "summary": "Live follow-up on a game this run already built: switches the game to night (or back to day): skybox, sun, lamps and fog, in the editor and in the finished build. Use for requests like 'make it night'.",
+  "accepts": [
+    "text"
+  ],
+  "produces": [
+    "frames"
+  ],
+  "runtime": "script",
+  "needs": [
+    "unity"
+  ],
+  "mock": true,
+  "allow": {
+    "write": [
+      "$RUN",
+      "$paths.unityProject"
+    ]
+  }
+}

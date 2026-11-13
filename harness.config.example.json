@@ -31,6 +31,8 @@
     "forge": "<colab asset forge project root>",
     "proxy": "<local model proxy folder>",
     "unityEditor": "<Unity.exe of the Unity 6 editor>",
+    "unityProject": "runs/.game/unity",
+    "robloxProject": "runs/.game/roblox",
     "blender": "<blender executable>",
     "ffmpeg": "ffmpeg",
     "canvasMcp": "<course MCP server folder>",

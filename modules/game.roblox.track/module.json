@@ -1,0 +1,27 @@
+{
+  "id": "game.roblox.track",
+  "label": "Track",
+  "icon": "road",
+  "kind": "agent",
+  "summary": "Part of the Roblox game: lays the road parts on the same centre line as the Unity game (exported by the Unity editor) and draws it from above and in profile.",
+  "accepts": [
+    "text"
+  ],
+  "produces": [
+    "image",
+    "code"
+  ],
+  "runtime": "script",
+  "needs": [
+    "roblox"
+  ],
+  "hidden": true,
+  "mock": true,
+  "allow": {
+    "write": [
+      "$RUN",
+      "$paths.robloxProject",
+      "$paths.unityProject"
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "id": "game.unity",
+  "label": "Unity",
+  "icon": "cube",
+  "kind": "orchestrator",
+  "summary": "Part of the game module: builds the game in a warm Unity 6 project, one child cell per part (Track, Karts, Humanoids, Combat, UI, Build).",
+  "accepts": [
+    "text"
+  ],
+  "produces": [
+    "frames",
+    "video",
+    "link"
+  ],
+  "runtime": "script",
+  "needs": [
+    "unity"
+  ],
+  "hidden": true,
+  "mock": true,
+  "allow": {
+    "write": [
+      "$RUN",
+      "$paths.unityProject"
+    ]
+  }
+}

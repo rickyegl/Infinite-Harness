@@ -1,9 +1,9 @@
 {
   "id": "mock.asset",
-  "label": "Test image",
+  "label": "Test asset",
   "icon": "image",
   "kind": "tool",
-  "summary": "Test module: draws a placeholder image with the prompt written on it. Use only for test prompts that ask for a test image.",
+  "summary": "Test module: makes a placeholder asset (an image with the prompt written on it, a WAV loop, a glTF box). Use only for test prompts that ask for a test image or test asset.",
   "accepts": [
     "text"
   ],

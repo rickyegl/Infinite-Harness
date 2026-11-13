@@ -1,0 +1,50 @@
+{"t":1,"type":"node.state","node":".","state":"running"}
+{"t":102,"type":"node.step","node":".","title":"Opening the Unity project","detail":"Unity 6, URP template with the harness editor bridge","icon":"cube"}
+{"t":1164,"type":"node.step","node":".","title":"Editor ready in 1 s","detail":"Unity 6000.2.7f2, no WebGL module (the build falls back to Windows)","icon":"check"}
+{"t":1690,"type":"node.step","node":".","title":"Imported 2 banners","detail":"Banners/noodle-clash-banner, Banners/hover-spiral-banner","icon":"image"}
+{"t":1692,"type":"node.spawn","node":"track","parent":".","module":"game.unity.track","label":"Track","kind":"agent","prompt":"Lay the wavy circuit: 2 loops, 2 twists, bank 0.9, 22 m drop, hover sections."}
+{"t":1693,"type":"node.state","node":"track","state":"running"}
+{"t":1696,"type":"node.step","node":"track","title":"Generating the centre line","detail":"wavy, 960 m, seed 7319","icon":"road"}
+{"t":1950,"type":"node.step","node":"track","title":"Lap of 1198 m","detail":"2 loop, 2 twist, 49% hover","icon":"road"}
+{"t":2477,"type":"node.evidence","node":"track","kind":"frames","uri":"./default/track-overview.jpg","caption":"Track","meta":{"frames":["./default/track-overview.jpg","./default/track-loop.jpg","./default/track-twist.jpg","./default/track-corner.jpg"],"fps":1,"loop":true,"fit":"cover"}}
+{"t":2480,"type":"node.evidence","node":"track","kind":"code","uri":"./default/track-track.json","caption":"game.json: track","meta":{"lines":[["+","\"track\": {"],["+","  \"shape\": \"wavy\","],["+","  \"length\": 960,"],["+","  \"width\": 18,"],["+","  \"hills\": 3,"],["+","  \"seed\": 7319,"],["+","  \"loops\": 2,"],["+","  \"twists\": 2,"],["+","  \"bank\": 0.95,"],["+","  \"drop\": 22,"],["+","  \"hover\": true,"],["+","  \"loopRadius\": 16"],["+","}"]]}}
+{"t":2481,"type":"node.done","node":"track","summary":"1198 m lap with twist, loop, loop, twist"}
+{"t":2482,"type":"node.spawn","node":"karts","parent":".","module":"game.unity.karts","label":"Karts","kind":"agent","prompt":"6 arcade karts, top speed 115 km/h."}
+{"t":2483,"type":"node.state","node":"karts","state":"running"}
+{"t":2488,"type":"node.step","node":"karts","title":"Placing the grid","detail":"Zibbo, Vemli, Pogrin, Dazzu, Wiblet, Tufflo","icon":"game"}
+{"t":3133,"type":"node.evidence","node":"karts","kind":"frames","uri":"./default/karts-grid.jpg","caption":"Karts","meta":{"frames":["./default/karts-grid.jpg","./default/karts-kart.jpg","./default/karts-loopride.jpg"],"fps":1,"loop":true,"fit":"cover"}}
+{"t":3135,"type":"node.evidence","node":"karts","kind":"code","uri":"./default/karts-karts.json","caption":"game.json: karts","meta":{"lines":[["+","\"karts\": {"],["+","  \"count\": 6,"],["+","  \"topSpeed\": 32,"],["+","  \"accel\": 11,"],["+","  \"grip\": 8,"],["+","  \"steer\": 10,"],["+","  \"colors\": ["],["+","    \"#ff6046\","],["+","    \"#24bddd\","],["+","    \"#ffd447\","],["+","    \"#925ce6\","],["+","    \"#52cd70\","],["+","    \"#ef73ba\","],["+","    \"#e8463c\","],["+","    \"#3c8ee8\""],["+","  ],"],["+","  \"names\": ["],["+","    \"Zibbo\","],["+","    \"Vemli\","],["+","    \"Pogrin\","],["+","    \"Dazzu\","],["+","    \"Wiblet\","],["+","    \"Tufflo\","],["+","    \"Blaze\","],["+","    \"Volt\""],["+","  ]"],["+","}"]]}}
+{"t":3137,"type":"node.done","node":"karts","summary":"6 karts on the grid"}
+{"t":3138,"type":"node.spawn","node":"humanoids","parent":".","module":"game.unity.humanoids","label":"Humanoids","kind":"agent","prompt":"A rider on every kart, each with a noodle."}
+{"t":3139,"type":"node.state","node":"humanoids","state":"running"}
+{"t":3145,"type":"node.step","node":"humanoids","title":"Seating the riders","detail":"noodle, height 1.10","icon":"person"}
+{"t":3665,"type":"node.evidence","node":"humanoids","kind":"frames","uri":"./default/humanoids-rider.jpg","caption":"Riders","meta":{"frames":["./default/humanoids-rider.jpg","./default/humanoids-pack.jpg"],"fps":1,"loop":true,"fit":"cover"}}
+{"t":3668,"type":"node.evidence","node":"humanoids","kind":"code","uri":"./default/humanoids-riders.json","caption":"game.json: riders","meta":{"lines":[["+","\"riders\": {"],["+","  \"weapon\": \"noodle\","],["+","  \"height\": 1.1,"],["+","  \"skin\": \"#dca278\""],["+","}"]]}}
+{"t":3668,"type":"node.done","node":"humanoids","summary":"6 riders with a noodle"}
+{"t":3669,"type":"node.spawn","node":"combat","parent":".","module":"game.unity.combat","label":"Combat","kind":"agent","prompt":"Swings reach 5.0 m; a hit shoves and slows the victim."}
+{"t":3670,"type":"node.state","node":"combat","state":"running"}
+{"t":3677,"type":"node.step","node":"combat","title":"Wiring the swing and the hit","detail":"range 5.0 m, cooldown 1.4 s, victim keeps 65% speed","icon":"sword"}
+{"t":3941,"type":"node.evidence","node":"combat","kind":"frames","uri":"./default/combat-combat.jpg","caption":"Combat","meta":{"frames":["./default/combat-combat.jpg","./default/combat-chase.jpg"],"fps":1,"loop":true,"fit":"cover"}}
+{"t":3943,"type":"node.evidence","node":"combat","kind":"code","uri":"./default/combat-combat.json","caption":"game.json: combat","meta":{"lines":[["+","\"combat\": {"],["+","  \"range\": 5,"],["+","  \"cooldown\": 1.4,"],["+","  \"knock\": 7,"],["+","  \"slow\": 0.65,"],["+","  \"aiAggression\": 0.8,"],["+","  \"hitColor\": \"#fff084\""],["+","}"]]}}
+{"t":3944,"type":"node.done","node":"combat","summary":"Riders swing at anyone in range; a hit shoves, slows and flashes"}
+{"t":3945,"type":"node.spawn","node":"ui","parent":".","module":"game.unity.ui","label":"UI","kind":"agent","prompt":"HUD for \"Noodle Rush\": lap, place, speed, minimap, hit feed."}
+{"t":3946,"type":"node.state","node":"ui","state":"running"}
+{"t":3949,"type":"node.step","node":"ui","title":"Drawing the HUD","detail":"Noodle Rush: lap, place, speed, minimap, hit feed","icon":"layout"}
+{"t":4481,"type":"node.evidence","node":"ui","kind":"frames","uri":"./default/ui-hud.jpg","caption":"HUD","meta":{"frames":["./default/ui-hud.jpg","./default/ui-start.jpg"],"fps":1,"loop":true,"fit":"cover"}}
+{"t":4483,"type":"node.evidence","node":"ui","kind":"code","uri":"./default/ui-hud.json","caption":"game.json: hud","meta":{"lines":[["+","\"hud\": {"],["+","  \"title\": \"Noodle Rush\","],["+","  \"accent\": \"#ff6046\","],["+","  \"minimap\": true"],["+","}"]]}}
+{"t":4485,"type":"node.done","node":"ui","summary":"HUD with lap, place, speed and minimap"}
+{"t":4486,"type":"node.spawn","node":"build","parent":".","module":"game.unity.build","label":"Build","kind":"agent","prompt":"Race-test on autopilot, record 10 s of play, build the player."}
+{"t":4487,"type":"node.state","node":"build","state":"running"}
+{"t":4491,"type":"node.step","node":"build","title":"Race test on autopilot","detail":"3 laps, every kart driven by the AI","icon":"play"}
+{"t":15229,"type":"node.step","node":"build","title":"Race finished in 124 s","detail":"21 hits; 1. Zibbo 113.9 s, 2. Vemli 121.3 s, 3. Pogrin 123.7 s, 4. Tufflo 123.8 s, 5. Dazzu, 6. Wiblet","icon":"check"}
+{"t":15232,"type":"node.step","node":"build","title":"Recording 10 s of play","detail":"starting just before the loop","icon":"record"}
+{"t":30140,"type":"node.evidence","node":"build","kind":"frames","uri":"./default/build-frame_00045.jpg","caption":"In play","meta":{"frames":["./default/build-frame_00045.jpg","./default/build-frame_00150.jpg","./default/build-frame_00255.jpg"],"fps":1,"loop":true,"fit":"cover"}}
+{"t":30142,"type":"node.evidence","node":"build","kind":"video","uri":"./default/build-gameplay.mp4","caption":"10 s of play","meta":{"frames":["./default/build-frame_00045.jpg","./default/build-frame_00150.jpg","./default/build-frame_00255.jpg"]}}
+{"t":30143,"type":"node.evidence","node":"build","kind":"image","uri":"./default/build-finish.jpg","caption":"Finish"}
+{"t":30145,"type":"node.evidence","node":"build","kind":"doc","uri":"./default/build-race-test.md","caption":"Race test"}
+{"t":32230,"type":"node.step","node":"build","title":"Building for Windows","detail":"the WebGL module is not installed in this editor, so this is the Windows fallback","icon":"hammer"}
+{"t":36945,"type":"node.step","node":"build","title":"Built in 5 s","detail":"99 MB","icon":"check"}
+{"t":36947,"type":"node.output","node":"build","name":"Windows build","uri":"./default/build-BrawlKarts.exe","kind":"file"}
+{"t":36948,"type":"node.output","node":"build","name":"Gameplay","uri":"./default/build-gameplay.mp4","kind":"video"}
+{"t":36951,"type":"node.done","node":"build","summary":"Windows build in 5 s; race test 124 s, 21 hits"}
+{"t":36954,"type":"node.done","node":".","summary":"Noodle Rush built in Unity (windows, 5 s build). Track: 1198 m lap with twist, loop, loop, twist. Karts: 6 karts on the grid. Humanoids: 6 riders with a noodle. Combat: Riders swing at anyone in range; a hit shoves, slows and flashes. UI: HUD with lap, place, speed and minimap. Build: Windows build in 5 s; race test 124 s, 21 hits"}

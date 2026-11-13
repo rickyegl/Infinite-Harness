@@ -1,0 +1,27 @@
+{
+  "id": "game.roblox",
+  "label": "Roblox",
+  "icon": "cube",
+  "kind": "orchestrator",
+  "summary": "Part of the game module: builds the same game as a Roblox place (Rojo project, Luau), one child cell per part (Track, Karts, Humanoids, Combat, UI, Build). Built with rojo, not opened in Studio.",
+  "accepts": [
+    "text"
+  ],
+  "produces": [
+    "image",
+    "code",
+    "doc"
+  ],
+  "runtime": "script",
+  "needs": [
+    "roblox"
+  ],
+  "hidden": true,
+  "mock": true,
+  "allow": {
+    "write": [
+      "$RUN",
+      "$paths.robloxProject"
+    ]
+  }
+}

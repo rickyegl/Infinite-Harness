@@ -1,6 +1,7 @@
 // pnpm --filter bridge smoke ["prompt"]: starts a bridge on a free port, posts the prompt through HTTP, follows
 // the run over the WebSocket and prints one line per event. Exits 0 when the run ends done.
 // Use the bridge that is already running instead with HARNESS_BRIDGE=<url> (token read from the token file).
+// With HARNESS_RUN=<run id> the prompt is a follow-up (`/say`) on that run; only its new events are printed.
 
 import type { HarnessEvent } from "@harness/protocol";
 import { readFileSync } from "node:fs";
@@ -21,9 +22,17 @@ else {
   close = b.close;
 }
 const h = { authorization: `Bearer ${token}`, "content-type": "application/json" };
-const r = (await (await fetch(`${url}/runs`, { method: "POST", headers: h, body: JSON.stringify({ prompt }) })).json()) as { id: string };
-console.log(`run ${r.id}: ${prompt}`);
-const ws = new WebSocket(`${url.replace("http", "ws")}/runs/${r.id}/events?seq=0`, { headers: { authorization: `Bearer ${token}` } });
+const again = process.env.HARNESS_RUN;
+let from = 0;
+if (again) {
+  const old = await (await fetch(`${url}/runs/${again}/events?seq=0`, { headers: h })).text();
+  from = old.trim().split(/\r?\n/).filter(Boolean).length;
+  const said = await fetch(`${url}/runs/${again}/say`, { method: "POST", headers: h, body: JSON.stringify({ text: prompt }) });
+  if (!said.ok) throw new Error(`say: ${said.status} ${await said.text()}`);
+}
+const r = again ? { id: again } : ((await (await fetch(`${url}/runs`, { method: "POST", headers: h, body: JSON.stringify({ prompt }) })).json()) as { id: string });
+console.log(`${again ? "follow-up on" : "run"} ${r.id}: ${prompt}`);
+const ws = new WebSocket(`${url.replace("http", "ws")}/runs/${r.id}/events?seq=${from}`, { headers: { authorization: `Bearer ${token}` } });
 const ok = await new Promise<boolean>((resolve) => {
   let failed = false;
   ws.on("message", (d) => {

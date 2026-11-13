@@ -1,0 +1,1619 @@
+<roblox version="4">
+  <Item class="HttpService" referent="0">
+    <Properties>
+      <string name="Name">HttpService</string>
+      <bool name="HttpEnabled">true</bool>
+    </Properties>
+  </Item>
+  <Item class="Lighting" referent="1">
+    <Properties>
+      <string name="Name">Lighting</string>
+      <float name="Brightness">2.5</float>
+      <float name="ClockTime">14.5</float>
+      <bool name="GlobalShadows">true</bool>
+      <token name="Technology">4</token>
+    </Properties>
+  </Item>
+  <Item class="ReplicatedStorage" referent="2">
+    <Properties>
+      <string name="Name">ReplicatedStorage</string>
+    </Properties>
+    <Item class="Folder" referent="3">
+      <Properties>
+        <string name="Name">Shared</string>
+      </Properties>
+      <Item class="ModuleScript" referent="4">
+        <Properties>
+          <string name="Name">Config</string>
+          <string name="Source"><![CDATA[-- The game design, written by the engine cells from design.json (generated).
+return {
+	title = "Noodle Rush",
+	laps = 3,
+	look = {
+		sky = "#89dfff",
+		ground = "#83d85c",
+		night = false,
+		realistic = false,
+	},
+	built = {
+		track = true,
+		karts = true,
+		riders = true,
+		combat = true,
+		hud = true,
+	},
+	karts = {
+		count = 6,
+		topSpeed = 32,
+		accel = 11,
+		grip = 8,
+		steer = 10,
+		colors = {
+			"#ff6046",
+			"#24bddd",
+			"#ffd447",
+			"#925ce6",
+			"#52cd70",
+			"#ef73ba",
+			"#e8463c",
+			"#3c8ee8",
+		},
+		names = {
+			"Zibbo",
+			"Vemli",
+			"Pogrin",
+			"Dazzu",
+			"Wiblet",
+			"Tufflo",
+			"Blaze",
+			"Volt",
+		},
+	},
+	riders = {
+		weapon = "noodle",
+		height = 1.1,
+		skin = "#dca278",
+	},
+	combat = {
+		range = 5,
+		cooldown = 1.4,
+		knock = 7,
+		slow = 0.65,
+		aiAggression = 0.8,
+		hitColor = "#fff084",
+	},
+	hud = {
+		title = "Noodle Rush",
+		accent = "#ff6046",
+		minimap = true,
+	},
+}
+]]></string>
+        </Properties>
+      </Item>
+      <Item class="ModuleScript" referent="5">
+        <Properties>
+          <string name="Name">Flags</string>
+          <string name="Source"><![CDATA[-- Live follow-ups rewrite this file and rebuild the place (generated).
+return {
+	night = false,
+	realistic = false,
+	musicId = "",
+	relay = false,
+	relayUrl = "",
+	version = 1,
+}
+]]></string>
+        </Properties>
+      </Item>
+      <Item class="ModuleScript" referent="6">
+        <Properties>
+          <string name="Name">Look</string>
+          <string name="Source"><![CDATA[-- Day, night and the realistic look for the place: clock time, ambient light, atmosphere, bloom, colour
+-- grading, sun rays, lamps and glowing edges, and a slightly wet road. Applied by the server at start;
+-- Lighting replicates to every player.
+
+local CollectionService = game:GetService("CollectionService")
+local Lighting = game:GetService("Lighting")
+
+local Look = {}
+
+local function get(className: string, name: string): Instance
+	local x = Lighting:FindFirstChild(name)
+	if not x then
+		x = Instance.new(className)
+		x.Name = name
+		x.Parent = Lighting
+	end
+	return x
+end
+
+function Look.apply(night: boolean, realistic: boolean, look: { sky: string?, ground: string? })
+	local sky = Color3.fromHex(look.sky or "#7fb4e6")
+	Lighting.ClockTime = if night then 0.4 elseif realistic then 16.2 else 14.5
+	Lighting.Brightness = if night then 0.4 elseif realistic then 3 else 2.2
+	Lighting.Ambient = if night then Color3.fromRGB(18, 22, 40) else Color3.fromRGB(90, 96, 104)
+	Lighting.OutdoorAmbient = if night then Color3.fromRGB(26, 32, 60) else sky:Lerp(Color3.new(0.6, 0.6, 0.6), 0.5)
+	Lighting.EnvironmentDiffuseScale = if realistic then 1 else 0.4
+	Lighting.EnvironmentSpecularScale = if realistic then 1 else 0.3
+	Lighting.FogEnd = 100000
+
+	local atm = get("Atmosphere", "HarnessAtmosphere") :: Atmosphere
+	atm.Density = if night then 0.38 elseif realistic then 0.32 else 0.22
+	atm.Haze = if realistic then 1.4 else 0.6
+	atm.Color = if night then Color3.fromRGB(40, 50, 90) else sky
+	atm.Decay = if night then Color3.fromRGB(20, 20, 40) else Color3.fromRGB(110, 120, 140)
+
+	local bloom = get("BloomEffect", "HarnessBloom") :: BloomEffect
+	bloom.Intensity = if night then 1.4 elseif realistic then 0.7 else 0.25
+	bloom.Threshold = if night then 0.8 else 0.95
+	bloom.Size = 28
+
+	local cc = get("ColorCorrectionEffect", "HarnessGrade") :: ColorCorrectionEffect
+	cc.Saturation = if realistic then 0.12 else 0.18
+	cc.Contrast = if realistic then 0.14 else 0.05
+	cc.TintColor = if night then Color3.fromRGB(215, 225, 255) else Color3.new(1, 1, 1)
+
+	local rays = get("SunRaysEffect", "HarnessSunRays") :: SunRaysEffect
+	rays.Enabled = realistic and not night
+	rays.Intensity = 0.06
+
+	for _, l in CollectionService:GetTagged("NightLight") do
+		if l:IsA("Light") then
+			l.Enabled = night
+			l.Brightness = if realistic then 3.2 else 2
+			l.Range = if realistic then 60 else 45
+		end
+	end
+	for _, p in CollectionService:GetTagged("NightGlow") do
+		if p:IsA("BasePart") then
+			p.Material = if night then Enum.Material.Neon else Enum.Material.SmoothPlastic
+		end
+	end
+	for _, p in CollectionService:GetTagged("Road") do
+		if p:IsA("BasePart") then
+			p.Material = if realistic then Enum.Material.Asphalt else Enum.Material.SmoothPlastic
+			p.Reflectance = if realistic then (if night then 0.18 else 0.08) else 0
+		end
+	end
+end
+
+return Look
+]]></string>
+        </Properties>
+      </Item>
+      <Item class="ModuleScript" referent="7">
+        <Properties>
+          <string name="Name">Track</string>
+          <string name="Source"><![CDATA[-- The centre line in studs, with an up vector per sample (the road loops, twists and banks). Karts live in
+-- track space (studs along the line, studs from the centre), exactly like the Unity game, so laps are exact and
+-- the crossplay relay can place a remote kart by progress (0..1) and lateral offset (-1..1).
+--
+-- TrackData holds metres in Unity axes (left-handed, +Z forward). Mirroring Z gives right-handed axes; "right"
+-- is then worked out natively (tangent x up), so +lateral is the driver's right in both games.
+
+local Data = require(script.Parent.TrackData)
+
+local Track = {}
+Track.SCALE = 3 -- studs per metre
+local S = Track.SCALE
+
+local pts: { Vector3 } = {}
+local ups: { Vector3 } = {}
+local hov: { number } = {}
+local n = math.floor(#Data.points / 3)
+for i = 0, n - 1 do
+	local x, y, z = Data.points[i * 3 + 1], Data.points[i * 3 + 2], Data.points[i * 3 + 3]
+	pts[i + 1] = Vector3.new(x * S, y * S, -z * S)
+	local ux, uy, uz = Data.ups[i * 3 + 1] or 0, Data.ups[i * 3 + 2] or 1, Data.ups[i * 3 + 3] or 0
+	local u = Vector3.new(ux, uy, -uz)
+	ups[i + 1] = if u.Magnitude > 1e-4 then u.Unit else Vector3.yAxis
+	hov[i + 1] = Data.hover[i + 1] or 0
+end
+
+local cum: { number } = { 0 }
+for i = 1, n do
+	cum[i + 1] = cum[i] + (pts[i % n + 1] - pts[i]).Magnitude
+end
+
+Track.count = n
+Track.points = pts
+Track.ups = ups
+Track.length = cum[n + 1]
+Track.halfWidth = Data.width * S * 0.5
+
+local function P(i: number): Vector3
+	return pts[(i - 1) % n + 1]
+end
+local function U(i: number): Vector3
+	return ups[(i - 1) % n + 1]
+end
+
+local function find(dist: number): (number, number)
+	local d = dist % Track.length
+	local lo, hi = 1, n + 1
+	while hi - lo > 1 do
+		local mid = (lo + hi) // 2
+		if cum[mid] <= d then
+			lo = mid
+		else
+			hi = mid
+		end
+	end
+	local u = (d - cum[lo]) / math.max(1e-4, cum[lo + 1] - cum[lo])
+	return lo, u
+end
+
+--- studs along the line where sample i (1-based) sits; i = count + 1 is the full lap
+function Track.distOf(i: number): number
+	return cum[math.clamp(i, 1, n + 1)]
+end
+
+--- centre, tangent, right and up at a distance along the line (wraps)
+function Track.sample(dist: number): (Vector3, Vector3, Vector3, Vector3)
+	local lo, u = find(dist)
+	local centre = P(lo):Lerp(P(lo + 1), u)
+	local tangent = (P(lo + 1) - P(lo - 1)):Lerp(P(lo + 2) - P(lo), u).Unit
+	local up = U(lo):Lerp(U(lo + 1), u)
+	up = (up - tangent * up:Dot(tangent)).Unit
+	local right = tangent:Cross(up)
+	return centre, tangent, right, up
+end
+
+--- world CFrame for a kart at (studs along, studs from centre, heading offset in degrees, + = right)
+function Track.poseAt(dist: number, lateral: number, headingDeg: number?): CFrame
+	local c, t, r, up = Track.sample(dist)
+	local cf = CFrame.fromMatrix(c + r * lateral, r, up, -t)
+	if headingDeg and headingDeg ~= 0 then
+		cf *= CFrame.Angles(0, -math.rad(headingDeg), 0)
+	end
+	return cf
+end
+
+--- 0 on plain road, 1 on loops, twists and steep banks (hover sections)
+function Track.hover(dist: number): number
+	local lo, u = find(dist)
+	return hov[lo] + (hov[lo % n + 1] - hov[lo]) * u
+end
+
+--- loops, twists and drops as {kind, from, to} in studs along the line
+Track.features = {}
+for _, f in Data.features do
+	table.insert(Track.features, { kind = f.kind, from = cum[f.from + 1], to = cum[f.to + 1] })
+end
+
+function Track.featureMid(kind: string): number
+	for _, f in Track.features do
+		if f.kind == kind then
+			return (f.from + f.to) * 0.5
+		end
+	end
+	return -1
+end
+
+return Track
+]]></string>
+        </Properties>
+      </Item>
+      <Item class="ModuleScript" referent="8">
+        <Properties>
+          <string name="Name">TrackData</string>
+          <string name="Source"><![CDATA[-- The centre line from the Unity editor's track_export: metres, Unity axes (generated).
+return {
+	width = 18,
+	points = {
+		180.14, 4.14, 0, 180.17, 4.15, 3, 179.86, 4.17, 5.98, 179.24, 4.18, 8.91,
+		178.32, 4.18, 11.77, 177.12, 4.19, 14.52, 175.7, 4.19, 17.16, 174.07, 4.19, 19.68,
+		172.27, 4.19, 22.07, 170.32, 4.18, 24.36, 168.25, 4.17, 26.53, 166.07, 4.16, 28.59,
+		163.81, 4.15, 30.56, 161.47, 4.13, 32.44, 159.07, 4.11, 34.23, 156.61, 4.09, 35.96,
+		154.11, 4.07, 37.61, 151.57, 4.04, 39.21, 149, 4.02, 40.76, 146.41, 3.99, 42.27,
+		143.79, 3.95, 43.74, 141.17, 3.92, 45.19, 138.53, 3.88, 46.62, 135.89, 3.83, 48.04,
+		133.25, 3.78, 49.47, 130.62, 3.73, 50.91, 128.01, 3.68, 52.39, 125.42, 3.62, 53.91,
+		122.88, 3.55, 55.49, 120.38, 3.48, 57.16, 117.96, 3.4, 58.93, 115.62, 3.32, 60.81,
+		113.4, 3.23, 62.82, 111.3, 3.13, 64.97, 109.35, 3.04, 67.24, 107.54, 2.93, 69.63,
+		105.86, 2.83, 72.12, 104.31, 2.73, 74.69, 102.85, 2.63, 77.31, 101.46, 2.53, 79.97,
+		100.12, 2.43, 82.65, 98.79, 2.34, 85.34, 97.45, 2.24, 88.03, 96.09, 2.15, 90.7,
+		94.68, 2.06, 93.35, 93.21, 1.98, 95.97, 91.68, 1.9, 98.54, 90.06, 1.81, 101.07,
+		88.35, 1.74, 103.53, 86.55, 1.66, 105.93, 84.64, 1.59, 108.25, 82.64, 1.52, 110.48,
+		80.53, 1.45, 112.62, 78.33, 1.39, 114.65, 76.02, 1.33, 116.57, 73.62, 1.27, 118.37,
+		71.13, 1.22, 120.04, 68.55, 1.17, 121.57, 65.9, 1.12, 122.98, 63.18, 1.08, 124.24,
+		60.41, 1.04, 125.39, 57.62, 1, 126.52, 54.81, 0.98, 127.68, 51.99, 0.99, 128.95,
+		49.13, 1.08, 130.35, 46.2, 1.33, 131.91, 43.17, 1.83, 133.61, 40.02, 2.7, 135.36,
+		36.74, 4.05, 137.05, 33.35, 5.96, 138.48, 29.89, 8.45, 139.39, 26.46, 11.41, 139.53,
+		23.17, 14.63, 138.68, 20.16, 17.77, 136.71, 17.51, 20.42, 133.68, 15.26, 22.21, 129.81,
+		13.36, 22.85, 125.46, 11.68, 22.24, 121.09, 10.05, 20.48, 117.13, 8.28, 17.86, 113.91,
+		6.22, 14.75, 111.58, 3.8, 11.57, 110.15, 1.02, 8.64, 109.45, -2.06, 6.18, 109.27,
+		-5.35, 4.31, 109.36, -8.72, 2.99, 109.5, -12.1, 2.16, 109.53, -15.4, 1.7, 109.36,
+		-18.58, 1.49, 108.94, -21.64, 1.44, 108.28, -24.57, 1.48, 107.39, -27.39, 1.54, 106.31,
+		-30.15, 1.63, 105.12, -32.89, 1.72, 103.89, -35.64, 1.82, 102.7, -38.43, 1.92, 101.59,
+		-41.26, 2.03, 100.6, -44.13, 2.14, 99.71, -47.03, 2.25, 98.94, -49.95, 2.36, 98.29,
+		-52.9, 2.48, 97.75, -55.87, 2.59, 97.31, -58.9, 2.71, 97.09, -62.36, 2.84, 97.43,
+		-66.79, 3.1, 98.27, -72.54, 3.86, 99.56, -79.57, 5.97, 101.24, -86.95, 10.55, 103.26,
+		-92.52, 18.12, 105.57, -93.62, 27.24, 108.13, -89.26, 34.16, 110.93, -81.97, 35.1, 113.93,
+		-76.64, 29.5, 116.95, -76.7, 20.58, 119.74, -81.97, 12.49, 122.11, -89.9, 7.34, 123.98,
+		-97.99, 4.99, 125.39, -104.95, 4.28, 126.39, -110.55, 4.22, 126.98, -115.08, 4.29, 127.12,
+		-119.02, 4.37, 126.72, -122.83, 4.44, 125.8, -126.64, 4.52, 124.51, -130.41, 4.59, 122.85,
+		-134.13, 4.66, 120.84, -137.76, 4.72, 118.48, -141.29, 4.79, 115.79, -144.69, 4.85, 112.79,
+		-147.93, 4.91, 109.49, -150.97, 4.97, 105.91, -153.78, 5.02, 102.07, -156.31, 5.08, 98,
+		-158.54, 5.13, 93.73, -160.41, 5.17, 89.31, -161.89, 5.21, 84.79, -162.96, 5.25, 80.23,
+		-163.6, 5.28, 75.71, -163.82, 5.31, 71.3, -163.65, 5.33, 67.05, -163.14, 5.34, 63.01,
+		-162.35, 5.35, 59.22, -161.37, 5.35, 55.67, -160.25, 5.35, 52.35, -159.08, 5.33, 49.21,
+		-157.9, 5.32, 46.22, -156.77, 5.29, 43.31, -155.73, 5.26, 40.46, -154.8, 5.23, 37.59,
+		-153.9, 5.19, 34.74, -152.89, 5.14, 31.91, -151.81, 5.09, 29.11, -150.67, 5.03, 26.34,
+		-149.49, 4.97, 23.58, -148.29, 4.9, 20.83, -147.09, 4.82, 18.08, -145.92, 4.73, 15.32,
+		-144.81, 4.64, 12.53, -143.8, 4.54, 9.7, -142.92, 4.43, 6.84, -142.23, 4.31, 3.92,
+		-141.77, 4.18, 0.95, -141.57, 4.05, -2.04, -141.65, 3.91, -5.04, -141.99, 3.77, -8.02,
+		-142.56, 3.64, -10.96, -143.32, 3.51, -13.86, -144.21, 3.38, -16.73, -145.19, 3.26, -19.56,
+		-146.24, 3.14, -22.37, -147.31, 3.03, -25.18, -148.38, 2.92, -27.98, -149.43, 2.82, -30.79,
+		-150.44, 2.72, -33.61, -151.38, 2.62, -36.46, -152.23, 2.52, -39.34, -152.98, 2.43, -42.24,
+		-153.61, 2.34, -45.18, -154.09, 2.26, -48.14, -154.41, 2.17, -51.12, -154.54, 2.09, -54.12,
+		-154.47, 2.02, -57.12, -154.17, 1.95, -60.1, -153.64, 1.88, -63.05, -152.86, 1.81, -65.95,
+		-151.83, 1.75, -68.76, -150.55, 1.7, -71.48, -149.04, 1.65, -74.07, -147.31, 1.6, -76.52,
+		-145.39, 1.56, -78.82, -143.28, 1.52, -80.96, -141.03, 1.49, -82.94, -138.64, 1.47, -84.75,
+		-136.15, 1.44, -86.42, -133.56, 1.43, -87.93, -130.89, 1.41, -89.3, -128.16, 1.4, -90.54,
+		-125.37, 1.39, -91.65, -122.54, 1.38, -92.64, -119.67, 1.38, -93.52, -116.78, 1.38, -94.3,
+		-113.85, 1.38, -94.99, -110.91, 1.39, -95.58, -107.95, 1.39, -96.22, -104.63, 1.41, -97.35,
+		-100.39, 1.53, -98.99, -94.78, 2.11, -101.04, -87.82, 4.02, -103.4, -80.39, 8.4, -105.9,
+		-74.66, 15.84, -108.4, -73.38, 24.95, -110.86, -77.66, 32, -113.35, -85.06, 33.11, -115.98,
+		-90.74, 27.61, -118.71, -91.2, 18.69, -121.39, -86.55, 10.48, -123.89, -79.36, 5.2, -126.15,
+		-72.15, 2.72, -128.16, -66.26, 1.91, -129.87, -61.95, 1.79, -131.23, -58.91, 1.82, -132.16,
+		-56.63, 1.86, -132.59, -54.57, 1.91, -132.63, -52.63, 1.96, -132.46, -50.76, 2.01, -132.11,
+		-48.9, 2.06, -131.59, -46.97, 2.12, -130.96, -44.92, 2.17, -130.25, -42.69, 2.22, -129.51,
+		-40.24, 2.27, -128.77, -37.57, 2.33, -128.07, -34.68, 2.38, -127.42, -31.6, 2.43, -126.84,
+		-28.35, 2.47, -126.32, -24.98, 2.52, -125.86, -21.51, 2.56, -125.46, -17.98, 2.6, -125.11,
+		-14.41, 2.64, -124.8, -10.85, 2.68, -124.53, -7.3, 2.72, -124.3, -3.79, 2.75, -124.11,
+		-0.34, 2.78, -123.98, 3.05, 2.82, -123.9, 6.36, 2.85, -123.9, 9.59, 2.88, -123.99,
+		12.74, 2.9, -124.19, 15.81, 2.93, -124.51, 18.81, 2.96, -124.97, 21.75, 2.98, -125.6,
+		24.68, 3, -126.28, 27.62, 3.02, -126.86, 30.58, 3.05, -127.34, 33.55, 3.07, -127.73,
+		36.54, 3.08, -128, 39.54, 3.1, -128.15, 42.54, 3.12, -128.09, 45.52, 3.14, -127.74,
+		48.45, 3.19, -127.05, 51.29, 3.29, -125.97, 53.99, 3.51, -124.49, 56.5, 3.95, -122.62,
+		58.79, 4.71, -120.43, 60.86, 5.91, -118.06, 62.73, 7.65, -115.66, 64.51, 9.97, -113.47,
+		66.36, 12.81, -111.71, 68.49, 15.98, -110.57, 71.1, 19.19, -110.14, 74.35, 22.05, -110.37,
+		78.29, 24.16, -111.04, 82.77, 25.2, -111.82, 87.53, 25, -112.35, 92.21, 23.58, -112.29,
+		96.42, 21.19, -111.45, 99.88, 18.18, -109.76, 102.41, 14.95, -107.32, 104.04, 11.87, -104.29,
+		104.88, 9.21, -100.9, 105.18, 7.1, -97.32, 105.14, 5.56, -93.73, 105.01, 4.53, -90.21,
+		104.93, 3.91, -86.81, 105.02, 3.57, -83.55, 105.36, 3.42, -80.42, 105.97, 3.36, -77.42,
+		106.87, 3.36, -74.54, 108.02, 3.36, -71.77, 109.4, 3.38, -69.11, 110.97, 3.39, -66.55,
+		112.69, 3.41, -64.09, 114.57, 3.42, -61.75, 116.59, 3.44, -59.54, 118.75, 3.46, -57.46,
+		121.03, 3.49, -55.5, 123.4, 3.51, -53.67, 125.84, 3.53, -51.93, 128.34, 3.55, -50.27,
+		130.88, 3.58, -48.67, 133.45, 3.6, -47.12, 136.03, 3.62, -45.59, 138.62, 3.65, -44.08,
+		141.22, 3.67, -42.57, 143.81, 3.7, -41.06, 146.38, 3.72, -39.52, 148.94, 3.74, -37.96,
+		151.48, 3.77, -36.36, 153.99, 3.79, -34.71, 156.46, 3.82, -33.02, 158.89, 3.84, -31.26,
+		161.27, 3.87, -29.43, 163.59, 3.89, -27.53, 165.84, 3.91, -25.54, 168.01, 3.94, -23.47,
+		170.07, 3.96, -21.29, 172.02, 3.99, -19.01, 173.82, 4.01, -16.61, 175.46, 4.03, -14.1,
+		176.91, 4.06, -11.48, 178.14, 4.08, -8.74, 179.1, 4.1, -5.9, 179.78, 4.12, -2.98,
+	},
+	ups = {
+		0, 1, -0.01, 0, 1, 0, 0, 1, 0, 0, 1, 0,
+		0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
+		0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
+		0, 1, 0, 0, 1, 0, -0.01, 1, 0, -0.01, 1, 0,
+		-0.01, 1, 0, -0.04, 1, -0.04, -0.08, 0.99, -0.11, -0.1, 0.98, -0.15,
+		-0.09, 0.99, -0.14, -0.06, 1, -0.07, -0.01, 1, 0, 0.03, 1, 0.09,
+		0.08, 0.98, 0.18, 0.13, 0.95, 0.28, 0.2, 0.91, 0.38, 0.26, 0.84, 0.47,
+		0.33, 0.76, 0.55, 0.4, 0.68, 0.61, 0.47, 0.6, 0.64, 0.53, 0.54, 0.65,
+		0.59, 0.51, 0.63, 0.62, 0.51, 0.59, 0.64, 0.54, 0.54, 0.64, 0.6, 0.48,
+		0.6, 0.69, 0.41, 0.52, 0.78, 0.33, 0.41, 0.87, 0.26, 0.28, 0.94, 0.18,
+		0.13, 0.99, 0.1, -0.02, 1, 0.03, -0.15, 0.99, -0.04, -0.27, 0.96, -0.11,
+		-0.37, 0.91, -0.17, -0.44, 0.87, -0.23, -0.5, 0.82, -0.29, -0.55, 0.77, -0.34,
+		-0.58, 0.72, -0.39, -0.59, 0.67, -0.44, -0.6, 0.63, -0.49, -0.59, 0.6, -0.54,
+		-0.45, 0.77, -0.45, -0.29, 0.91, -0.3, -0.1, 0.99, -0.1, -0.02, 1, 0.01,
+		-0.01, 1, 0.01, -0.01, 1, 0.01, -0.01, 1, 0.01, -0.01, 1, 0.01,
+		-0.01, 1, 0, -0.02, 1, -0.01, -0.02, 1, -0.04, -0.03, 0.99, -0.1,
+		-0.04, 0.98, -0.17, -0.04, 0.96, -0.28, -0.03, 0.91, -0.41, -0.02, 0.83, -0.56,
+		0.01, 0.71, -0.71, 0.04, 0.53, -0.85, 0.09, 0.31, -0.95, 0.13, 0.04, -0.99,
+		0.16, -0.26, -0.95, 0.17, -0.54, -0.82, 0.14, -0.78, -0.61, 0.08, -0.94, -0.32,
+		0, -1, 0, -0.11, -0.94, 0.31, -0.22, -0.78, 0.58, -0.31, -0.54, 0.78,
+		-0.38, -0.26, 0.89, -0.41, 0.04, 0.91, -0.4, 0.31, 0.86, -0.36, 0.53, 0.76,
+		-0.31, 0.71, 0.64, -0.24, 0.83, 0.5, -0.18, 0.91, 0.37, -0.12, 0.96, 0.26,
+		-0.07, 0.98, 0.17, -0.03, 0.99, 0.1, 0, 1, 0.05, 0.02, 1, 0.03,
+		0.03, 1, 0.02, 0.03, 1, 0.01, 0.03, 1, 0.01, 0.03, 1, 0.01,
+		0.03, 1, 0.01, 0.04, 1, 0.01, 0.04, 1, 0.01, 0.04, 1, 0.01,
+		0.04, 1, 0.01, 0.04, 1, 0, 0.04, 1, 0, 0.04, 1, 0.01,
+		0.09, 1, 0.02, 0.2, 0.98, 0.04, 0.41, 0.91, 0.06, 0.68, 0.73, 0.09,
+		0.93, 0.36, 0.11, 0.97, -0.23, 0.11, 0.53, -0.84, 0.07, -0.33, -0.94, -0.04,
+		-0.91, -0.38, -0.13, -0.95, 0.27, -0.15, -0.71, 0.7, -0.13, -0.41, 0.91, -0.1,
+		-0.18, 0.98, -0.06, -0.05, 1, -0.03, 0.01, 1, -0.01, 0.02, 1, 0,
+		0.02, 1, 0, 0.02, 1, 0, 0.02, 1, 0, 0.02, 1, 0,
+		0.02, 1, 0, 0.02, 1, 0, 0.01, 1, 0, 0.01, 1, 0,
+		0.01, 1, 0, 0.01, 1, 0.01, 0.01, 1, 0.01, 0.01, 1, 0.01,
+		0.01, 1, 0.01, 0.01, 1, 0.01, 0.01, 1, 0.01, 0.01, 1, 0.01,
+		0, 1, 0.01, 0, 1, 0.01, 0, 1, 0, 0, 1, 0,
+		0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
+		0, 1, -0.01, 0, 1, -0.01, 0, 1, -0.01, 0.04, 1, 0,
+		0.21, 0.98, 0.06, 0.31, 0.95, 0.1, 0.32, 0.94, 0.11, 0.21, 0.98, 0.07,
+		0.05, 1, 0, -0.12, 0.99, -0.08, -0.3, 0.94, -0.16, -0.46, 0.86, -0.22,
+		-0.6, 0.76, -0.25, -0.71, 0.65, -0.26, -0.8, 0.54, -0.24, -0.88, 0.44, -0.19,
+		-0.92, 0.37, -0.12, -0.93, 0.35, -0.03, -0.92, 0.39, 0.05, -0.87, 0.48, 0.11,
+		-0.8, 0.59, 0.16, -0.7, 0.7, 0.17, -0.57, 0.81, 0.15, -0.42, 0.9, 0.12,
+		-0.25, 0.97, 0.06, -0.07, 1, -0.01, 0.11, 0.99, -0.08, 0.27, 0.95, -0.13,
+		0.41, 0.9, -0.17, 0.54, 0.82, -0.2, 0.65, 0.73, -0.2, 0.74, 0.64, -0.2,
+		0.81, 0.56, -0.17, 0.87, 0.48, -0.13, 0.91, 0.41, -0.08, 0.94, 0.35, -0.02,
+		0.95, 0.3, 0.05, 0.96, 0.26, 0.13, 0.95, 0.24, 0.21, 0.93, 0.23, 0.29,
+		0.9, 0.23, 0.37, 0.86, 0.23, 0.45, 0.82, 0.23, 0.52, 0.77, 0.24, 0.59,
+		0.72, 0.26, 0.65, 0.66, 0.29, 0.69, 0.6, 0.32, 0.73, 0.54, 0.37, 0.76,
+		0.48, 0.42, 0.77, 0.43, 0.47, 0.77, 0.35, 0.61, 0.71, 0.22, 0.84, 0.5,
+		0.1, 0.96, 0.27, 0.01, 1, 0.04, 0, 1, 0, 0, 1, 0,
+		0, 1, 0, 0, 1, 0, 0, 1, 0, -0.01, 1, 0,
+		-0.06, 1, -0.01, -0.17, 0.98, -0.01, -0.38, 0.93, -0.02, -0.65, 0.76, -0.02,
+		-0.92, 0.4, -0.04, -0.98, -0.19, -0.06, -0.56, -0.83, -0.04, 0.31, -0.95, 0.03,
+		0.91, -0.41, 0.08, 0.97, 0.23, 0.08, 0.74, 0.66, 0.07, 0.46, 0.89, 0.05,
+		0.22, 0.97, 0.03, 0.08, 1, 0.02, 0, 1, 0.01, -0.02, 1, 0,
+		-0.02, 1, 0, -0.02, 1, 0, -0.03, 1, 0, -0.03, 1, 0,
+		-0.03, 1, 0, -0.03, 1, 0, -0.03, 1, 0, -0.02, 1, 0,
+		-0.02, 1, 0, -0.02, 1, 0.01, -0.02, 1, 0.01, -0.02, 1, 0.01,
+		-0.01, 1, 0.01, -0.01, 1, 0.01, -0.01, 1, 0.01, -0.01, 1, 0.01,
+		-0.01, 1, 0.01, -0.01, 1, 0.01, -0.01, 1, 0.01, -0.01, 1, 0,
+		-0.01, 1, 0, -0.01, 1, 0, -0.01, 1, 0, -0.01, 1, 0,
+		-0.01, 1, 0, -0.01, 1, 0, -0.01, 1, 0, -0.01, 1, 0,
+		-0.01, 1, 0, -0.01, 1, 0, -0.01, 1, 0, -0.01, 1, 0,
+		-0.01, 1, 0, -0.01, 1, 0, -0.01, 1, -0.01, 0, 1, -0.04,
+		0, 1, -0.08, 0.01, 0.99, -0.15, 0.04, 0.97, -0.24, 0.08, 0.93, -0.36,
+		0.13, 0.86, -0.49, 0.21, 0.75, -0.62, 0.29, 0.6, -0.75, 0.38, 0.39, -0.84,
+		0.46, 0.13, -0.88, 0.5, -0.16, -0.85, 0.5, -0.45, -0.74, 0.42, -0.71, -0.56,
+		0.28, -0.9, -0.33, 0.08, -0.99, -0.08, -0.16, -0.97, 0.16, -0.4, -0.85, 0.35,
+		-0.61, -0.63, 0.49, -0.76, -0.35, 0.55, -0.83, -0.06, 0.55, -0.83, 0.22, 0.51,
+		-0.77, 0.46, 0.43, -0.67, 0.65, 0.35, -0.54, 0.8, 0.27, -0.41, 0.89, 0.19,
+		-0.29, 0.95, 0.13, -0.19, 0.98, 0.08, -0.11, 0.99, 0.05, -0.06, 1, 0.02,
+		-0.02, 1, 0.01, -0.01, 1, 0, 0, 1, 0, 0, 1, 0,
+		0, 1, 0, 0, 1, 0, 0, 1, 0, 0.09, 0.99, -0.11,
+		0.23, 0.93, -0.3, 0.31, 0.84, -0.43, 0.34, 0.79, -0.51, 0.26, 0.87, -0.42,
+		0.19, 0.93, -0.33, 0.13, 0.97, -0.23, 0.07, 0.99, -0.13, 0.01, 1, -0.04,
+		-0.03, 1, 0.04, -0.06, 1, 0.08, -0.06, 1, 0.08, -0.03, 1, 0.03,
+		-0.01, 1, 0, -0.01, 1, 0, -0.01, 1, 0, -0.01, 1, 0,
+		-0.01, 1, -0.01, -0.01, 1, -0.01, -0.01, 1, -0.01, -0.01, 1, -0.01,
+		-0.01, 1, -0.01, -0.01, 1, -0.01, 0, 1, -0.01, 0, 1, -0.01,
+		0, 1, -0.01, 0, 1, -0.01, 0, 1, -0.01, 0, 1, -0.01,
+	},
+	hover = {
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0.08, 0.31, 0.54, 0.77, 1, 1, 1, 1, 1, 1, 1,
+		0.92, 0.69, 0.46, 0.23, 0, 0, 0, 0, 0.15, 0.38, 0.62, 0.85,
+		1, 1, 1, 0.85, 0.62, 0.38, 0.15, 0, 0, 0.15, 0.38, 0.62,
+		0.85, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+		1, 1, 1, 1, 1, 1, 1, 1, 0.77, 0.54, 0.31, 0.08,
+		0, 0, 0, 0, 0.23, 0.46, 0.69, 0.92, 1, 1, 1, 1,
+		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.92, 0.69,
+		0.46, 0.23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.23, 0.46,
+		0.69, 0.92, 1, 1, 1, 1, 1, 1, 1, 0.85, 0.62, 0.38,
+		0.15, 0, 0, 0.08, 0.31, 0.54, 0.77, 1, 1, 1, 1, 1,
+		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+		1, 1, 0.77, 0.54, 0.31, 0.08, 0, 0, 0.23, 0.46, 0.69, 0.92,
+		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+		1, 1, 0.92, 0.69, 0.46, 0.23, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.08, 0.31,
+		0.54, 0.77, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+		1, 1, 1, 1, 1, 1, 1, 1, 1, 0.85, 0.62, 0.38,
+		0.15, 0, 0, 0.08, 0.31, 0.46, 0.46, 0.46, 0.23, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0,
+	},
+	features = {
+		{
+			kind = "twist",
+			from = 59,
+			to = 93,
+		},
+		{
+			kind = "loop",
+			from = 101,
+			to = 120,
+		},
+		{
+			kind = "loop",
+			from = 201,
+			to = 220,
+		},
+		{
+			kind = "twist",
+			from = 252,
+			to = 287,
+		},
+	},
+}
+]]></string>
+        </Properties>
+      </Item>
+    </Item>
+  </Item>
+  <Item class="ServerScriptService" referent="9">
+    <Properties>
+      <string name="Name">ServerScriptService</string>
+    </Properties>
+    <Item class="Folder" referent="10">
+      <Properties>
+        <string name="Name">Server</string>
+      </Properties>
+      <Item class="Script" referent="11">
+        <Properties>
+          <string name="Name">Race</string>
+          <token name="RunContext">0</token>
+          <string name="Source"><![CDATA[-- The race server. Builds the track from Track.luau (road slabs that follow the loops and twists, kerbs, glowing
+-- rails on hover sections, pillars, lamps, the start gantry), then runs the race: karts move in track space
+-- (studs along the line, studs from the centre) so they stay glued to the road upside down; players drive with
+-- the Drive remote, the rest are AI. Riders swing their weapons at whoever is close; hits slow and shove.
+-- With the crossplay flag on it also posts its karts to the relay and shows the other engine's karts as ghosts.
+-- Each piece only exists once its part cell has written it (Config.built).
+
+local CollectionService = game:GetService("CollectionService")
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local SoundService = game:GetService("SoundService")
+
+local Shared = ReplicatedStorage:WaitForChild("Shared")
+local Config = require(Shared:WaitForChild("Config"))
+local Flags = require(Shared:WaitForChild("Flags"))
+local Look = require(Shared:WaitForChild("Look"))
+local Track = require(Shared:WaitForChild("Track"))
+
+local S = Track.SCALE
+local L = Track.length
+local HW = Track.halfWidth
+local built = Config.built or {}
+local look = Config.look or {}
+
+Players.CharacterAutoLoads = false
+
+local remotes = Instance.new("Folder")
+remotes.Name = "Race"
+local Drive = Instance.new("RemoteEvent")
+Drive.Name = "Drive"
+Drive.Parent = remotes
+local StateEvent = Instance.new("RemoteEvent")
+StateEvent.Name = "State"
+StateEvent.Parent = remotes
+local FeedEvent = Instance.new("RemoteEvent")
+FeedEvent.Name = "Feed"
+FeedEvent.Parent = remotes
+remotes.Parent = ReplicatedStorage
+
+----------------------------------------------------------------------------------------------------------------
+-- building blocks
+
+local function make(className: string, props: { [string]: any }, parent: Instance?): any
+	local x = Instance.new(className)
+	if x:IsA("BasePart") then
+		x.Anchored = true
+		x.CanCollide = false
+		x.TopSurface = Enum.SurfaceType.Smooth
+		x.BottomSurface = Enum.SurfaceType.Smooth
+	end
+	for k, v in props do
+		(x :: any)[k] = v
+	end
+	x.Parent = parent
+	return x
+end
+
+local function hex(s: string?, fallback: Color3): Color3
+	if type(s) ~= "string" then
+		return fallback
+	end
+	local ok, c = pcall(Color3.fromHex, s)
+	return if ok then c else fallback
+end
+
+local world = make("Folder", { Name = "Track" }, workspace)
+
+----------------------------------------------------------------------------------------------------------------
+-- the track
+
+local ROAD = Color3.fromRGB(52, 54, 60)
+local HOVER_ROAD = Color3.fromRGB(38, 34, 70)
+local RAIL = Color3.fromRGB(80, 230, 255)
+
+local function buildTrack()
+	local n = Track.count
+	local pts, ups = Track.points, Track.ups
+	local minY, minX, maxX, minZ, maxZ = math.huge, math.huge, -math.huge, math.huge, -math.huge
+	for _, p in pts do
+		minY, minX, maxX = math.min(minY, p.Y), math.min(minX, p.X), math.max(maxX, p.X)
+		minZ, maxZ = math.min(minZ, p.Z), math.max(maxZ, p.Z)
+	end
+	local groundY = minY - 3
+
+	local road = make("Folder", { Name = "Road" }, world)
+	local deco = make("Folder", { Name = "Deco" }, world)
+	for i = 1, n do
+		local a, b = pts[i], pts[i % n + 1]
+		local seg = b - a
+		local len = seg.Magnitude
+		if len < 1e-3 then
+			continue
+		end
+		local t = seg.Unit
+		local up = (ups[i] + ups[i % n + 1])
+		up = (up - t * up:Dot(t)).Unit
+		local right = t:Cross(up)
+		local mid = (a + b) * 0.5
+		local hovering = Track.hover(Track.distOf(i)) > 0.5
+		local slab = make("Part", {
+			Name = "Road" .. i,
+			Size = Vector3.new(HW * 2, 1.2, len + 0.35),
+			CFrame = CFrame.fromMatrix(mid - up * 0.6, right, up, -t),
+			Color = if hovering then HOVER_ROAD else ROAD,
+			Material = Enum.Material.SmoothPlastic,
+		}, road)
+		CollectionService:AddTag(slab, "Road")
+		for side = -1, 1, 2 do
+			local edge = mid + right * side * (HW + 0.8)
+			if hovering then
+				local rail = make("Part", {
+					Name = "Rail",
+					Size = Vector3.new(0.7, 0.7, len + 0.35),
+					CFrame = CFrame.fromMatrix(edge + up * 0.6, right, up, -t),
+					Color = RAIL,
+					Material = Enum.Material.Neon,
+				}, deco)
+				CollectionService:AddTag(rail, "HoverRail")
+			else
+				make("Part", {
+					Name = "Kerb",
+					Size = Vector3.new(1.6, 1.5, len + 0.35),
+					CFrame = CFrame.fromMatrix(edge - up * 0.45, right, up, -t),
+					Color = if (i // 2) % 2 == 0 then Color3.fromRGB(220, 40, 40) else Color3.new(1, 1, 1),
+					Material = Enum.Material.SmoothPlastic,
+				}, deco)
+			end
+		end
+		-- pillars under raised, upright road
+		local base = mid - up * 1.2
+		if i % 6 == 0 and up.Y > 0.85 and base.Y - groundY > 6 then
+			local h = base.Y - groundY
+			make("Part", {
+				Name = "Pillar",
+				Size = Vector3.new(2.4, h, 2.4),
+				CFrame = CFrame.new(base.X, groundY + h / 2, base.Z),
+				Color = Color3.fromRGB(150, 150, 158),
+				Material = Enum.Material.Concrete,
+			}, deco)
+		end
+		-- lamps along the plain road; they light up at night
+		if i % 8 == 4 and not hovering and up.Y > 0.9 then
+			local side = if (i // 8) % 2 == 0 then 1 else -1
+			local foot = mid + right * side * (HW + 4)
+			local post = make("Part", {
+				Name = "LampPost",
+				Size = Vector3.new(0.8, 16, 0.8),
+				CFrame = CFrame.new(foot + Vector3.new(0, 8, 0)),
+				Color = Color3.fromRGB(60, 62, 70),
+				Material = Enum.Material.Metal,
+			}, deco)
+			local head = make("Part", {
+				Name = "Lamp",
+				Size = Vector3.new(3, 0.8, 1.6),
+				CFrame = post.CFrame * CFrame.new(-side * 1.2, 8, 0),
+				Color = Color3.fromRGB(255, 226, 160),
+				Material = Enum.Material.SmoothPlastic,
+			}, deco)
+			CollectionService:AddTag(head, "NightGlow")
+			local light = make("PointLight", { Range = 45, Brightness = 2, Color = Color3.fromRGB(255, 214, 150), Enabled = false }, head)
+			CollectionService:AddTag(light, "NightLight")
+		end
+	end
+
+	local margin = 140
+	make("Part", {
+		Name = "Ground",
+		Size = Vector3.new(maxX - minX + margin * 2, 2, maxZ - minZ + margin * 2),
+		CFrame = CFrame.new((minX + maxX) / 2, groundY - 1, (minZ + maxZ) / 2),
+		Color = hex(look.ground, Color3.fromRGB(95, 158, 74)),
+		Material = Enum.Material.Grass,
+		CanCollide = true,
+	}, world)
+
+	-- start gantry and chequered line at distance 0
+	local start = Track.poseAt(0, 0)
+	for side = -1, 1, 2 do
+		make("Part", {
+			Name = "GantryPost",
+			Size = Vector3.new(1.6, 20, 1.6),
+			CFrame = start * CFrame.new(side * (HW + 2.5), 10, 0),
+			Color = Color3.fromRGB(40, 40, 46),
+			Material = Enum.Material.Metal,
+		}, world)
+	end
+	local bar = make("Part", {
+		Name = "GantryBar",
+		Size = Vector3.new(HW * 2 + 6.6, 3.6, 1.4),
+		CFrame = start * CFrame.new(0, 19, 0),
+		Color = Color3.fromRGB(24, 24, 30),
+		Material = Enum.Material.SmoothPlastic,
+	}, world)
+	for _, face in { Enum.NormalId.Front, Enum.NormalId.Back } do
+		local gui = make("SurfaceGui", { Face = face, PixelsPerStud = 24, LightInfluence = 0 }, bar)
+		make("TextLabel", {
+			Size = UDim2.fromScale(1, 1),
+			BackgroundTransparency = 1,
+			Text = string.upper(Config.title or "Race"),
+			TextColor3 = hex(Config.hud and Config.hud.accent, Color3.fromRGB(255, 210, 60)),
+			TextScaled = true,
+			Font = Enum.Font.GothamBlack,
+		}, gui)
+	end
+	local cells = 10
+	for c = 0, cells - 1 do
+		for r = 0, 1 do
+			make("Part", {
+				Name = "Chequer",
+				Size = Vector3.new(HW * 2 / cells, 0.1, 1.4),
+				CFrame = start * CFrame.new(-HW + (c + 0.5) * HW * 2 / cells, 0.05, (r - 0.5) * 1.4),
+				Color = if (c + r) % 2 == 0 then Color3.new(1, 1, 1) else Color3.fromRGB(20, 20, 20),
+				Material = Enum.Material.SmoothPlastic,
+			}, world)
+		end
+	end
+end
+
+if built.track then
+	buildTrack()
+end
+
+----------------------------------------------------------------------------------------------------------------
+-- karts and riders
+
+type Kart = {
+	index: number,
+	name: string,
+	color: Color3,
+	model: Model,
+	root: BasePart,
+	weapon: { { part: BasePart, offset: CFrame } },
+	glow: BasePart?,
+	highlight: Highlight?,
+	dist: number,
+	lat: number,
+	speed: number,
+	steer: number,
+	throttle: number,
+	attack: boolean,
+	cool: number,
+	swing: number,
+	flash: number,
+	slowed: number,
+	lane: number,
+	pace: number,
+	wander: number,
+	owner: Player?,
+	finished: number?,
+}
+
+local KC = Config.karts or {}
+local RC = Config.riders or {}
+local CC = Config.combat or {}
+local TOP = (KC.topSpeed or 26) * S
+local ACCEL = (KC.accel or 9) * S
+local STEER = (KC.steer or 9) * S
+local RANGE = (CC.range or 4.5) * S
+local karts: { Kart } = {}
+local kartFolder = make("Folder", { Name = "Karts" }, workspace)
+
+local function weaponParts(model: Model, root: BasePart, color: Color3): { { part: BasePart, offset: CFrame } }
+	local kind = string.lower(RC.weapon or "club")
+	local shoulder = CFrame.new(1.4, 3.9, 0.4)
+	local out = {}
+	local function add(size: Vector3, at: CFrame, c: Color3, shape: Enum.PartType?)
+		local p = make("Part", { Name = "Weapon", Size = size, Color = c, Material = Enum.Material.SmoothPlastic }, model)
+		if shape then
+			p.Shape = shape
+		end
+		table.insert(out, { part = p, offset = at })
+		p.CFrame = root.CFrame * shoulder * at
+	end
+	local handle = Color3.fromRGB(110, 76, 44)
+	if kind == "glove" then
+		-- a big boxing glove on a short spring arm
+		add(Vector3.new(0.3, 1.6, 0.3), CFrame.new(0, 0.8, 0), Color3.fromRGB(180, 180, 190))
+		add(Vector3.new(1.7, 1.7, 1.7), CFrame.new(0, 2.3, 0), Color3.fromRGB(210, 40, 40), Enum.PartType.Ball)
+	elseif kind == "noodle" then
+		-- a long foam pool noodle in three soft segments
+		for s = 0, 2 do
+			add(Vector3.new(1.4, 0.7, 0.7), CFrame.new(0, 0.7 + s * 1.3, 0) * CFrame.Angles(0, 0, math.rad(90 + s * 8)), color:Lerp(Color3.new(1, 1, 1), 0.25), Enum.PartType.Cylinder)
+		end
+	else
+		add(Vector3.new(0.4, 2.2, 0.4), CFrame.new(0, 1.1, 0), handle)
+		add(Vector3.new(1.1, 1.8, 1.1), CFrame.new(0, 2.8, 0), color, Enum.PartType.Cylinder)
+	end
+	return out
+end
+
+local function buildKart(i: number): Kart
+	local colors = KC.colors or {}
+	local names = KC.names or {}
+	local color = hex(colors[(i - 1) % math.max(1, #colors) + 1], Color3.fromHSV((i * 0.17) % 1, 0.7, 0.9))
+	local name = names[i] or ("Kart " .. i)
+	local model = make("Model", { Name = name }, nil)
+	local root = make("Part", { Name = "Root", Size = Vector3.new(1, 1, 1), Transparency = 1 }, model)
+	model.PrimaryPart = root
+	local function at(className: string, props: { [string]: any }, offset: CFrame): BasePart
+		local p = make(className, props, model)
+		p.CFrame = offset
+		return p
+	end
+	at("Part", { Name = "Body", Size = Vector3.new(4, 1.2, 6), Color = color, Material = Enum.Material.SmoothPlastic }, CFrame.new(0, 1.3, 0))
+	at("WedgePart", { Name = "Nose", Size = Vector3.new(3.6, 0.9, 1.8), Color = color, Material = Enum.Material.SmoothPlastic }, CFrame.new(0, 1.15, -3.9))
+	at("Part", { Name = "Spoiler", Size = Vector3.new(4.4, 0.25, 1.1), Color = Color3.fromRGB(30, 30, 34) }, CFrame.new(0, 2.7, 2.8))
+	at("Part", { Name = "Seat", Size = Vector3.new(2.2, 1.4, 1.6), Color = Color3.fromRGB(30, 30, 34) }, CFrame.new(0, 2.2, 0.9))
+	for _, w in { { -2.3, -2 }, { 2.3, -2 }, { -2.3, 2 }, { 2.3, 2 } } do
+		local wheel = at("Part", { Name = "Wheel", Shape = Enum.PartType.Cylinder, Size = Vector3.new(1, 1.7, 1.7), Color = Color3.fromRGB(22, 22, 24) }, CFrame.new(w[1], 0.85, w[2]))
+		CollectionService:AddTag(wheel, "Wheel")
+	end
+	local glow = at("Part", { Name = "HoverGlow", Size = Vector3.new(3.6, 0.15, 5.4), Color = RAIL, Material = Enum.Material.Neon, Transparency = 1 }, CFrame.new(0, 0.35, 0))
+	local weapon = {}
+	if built.riders then
+		local skin = hex(RC.skin, Color3.fromRGB(241, 194, 125))
+		local h = math.clamp(RC.height or 1, 0.7, 1.4)
+		at("Part", { Name = "Torso", Size = Vector3.new(2, 2, 1) * h, Color = color:Lerp(Color3.new(1, 1, 1), 0.2) }, CFrame.new(0, 3.4, 0.6))
+		local head = at("Part", { Name = "Head", Shape = Enum.PartType.Ball, Size = Vector3.new(1.4, 1.4, 1.4) * h, Color = skin }, CFrame.new(0, 3.4 + 1.75 * h, 0.6))
+		at("Part", { Name = "Helmet", Shape = Enum.PartType.Ball, Size = Vector3.new(1.55, 1.55, 1.55) * h, Color = color, Transparency = 0.15 }, CFrame.new(0, 3.55 + 1.75 * h, 0.65))
+		at("Part", { Name = "LeftArm", Size = Vector3.new(0.6, 1.8, 0.6) * h, Color = skin }, CFrame.new(-1.4, 3.2, -0.2) * CFrame.Angles(math.rad(-50), 0, 0))
+		at("Part", { Name = "RightArm", Size = Vector3.new(0.6, 1.8, 0.6) * h, Color = skin }, CFrame.new(1.4, 3.6, 0.4))
+		local tag = make("BillboardGui", { Size = UDim2.fromOffset(160, 34), StudsOffset = Vector3.new(0, 2.2, 0), AlwaysOnTop = false, MaxDistance = 220 }, head)
+		make("TextLabel", {
+			Size = UDim2.fromScale(1, 1),
+			BackgroundTransparency = 1,
+			Text = name,
+			TextColor3 = Color3.new(1, 1, 1),
+			TextStrokeTransparency = 0.3,
+			TextScaled = true,
+			Font = Enum.Font.GothamBold,
+		}, tag)
+		weapon = weaponParts(model, root, color)
+	end
+	local highlight = make("Highlight", {
+		Enabled = false,
+		FillColor = hex(CC.hitColor, Color3.fromRGB(255, 210, 60)),
+		FillTransparency = 0.35,
+		OutlineColor = Color3.new(1, 1, 1),
+	}, model)
+	model.Parent = kartFolder
+	return {
+		index = i,
+		name = name,
+		color = color,
+		model = model,
+		root = root,
+		weapon = weapon,
+		glow = glow,
+		highlight = highlight,
+		dist = 0,
+		lat = 0,
+		speed = 0,
+		steer = 0,
+		throttle = 0,
+		attack = false,
+		cool = 0,
+		swing = 0,
+		flash = 0,
+		slowed = 0,
+		lane = 0,
+		pace = 1,
+		wander = math.random() * 10,
+		owner = nil,
+		finished = nil,
+	}
+end
+
+if built.karts then
+	for i = 1, math.clamp(KC.count or 6, 1, 12) do
+		table.insert(karts, buildKart(i))
+	end
+end
+
+----------------------------------------------------------------------------------------------------------------
+-- race state
+
+local laps = math.max(1, Config.laps or 2)
+local phase = "countdown"
+local clock = 3
+local order: { Kart } = {}
+
+local function grid()
+	order = {}
+	for i, k in karts do
+		local row = (i - 1) // 2
+		k.dist = -(row + 1) * 14
+		k.lat = (if i % 2 == 1 then -1 else 1) * HW * 0.4
+		k.speed, k.cool, k.swing, k.flash, k.slowed = 0, 0, 0, 0, 0
+		k.finished = nil
+		k.lane = (math.random() * 2 - 1) * HW * 0.5
+		k.pace = 0.9 + math.random() * 0.08
+	end
+	phase, clock = "countdown", 3
+end
+
+local function lapOf(k: Kart): number
+	return math.clamp(math.floor(k.dist / L) + 1, 1, laps)
+end
+
+local function feed(text: string)
+	FeedEvent:FireAllClients(text)
+end
+
+local function hit(by: Kart, target: Kart)
+	target.speed *= 1 - math.clamp(CC.slow or 0.45, 0, 0.9)
+	target.slowed = 1.2
+	local away = if target.lat >= by.lat then 1 else -1
+	target.lat = math.clamp(target.lat + away * (CC.knock or 7) * S * 0.25, -HW + 2.5, HW - 2.5)
+	target.flash = 0.45
+	feed(by.name .. " bonked " .. target.name)
+end
+
+local function tryAttack(k: Kart)
+	if not built.combat or k.cool > 0 or phase ~= "race" then
+		return
+	end
+	k.cool = CC.cooldown or 1.6
+	k.swing = 0.35
+	local best, bestD = nil, RANGE
+	local p = k.root.Position
+	for _, o in karts do
+		if o ~= k and not o.finished then
+			local d = (o.root.Position - p).Magnitude
+			if d < bestD then
+				best, bestD = o, d
+			end
+		end
+	end
+	if best then
+		hit(k, best)
+	end
+end
+
+----------------------------------------------------------------------------------------------------------------
+-- players
+
+local inputs: { [Player]: { throttle: number, steer: number } } = {}
+
+local function assign(player: Player)
+	for _, k in karts do
+		if not k.owner then
+			k.owner = player
+			k.model:SetAttribute("Owner", player.UserId)
+			player:SetAttribute("Kart", k.name)
+			return
+		end
+	end
+end
+
+Players.PlayerAdded:Connect(assign)
+for _, p in Players:GetPlayers() do
+	assign(p)
+end
+Players.PlayerRemoving:Connect(function(player)
+	inputs[player] = nil
+	for _, k in karts do
+		if k.owner == player then
+			k.owner = nil
+			k.model:SetAttribute("Owner", nil)
+		end
+	end
+end)
+
+Drive.OnServerEvent:Connect(function(player, throttle, steer, attack)
+	if type(throttle) ~= "number" or type(steer) ~= "number" then
+		return
+	end
+	if throttle ~= throttle or steer ~= steer then
+		return
+	end
+	inputs[player] = { throttle = math.clamp(throttle, -1, 1), steer = math.clamp(steer, -1, 1) }
+	if attack == true then
+		for _, k in karts do
+			if k.owner == player then
+				tryAttack(k)
+			end
+		end
+	end
+end)
+
+----------------------------------------------------------------------------------------------------------------
+-- the loop
+
+local function aiDrive(k: Kart, dt: number)
+	k.wander += dt
+	local target = k.lane + math.sin(k.wander * 0.7 + k.index) * HW * 0.25
+	k.steer = math.clamp((target - k.lat) / 8, -1, 1)
+	k.throttle = 1
+	if built.combat and k.cool <= 0 then
+		for _, o in karts do
+			if o ~= k and (o.root.Position - k.root.Position).Magnitude < RANGE * 0.9 then
+				if math.random() < (CC.aiAggression or 0.6) * dt * 3 then
+					tryAttack(k)
+				end
+				break
+			end
+		end
+	end
+end
+
+local function place(k: Kart, now: number)
+	local hover = Track.hover(k.dist)
+	local lift = hover * (0.8 + math.sin(now * 6 + k.index) * 0.25)
+	local heading = k.steer * 10
+	local cf = Track.poseAt(k.dist, k.lat, heading) * CFrame.new(0, lift, 0)
+	k.model:PivotTo(cf)
+	if k.glow then
+		k.glow.Transparency = 1 - hover * 0.75
+	end
+	local swing = if k.swing > 0 then math.sin((1 - k.swing / 0.35) * math.pi) else 0
+	local shoulder = CFrame.new(1.4, 3.9, 0.4) * CFrame.Angles(-math.rad(25) - swing * math.rad(110), 0, -swing * math.rad(40))
+	for _, w in k.weapon do
+		w.part.CFrame = cf * shoulder * w.offset
+	end
+	if k.highlight then
+		k.highlight.Enabled = k.flash > 0
+	end
+end
+
+local function step(dt: number)
+	if phase == "countdown" then
+		clock -= dt
+		if clock <= 0 then
+			phase, clock = "race", 0
+		end
+	elseif phase == "race" then
+		clock += dt
+	elseif phase == "finished" then
+		clock -= dt
+		if clock <= 0 then
+			grid()
+		end
+	end
+
+	for _, k in karts do
+		k.cool = math.max(0, k.cool - dt)
+		k.swing = math.max(0, k.swing - dt)
+		k.flash = math.max(0, k.flash - dt)
+		k.slowed = math.max(0, k.slowed - dt)
+		if k.owner then
+			local i = inputs[k.owner]
+			k.throttle = if i then i.throttle else 0
+			k.steer = if i then i.steer else 0
+		else
+			aiDrive(k, dt)
+		end
+		if phase ~= "race" or k.finished then
+			k.throttle = if k.finished then 0.3 else 0
+			if phase == "countdown" then
+				k.speed = 0
+			end
+		end
+		local hover = Track.hover(k.dist)
+		local top = TOP * (if k.owner then 1 else k.pace) * (1 + hover * 0.15) * (if k.slowed > 0 then 0.75 else 1)
+		if k.throttle > 0 then
+			k.speed += ACCEL * k.throttle * dt
+		elseif k.throttle < 0 then
+			k.speed += ACCEL * 1.8 * k.throttle * dt
+		else
+			k.speed -= k.speed * 0.6 * dt
+		end
+		if k.speed > top then
+			k.speed = math.max(top, k.speed - ACCEL * 1.5 * dt)
+		end
+		k.speed = math.max(k.speed, -TOP * 0.25)
+		local grip = math.clamp(math.abs(k.speed) / TOP, 0.25, 1)
+		k.lat += k.steer * STEER * grip * dt
+		local edge = HW - 2.5
+		if math.abs(k.lat) > edge then
+			k.lat = math.clamp(k.lat, -edge, edge)
+			k.speed *= 1 - 0.8 * dt
+		end
+		k.dist += k.speed * dt
+		if phase == "race" and not k.finished and k.dist >= laps * L then
+			k.finished = clock
+			table.insert(order, k)
+			feed(string.format("%s finished %s (%.1f s)", k.name, if #order == 1 then "first" else "#" .. #order, clock))
+		end
+	end
+
+	-- karts side by side push each other apart
+	for a = 1, #karts do
+		for b = a + 1, #karts do
+			local ka, kb = karts[a], karts[b]
+			if math.abs(ka.dist - kb.dist) < 6 and math.abs(ka.lat - kb.lat) < 4.4 then
+				local push = (4.4 - math.abs(ka.lat - kb.lat)) * 0.5
+				local s = if ka.lat >= kb.lat then 1 else -1
+				ka.lat += s * push
+				kb.lat -= s * push
+			end
+		end
+	end
+
+	if phase == "race" and #karts > 0 then
+		local everyone = #order == #karts
+		local humansDone = true
+		local anyHuman = false
+		for _, k in karts do
+			if k.owner then
+				anyHuman = true
+				humansDone = humansDone and k.finished ~= nil
+			end
+		end
+		local timeUp = #order > 0 and clock - (order[1].finished or clock) > 20
+		if everyone or (anyHuman and humansDone) or timeUp then
+			phase, clock = "finished", 8
+		end
+	end
+
+	local now = os.clock()
+	for _, k in karts do
+		place(k, now)
+	end
+end
+
+local sorted: { Kart } = {}
+local function standings(): { Kart }
+	table.clear(sorted)
+	for _, k in karts do
+		table.insert(sorted, k)
+	end
+	table.sort(sorted, function(a, b)
+		if a.finished and b.finished then
+			return a.finished < b.finished
+		end
+		if a.finished or b.finished then
+			return a.finished ~= nil
+		end
+		return a.dist > b.dist
+	end)
+	return sorted
+end
+
+grid()
+local sendEvery, sendT = 0.1, 0
+RunService.Heartbeat:Connect(function(dt)
+	dt = math.min(dt, 0.1)
+	step(dt)
+	sendT += dt
+	if sendT >= sendEvery then
+		sendT = 0
+		local list = {}
+		for place_, k in standings() do
+			table.insert(list, {
+				n = k.name,
+				c = k.color:ToHex(),
+				d = k.dist,
+				l = k.lat,
+				lap = lapOf(k),
+				pl = place_,
+				v = k.speed / S,
+				o = if k.owner then k.owner.UserId else 0,
+				f = k.finished,
+				cd = k.cool,
+			})
+		end
+		StateEvent:FireAllClients({ phase = phase, clock = clock, laps = laps, karts = list })
+	end
+end)
+
+----------------------------------------------------------------------------------------------------------------
+-- look and music
+
+local function applyLook()
+	Look.apply(Flags.night == true or look.night == true, Flags.realistic == true or look.realistic == true, look)
+	for _, r in CollectionService:GetTagged("HoverRail") do
+		(r :: BasePart).Material = Enum.Material.Neon
+	end
+end
+applyLook()
+
+if type(Flags.musicId) == "string" and Flags.musicId ~= "" then
+	make("Sound", {
+		Name = "RaceMusic",
+		SoundId = "rbxassetid://" .. Flags.musicId:gsub("%D", ""),
+		Looped = true,
+		Volume = 0.45,
+		Playing = true,
+	}, SoundService)
+end
+
+----------------------------------------------------------------------------------------------------------------
+-- crossplay: post our karts to the relay, draw the other engine's karts as ghosts
+
+local ghosts: { [string]: { model: Model, p: number, l: number, h: number, v: number, seen: number } } = {}
+local ghostFolder = make("Folder", { Name = "Ghosts" }, workspace)
+
+local function ghostModel(name: string, color: Color3): Model
+	local m = make("Model", { Name = "Ghost " .. name }, nil)
+	local root = make("Part", { Name = "Root", Size = Vector3.new(1, 1, 1), Transparency = 1 }, m)
+	m.PrimaryPart = root
+	local body = make("Part", { Name = "Body", Size = Vector3.new(4, 1.6, 6), Color = color, Material = Enum.Material.ForceField, Transparency = 0.2 }, m)
+	body.CFrame = CFrame.new(0, 1.4, 0)
+	local shell = make("Part", { Name = "Rider", Size = Vector3.new(2, 2.6, 1.2), Color = color, Material = Enum.Material.Neon, Transparency = 0.55 }, m)
+	shell.CFrame = CFrame.new(0, 3.4, 0.6)
+	local tag = make("BillboardGui", { Size = UDim2.fromOffset(220, 36), StudsOffset = Vector3.new(0, 3.2, 0), AlwaysOnTop = true }, shell)
+	make("TextLabel", {
+		Size = UDim2.fromScale(1, 1),
+		BackgroundTransparency = 1,
+		Text = name .. " [Unity]",
+		TextColor3 = color:Lerp(Color3.new(1, 1, 1), 0.5),
+		TextStrokeTransparency = 0.2,
+		TextScaled = true,
+		Font = Enum.Font.GothamBold,
+	}, tag)
+	m.Parent = ghostFolder
+	return m
+end
+
+local function relayLoop(url: string)
+	local httpUrl = url:gsub("^ws", "http")
+	while true do
+		local states = {}
+		for _, k in karts do
+			if k.owner or #states == 0 then
+				table.insert(states, {
+					id = if k.owner then "rbx-" .. k.owner.UserId else "rbx-ai-" .. k.index,
+					eng = "roblox",
+					name = if k.owner then k.owner.DisplayName else k.name,
+					c = "#" .. k.color:ToHex(),
+					p = (k.dist % L) / L,
+					l = k.lat / HW,
+					h = k.steer * 10,
+					v = k.speed / L,
+					lap = lapOf(k),
+				})
+			end
+			if #states >= 8 then
+				break
+			end
+		end
+		local ok, res = pcall(function()
+			return HttpService:PostAsync(httpUrl, HttpService:JSONEncode({ states = states }), Enum.HttpContentType.ApplicationJson)
+		end)
+		if ok then
+			local decoded = HttpService:JSONDecode(res)
+			for _, s in decoded.states or {} do
+				if type(s) == "table" and type(s.id) == "string" and s.eng ~= "roblox" and type(s.p) == "number" then
+					local g = ghosts[s.id]
+					if not g then
+						g = { model = ghostModel(tostring(s.name or "Rider"), hex(s.c, RAIL)), p = 0, l = 0, h = 0, v = 0, seen = 0 }
+						ghosts[s.id] = g
+					end
+					g.p, g.l, g.h, g.v, g.seen = s.p, tonumber(s.l) or 0, tonumber(s.h) or 0, tonumber(s.v) or 0, os.clock()
+				end
+			end
+		end
+		task.wait(0.2)
+	end
+end
+
+if Flags.relay == true and type(Flags.relayUrl) == "string" and Flags.relayUrl ~= "" then
+	task.spawn(relayLoop, Flags.relayUrl)
+	RunService.Heartbeat:Connect(function(dt)
+		local now = os.clock()
+		for id, g in ghosts do
+			if now - g.seen > 3 then
+				g.model:Destroy()
+				ghosts[id] = nil
+			else
+				g.p = (g.p + g.v * dt) % 1
+				g.model:PivotTo(Track.poseAt(g.p * L, math.clamp(g.l, -1, 1) * HW, g.h))
+			end
+		end
+	end)
+end
+]]></string>
+        </Properties>
+      </Item>
+    </Item>
+  </Item>
+  <Item class="SoundService" referent="12">
+    <Properties>
+      <string name="Name">SoundService</string>
+    </Properties>
+  </Item>
+  <Item class="StarterPlayer" referent="13">
+    <Properties>
+      <string name="Name">StarterPlayer</string>
+      <float name="CameraMaxZoomDistance">400</float>
+    </Properties>
+    <Item class="StarterPlayerScripts" referent="14">
+      <Properties>
+        <string name="Name">StarterPlayerScripts</string>
+      </Properties>
+      <Item class="Folder" referent="15">
+        <Properties>
+          <string name="Name">Client</string>
+        </Properties>
+        <Item class="LocalScript" referent="16">
+          <Properties>
+            <string name="Name">Client</string>
+            <string name="Source"><![CDATA[-- The player's side: keys (or touch) to the Drive remote, a chase camera that rolls with the road through loops
+-- and twists, and the HUD (lap, place, speed, countdown, hit feed, results, minimap).
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+
+local Shared = ReplicatedStorage:WaitForChild("Shared")
+local Config = require(Shared:WaitForChild("Config"))
+local Track = require(Shared:WaitForChild("Track"))
+local Race = ReplicatedStorage:WaitForChild("Race")
+local Drive = Race:WaitForChild("Drive") :: RemoteEvent
+local StateEvent = Race:WaitForChild("State") :: RemoteEvent
+local FeedEvent = Race:WaitForChild("Feed") :: RemoteEvent
+
+local player = Players.LocalPlayer
+local camera = workspace.CurrentCamera
+local hud = Config.hud or {}
+local built = Config.built or {}
+local accent = Color3.fromHex(hud.accent or "#ffd23c")
+
+----------------------------------------------------------------------------------------------------------------
+-- input
+
+local keys: { [Enum.KeyCode]: boolean } = {}
+local attackQueued = false
+local touchSteer, touching = 0, false
+
+UserInputService.InputBegan:Connect(function(input, processed)
+	if processed then
+		return
+	end
+	if input.UserInputType == Enum.UserInputType.Keyboard or input.UserInputType.Name:find("Gamepad") then
+		keys[input.KeyCode] = true
+		if input.KeyCode == Enum.KeyCode.Space or input.KeyCode == Enum.KeyCode.F or input.KeyCode == Enum.KeyCode.ButtonX then
+			attackQueued = true
+		end
+	elseif input.UserInputType == Enum.UserInputType.Touch then
+		touching = true
+		local w = camera.ViewportSize.X
+		touchSteer = math.clamp((input.Position.X - w / 2) / (w / 4), -1, 1)
+		if input.Position.Y < camera.ViewportSize.Y * 0.4 then
+			attackQueued = true
+		end
+	end
+end)
+UserInputService.InputEnded:Connect(function(input)
+	keys[input.KeyCode] = nil
+	if input.UserInputType == Enum.UserInputType.Touch then
+		touching, touchSteer = false, 0
+	end
+end)
+
+local function axis(pos: { Enum.KeyCode }, neg: { Enum.KeyCode }): number
+	local v = 0
+	for _, k in pos do
+		if keys[k] then
+			v += 1
+			break
+		end
+	end
+	for _, k in neg do
+		if keys[k] then
+			v -= 1
+			break
+		end
+	end
+	return v
+end
+
+task.spawn(function()
+	while true do
+		local throttle = axis({ Enum.KeyCode.W, Enum.KeyCode.Up, Enum.KeyCode.ButtonR2 }, { Enum.KeyCode.S, Enum.KeyCode.Down, Enum.KeyCode.ButtonL2 })
+		local steer = axis({ Enum.KeyCode.D, Enum.KeyCode.Right }, { Enum.KeyCode.A, Enum.KeyCode.Left })
+		if UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled then
+			throttle = 1
+			steer = if touching then touchSteer else 0
+		end
+		Drive:FireServer(throttle, steer, attackQueued)
+		attackQueued = false
+		task.wait(1 / 20)
+	end
+end)
+
+----------------------------------------------------------------------------------------------------------------
+-- HUD
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "RaceHud"
+gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = true
+gui.Enabled = built.hud ~= false
+gui.Parent = player:WaitForChild("PlayerGui")
+
+local function label(props: { [string]: any }, parent: Instance): TextLabel
+	local l = Instance.new("TextLabel")
+	l.BackgroundTransparency = 1
+	l.TextColor3 = Color3.new(1, 1, 1)
+	l.TextStrokeTransparency = 0.4
+	l.Font = Enum.Font.GothamBlack
+	l.TextScaled = true
+	for k, v in props do
+		(l :: any)[k] = v
+	end
+	l.Parent = parent
+	return l
+end
+
+local title = label({ Text = string.upper(hud.title or Config.title or ""), Size = UDim2.fromOffset(360, 34), Position = UDim2.fromOffset(24, 18), TextXAlignment = Enum.TextXAlignment.Left, TextColor3 = accent }, gui)
+local lapLabel = label({ Text = "LAP 1/1", Size = UDim2.fromOffset(260, 46), Position = UDim2.fromOffset(24, 56), TextXAlignment = Enum.TextXAlignment.Left }, gui)
+local placeLabel = label({ Text = "", Size = UDim2.fromOffset(200, 80), Position = UDim2.new(1, -224, 0, 18), TextXAlignment = Enum.TextXAlignment.Right, TextColor3 = accent }, gui)
+local speedLabel = label({ Text = "", Size = UDim2.fromOffset(220, 52), Position = UDim2.new(1, -244, 1, -76), TextXAlignment = Enum.TextXAlignment.Right }, gui)
+local bigLabel = label({ Text = "", Size = UDim2.fromScale(0.6, 0.18), Position = UDim2.fromScale(0.2, 0.3), TextColor3 = accent }, gui)
+local hint = label({ Text = "W/S drive   A/D steer   SPACE swing", Size = UDim2.fromOffset(520, 22), Position = UDim2.new(0.5, -260, 1, -36), Font = Enum.Font.GothamMedium }, gui)
+title.ZIndex, hint.TextTransparency = 2, 0.3
+
+local feedBox = Instance.new("Frame")
+feedBox.BackgroundTransparency = 1
+feedBox.Size = UDim2.fromOffset(380, 140)
+feedBox.Position = UDim2.fromOffset(24, 112)
+feedBox.Parent = gui
+local feedLayout = Instance.new("UIListLayout")
+feedLayout.SortOrder = Enum.SortOrder.LayoutOrder
+feedLayout.Parent = feedBox
+local feedN = 0
+FeedEvent.OnClientEvent:Connect(function(text: string)
+	feedN += 1
+	local l = label({ Text = text, Size = UDim2.new(1, 0, 0, 24), TextXAlignment = Enum.TextXAlignment.Left, Font = Enum.Font.GothamBold, LayoutOrder = feedN }, feedBox)
+	local items = feedBox:GetChildren()
+	if #items > 6 then
+		for _, c in items do
+			if c:IsA("TextLabel") and c.LayoutOrder <= feedN - 5 then
+				c:Destroy()
+			end
+		end
+	end
+	task.delay(4, function()
+		if l.Parent then
+			l:Destroy()
+		end
+	end)
+end)
+
+local results = Instance.new("Frame")
+results.BackgroundColor3 = Color3.fromRGB(14, 16, 24)
+results.BackgroundTransparency = 0.2
+results.Size = UDim2.fromOffset(360, 300)
+results.Position = UDim2.new(0.5, -180, 0.5, -120)
+results.Visible = false
+results.Parent = gui
+local resultsText = label({ Text = "", Size = UDim2.new(1, -40, 1, -30), Position = UDim2.fromOffset(20, 15), TextScaled = false, TextSize = 22, Font = Enum.Font.GothamBold, TextYAlignment = Enum.TextYAlignment.Top, TextXAlignment = Enum.TextXAlignment.Left }, results)
+
+-- minimap: the centre line seen from above, a dot per kart
+local mapSize = 190
+local map = Instance.new("Frame")
+map.BackgroundColor3 = Color3.fromRGB(10, 12, 18)
+map.BackgroundTransparency = 0.45
+map.Size = UDim2.fromOffset(mapSize, mapSize)
+map.Position = UDim2.new(0, 24, 1, -mapSize - 24)
+map.Visible = hud.minimap ~= false
+map.Parent = gui
+local minX, maxX, minZ, maxZ = math.huge, -math.huge, math.huge, -math.huge
+for _, p in Track.points do
+	minX, maxX, minZ, maxZ = math.min(minX, p.X), math.max(maxX, p.X), math.min(minZ, p.Z), math.max(maxZ, p.Z)
+end
+local span = math.max(maxX - minX, maxZ - minZ, 1)
+local function toMap(p: Vector3): UDim2
+	local pad = 12
+	local s = (mapSize - pad * 2) / span
+	local cx, cz = (minX + maxX) / 2, (minZ + maxZ) / 2
+	return UDim2.fromOffset(mapSize / 2 + (p.X - cx) * s, mapSize / 2 + (p.Z - cz) * s)
+end
+for i = 1, Track.count, 2 do
+	local d = Instance.new("Frame")
+	d.Size = UDim2.fromOffset(3, 3)
+	d.AnchorPoint = Vector2.new(0.5, 0.5)
+	d.BorderSizePixel = 0
+	d.BackgroundColor3 = Color3.fromRGB(200, 205, 215)
+	d.Position = toMap(Track.points[i])
+	d.Parent = map
+end
+local dots: { [string]: Frame } = {}
+
+----------------------------------------------------------------------------------------------------------------
+-- state from the server
+
+local state: any = nil
+StateEvent.OnClientEvent:Connect(function(s)
+	state = s
+end)
+
+local function ordinal(n: number): string
+	local suffix = "th"
+	if n % 100 < 11 or n % 100 > 13 then
+		suffix = ({ "st", "nd", "rd" })[n % 10] or "th"
+	end
+	return n .. suffix
+end
+
+local function myKart(): any
+	if not state then
+		return nil
+	end
+	for _, k in state.karts do
+		if k.o == player.UserId then
+			return k
+		end
+	end
+	return state.karts[1]
+end
+
+----------------------------------------------------------------------------------------------------------------
+-- camera
+
+camera.CameraType = Enum.CameraType.Scriptable
+local camCF: CFrame? = nil
+RunService.RenderStepped:Connect(function(dt)
+	local me = myKart()
+	local target: CFrame
+	if me then
+		local model = workspace:FindFirstChild("Karts") and workspace.Karts:FindFirstChild(me.n)
+		local pose = if model then model:GetPivot() else Track.poseAt(me.d, me.l)
+		-- behind and above in the kart's own frame, so the camera rolls through loops with it
+		local eye = pose * CFrame.new(0, 7.5, 17)
+		target = CFrame.lookAt(eye.Position, (pose * CFrame.new(0, 2.5, -10)).Position, pose.UpVector)
+	else
+		local c = Track.poseAt(os.clock() * 30, 0)
+		target = CFrame.lookAt((c * CFrame.new(0, 40, 80)).Position, c.Position, Vector3.yAxis)
+	end
+	camCF = if camCF then camCF:Lerp(target, math.clamp(dt * 8, 0, 1)) else target
+	camera.CFrame = camCF :: CFrame
+	camera.FieldOfView = 70 + math.clamp((me and me.v or 0) / 3, 0, 14)
+
+	if not state then
+		return
+	end
+	lapLabel.Text = if me then string.format("LAP %d/%d", me.lap, state.laps) else ""
+	placeLabel.Text = if me then ordinal(me.pl) else ""
+	speedLabel.Text = if me then string.format("%d km/h", math.floor(math.abs(me.v) * 3.6)) else ""
+	if state.phase == "countdown" then
+		bigLabel.Text = tostring(math.max(1, math.ceil(state.clock)))
+	elseif state.phase == "race" and state.clock < 1 then
+		bigLabel.Text = "GO!"
+	elseif me and me.f and state.phase == "race" then
+		bigLabel.Text = "FINISHED " .. ordinal(me.pl)
+	else
+		bigLabel.Text = ""
+	end
+	results.Visible = state.phase == "finished"
+	if results.Visible then
+		local lines = { "RESULTS", "" }
+		for _, k in state.karts do
+			table.insert(lines, string.format("%s  %s%s", ordinal(k.pl), k.n, if k.f then string.format("   %.1f s", k.f) else ""))
+		end
+		resultsText.Text = table.concat(lines, "\n")
+	end
+	for _, k in state.karts do
+		local dot = dots[k.n]
+		if not dot then
+			dot = Instance.new("Frame")
+			dot.Size = UDim2.fromOffset(9, 9)
+			dot.AnchorPoint = Vector2.new(0.5, 0.5)
+			dot.BorderSizePixel = 0
+			dot.BackgroundColor3 = Color3.fromHex(k.c)
+			dot.ZIndex = 3
+			local corner = Instance.new("UICorner")
+			corner.CornerRadius = UDim.new(1, 0)
+			corner.Parent = dot
+			dot.Parent = map
+			dots[k.n] = dot
+		end
+		dot.Position = toMap((Track.sample(k.d)))
+		dot.Size = if me and k.n == me.n then UDim2.fromOffset(13, 13) else UDim2.fromOffset(9, 9)
+	end
+end)
+]]></string>
+          </Properties>
+        </Item>
+      </Item>
+    </Item>
+  </Item>
+  <Item class="Workspace" referent="17">
+    <Properties>
+      <string name="Name">Workspace</string>
+      <float name="Gravity">196.2</float>
+      <bool name="NeedsPivotMigration">false</bool>
+    </Properties>
+  </Item>
+</roblox>

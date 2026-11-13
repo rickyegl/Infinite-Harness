@@ -1,0 +1,5 @@
+{"t":1,"type":"node.state","node":".","state":"running"}
+{"t":5,"type":"node.step","node":".","title":"Placing the grid","detail":"Zibbo, Vemli, Pogrin, Dazzu, Wiblet, Tufflo","icon":"game"}
+{"t":7,"type":"node.evidence","node":".","kind":"image","uri":"./default/grid.svg","caption":"Starting grid","meta":{"fit":"contain"}}
+{"t":9,"type":"node.evidence","node":".","kind":"code","uri":"./default/karts.luau","caption":"Config.luau: karts","meta":{"lines":[["+","karts = {"],["+","  count = 6,"],["+","  topSpeed = 32,"],["+","  accel = 11,"],["+","  grip = 8,"],["+","  steer = 10,"],["+","  colors = {"],["+","    \"#ff6046\","],["+","    \"#24bddd\","],["+","    \"#ffd447\","],["+","    \"#925ce6\","],["+","    \"#52cd70\","],["+","    \"#ef73ba\","],["+","    \"#e8463c\","],["+","    \"#3c8ee8\","],["+","  },"],["+","  names = {"],["+","    \"Zibbo\","],["+","    \"Vemli\","],["+","    \"Pogrin\","],["+","    \"Dazzu\","],["+","    \"Wiblet\","],["+","    \"Tufflo\","],["+","    \"Blaze\","],["+","    \"Volt\","],["+","  },"],["+","}"]]}}
+{"t":10,"type":"node.done","node":".","summary":"6 karts, top speed 115 km/h, players take a kart when they join"}

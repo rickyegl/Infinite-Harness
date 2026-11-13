@@ -1,0 +1,26 @@
+{
+  "id": "game",
+  "label": "Game",
+  "icon": "game",
+  "kind": "orchestrator",
+  "summary": "Makes a playable video game (a kart racing game with riders who fight, built in both Unity and Roblox) from a request: writes the design, asks for the art, then runs one build team per engine. Follow-ups on a finished game (night, realistic look, music, crossplay) go to their own modules under this cell.",
+  "accepts": [
+    "text"
+  ],
+  "produces": [
+    "doc",
+    "frames",
+    "video",
+    "link"
+  ],
+  "runtime": "script",
+  "mock": true,
+  "allow": {
+    "tools": [
+      "harness.*"
+    ],
+    "write": [
+      "$RUN"
+    ]
+  }
+}

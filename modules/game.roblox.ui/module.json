@@ -1,0 +1,26 @@
+{
+  "id": "game.roblox.ui",
+  "label": "UI",
+  "icon": "layout",
+  "kind": "agent",
+  "summary": "Part of the Roblox game: switches on the ScreenGui HUD (lap, place, speed, countdown, feed, results, minimap); draws the layout.",
+  "accepts": [
+    "text"
+  ],
+  "produces": [
+    "image",
+    "code"
+  ],
+  "runtime": "script",
+  "needs": [
+    "roblox"
+  ],
+  "hidden": true,
+  "mock": true,
+  "allow": {
+    "write": [
+      "$RUN",
+      "$paths.robloxProject"
+    ]
+  }
+}

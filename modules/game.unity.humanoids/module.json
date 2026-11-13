@@ -1,0 +1,25 @@
+{
+  "id": "game.unity.humanoids",
+  "label": "Humanoids",
+  "icon": "person",
+  "kind": "agent",
+  "summary": "Part of the Unity game: seats a humanoid rider with a weapon on every kart and attaches editor shots.",
+  "accepts": [
+    "text"
+  ],
+  "produces": [
+    "frames"
+  ],
+  "runtime": "script",
+  "needs": [
+    "unity"
+  ],
+  "hidden": true,
+  "mock": true,
+  "allow": {
+    "write": [
+      "$RUN",
+      "$paths.unityProject"
+    ]
+  }
+}

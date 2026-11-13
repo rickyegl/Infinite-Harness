@@ -1,0 +1,25 @@
+{
+  "id": "game.unity.combat",
+  "label": "Combat",
+  "icon": "sword",
+  "kind": "agent",
+  "summary": "Part of the Unity game: sets the swing, hit and knock-back rules and attaches editor shots.",
+  "accepts": [
+    "text"
+  ],
+  "produces": [
+    "frames"
+  ],
+  "runtime": "script",
+  "needs": [
+    "unity"
+  ],
+  "hidden": true,
+  "mock": true,
+  "allow": {
+    "write": [
+      "$RUN",
+      "$paths.unityProject"
+    ]
+  }
+}

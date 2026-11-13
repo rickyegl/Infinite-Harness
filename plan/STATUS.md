@@ -1,5 +1,9 @@
 # Status
 
+> **packages/protocol changed (plan 03):** `ModuleManifest` gained an optional `hidden?: boolean` (a part of
+> another module, spawned by its parent's `run.ts`, never offered to the router); `checkManifest` checks its type.
+> Additive only; no event type changed.
+>
 > **packages/protocol changed (plan 02):** `src/manifest.ts` gained the types a module's `run.ts` receives:
 > `ModuleContext`, `AgentOptions`, `AgentResult`, `ShResult`, `ModuleRun`. Additive only; no event type changed.
 >
@@ -22,7 +26,11 @@ what the next agent should know. Keep it short; replace stale lines instead of a
 - **Done (plan 02):** the bridge (`apps/bridge`): runs a prompt through the router, modules and headless
   workers, stores and streams events; the site's live mode posts prompts and draws the run as it happens;
   `pnpm take` turns a run into a take that replays offline. Details under "The bridge" below.
-- **Next:** the module plans (03-07), then plan 08 replaces fixtures with recorded takes and finalises the
+- **Done (plan 03), with two fallbacks:** the game agents. One prompt builds the game in Unity and Roblox,
+  with six part cells under each engine, and four live follow-ups (night, realistic, music, crossplay) through
+  the relay at `/relay`. Fallbacks: a Windows build instead of WebGL (the WebGL module is not installed), and a
+  Roblox place that is built and linted but not opened in Studio. Details under "The games" below.
+- **Next:** the module plans (04-07), then plan 08 replaces fixtures with recorded takes and finalises the
   draft direction files (S37-S40, S42-S47).
 
 ## Waiting on the author
@@ -30,7 +38,17 @@ what the next agent should know. Keep it short; replace stale lines instead of a
 Agents write here what they stopped for (a program to open, a runtime to start, a sign-in, a question) and
 remove the line when it is answered. See `AGENTS.md` rule 5.
 
-- Nothing right now.
+- (plan 03) **WebGL Build Support** for the Unity 6 editor: the install was approved, but the Windows admin
+  prompt was cancelled, so it is not installed (USER-TODO 1). Until then the Build cell makes a Windows player,
+  and there is no "Play in browser". Once it is installed, rerun the game prompt: Build switches to WebGL by
+  itself, and the bridge serves it at `/runs/<id>/artifacts/webgl/`.
+- (plan 03) **Roblox Studio:** the author chose "Unity only for now". Open
+  `runs/<id>/artifacts/game.roblox.build/place.rbxlx` in Studio and press Play to confirm the place plays.
+  Nothing has run it in Studio yet.
+- (plan 03) **Roblox side of crossplay:** a Roblox server can reach the relay only through a public URL (a
+  tunnel, USER-TODO 2), and the place needs `HttpService` turned on. Today the relay is checked both ways
+  locally, and a stand-in Roblox rider proves the ghost in the Unity game.
+- (plan 03) **Publishing the Roblox place:** not done, and not to be done without your approval.
 
 ## Verified
 
@@ -85,6 +103,66 @@ remove the line when it is answered. See `AGENTS.md` rule 5.
     every cut on a beat; `pnpm lint:brand` clean (now scans `apps/bridge` too). The recorded take, the
     `hello` fixture and the router plans hold no vendor names or local paths (checked by grep; `video/takes/` is
     outside the lint's folders).
+
+- Plan 03 (2026-11-13), all on this machine (Unity 6000.2.7f2 open; rojo 7.4.4 and selene 0.32.0 through
+  aftman):
+  - Best run **20261113-014545** (the full prompt "Make a crazy racing game where humanoids fight while racing,
+    with loops, twists and hover sections, on Unity and Roblox", through the bridge, 78 s): Game cell; Design;
+    3 art requests; Unity and Roblox orchestrators with six child cells each; every child has at least 2
+    evidence items (Unity: editor shots plus the game.json section; Roblox: an SVG drawn from the place's data
+    plus the Luau it wrote); 10.0 s `gameplay.mp4` (ffprobe); the Unity race test finished in 124.4 s with 21
+    hits and a finish order; Windows player built in 5 s (95 MB); Roblox `place.rbxlx` built (58 KB), selene 0
+    errors and 0 warnings.
+  - Follow-ups on that run (wall time per `pnpm smoke` call, including the router): night 3.6 s, realistic
+    3.9 s, music 2.9 s, crossplay 4.0 s. Each also rebuilt the Roblox place ("Rebuilt the Roblox place",
+    0.2 s). The shots were looked at: night lamps and glowing kart edges; realistic before and after; the
+    crossplay capture shows the stand-in "Roblox rider" ghost with its name tag.
+  - Relay: the crossplay cell sends a WebSocket state and an HTTP state into a side room, and each arrives on the
+    other side.
+  - Fixtures recorded from that run: `game`, `game.unity`, `game.roblox`, `game.design`, the six Roblox parts and
+    the four follow-ups. The six Unity parts have none; the `game.unity` fixture replays them.
+  - `pnpm typecheck` clean; `pnpm test` (protocol, web, bridge 36 including the router table) passes;
+    `pnpm test:bridge`, `pnpm test:live`, `pnpm test:determinism` (96/96) pass; `pnpm film:rough` 140.625 s;
+    `pnpm lint:brand` clean (523 files). Fixtures were checked for local paths and keys by grep.
+
+## The games (plan 03)
+
+Modules: `game` (orchestrator), `game.design` (worker), `game.unity` and `game.roblox` (engine orchestrators),
+`game.unity.{track,karts,humanoids,combat,ui,build}` and `game.roblox.{...}` (hidden parts), and the follow-ups
+`game.lighting` (night), `game.shaders` (realistic), `game.music` (music) and `game.relay` (crossplay). Every
+module folder has a README. The shared run state is `runs/<id>/game-state.json` (design, art, Unity project and
+build, Roblox place, flags).
+
+- Projects: the Unity project lives in `paths.unityProject` (default `runs/.game/unity`; the template is laid over
+  the URP template), and the Roblox project in `paths.robloxProject` (default `runs/.game/roblox`, a Rojo project
+  with `default.project.json`, `aftman.toml` and `selene.toml`). Each run rewrites the config files in them.
+- Unity driver: a file queue (`Harness/queue`, `Harness/done`) that the open editor polls
+  (`Assets/Harness/Editor/HarnessBridge.cs`). Play ops write their result before they leave play mode, because
+  leaving play mode can reload the scripts and drop the op.
+- Roblox track: the Roblox Track part asks the Unity editor for the same centre line (`track_export`, every 3rd
+  sample, frames and hover spans), so both engines race the same loops and twists.
+- Relay: `ws://<bridge>/relay/<room>` for the Unity build; `POST /relay/<room>` with `{state}` or `{states}`
+  (answers the other clients' states) and `GET ?since=N` (long poll) for Roblox. A state goes stale after 5 s.
+
+**Hand-off.**
+
+- Best run: `20261113-014545`. Timings: design about 39 s (worker); Roblox side about 3 s; Unity parts 1-2 s
+  each on a warm editor; Build = race test about 10 s, then the 10 s capture (about 15 s), then the Windows build
+  (144 s cold, 31 s after a script change, 5 s incremental).
+- Improvised vs scripted: the design (title, track shape, loops, twists, hover, kart names, weapon, combat
+  numbers, HUD) is improvised by a worker in `game.design`. Everything after it is scripted: the parts turn the
+  design into config, and the editor and Rojo do the work. Art comes from the asset kinds (test placeholders until
+  plan 04).
+- Rough edges:
+  - No WebGL build yet (Windows fallback; see "Waiting on the author").
+  - The Roblox place has never been opened in Studio. Roblox music needs an uploaded audio id
+    (`Flags.musicId`), so the music follow-up plays only in Unity.
+  - The Roblox track depends on the open Unity editor (it exports the centre line from there).
+  - Keep the Unity editor in front: in the background, play mode can run many times slower (one race test took
+    over 8 minutes and timed out).
+  - The first render after a rebuild can come out blank (the shots op throws one away); URP can show a one-time
+    dialog in a new project; the crossplay ghost's body is faint, so its name tag carries it.
+  - Music in the full run is the test placeholder loop.
 
 ## The bridge (plan 02)
 
@@ -267,7 +345,7 @@ before falling back to the fixture (checked: the full film has 20, one per take,
   takes live only on this machine; keep them. Regenerating from the seeds in `cues.json` may not give
   identical takes.
 - `video/tools/marker.html` (the old two-track marker) is no longer used.
-- Unity automation path on this machine is unconfirmed (USER-TODO 6).
+- Unity automation is the harness's own editor bridge (a file queue); the editor must be open (plan 03).
 - `cloudflared` is not installed (USER-TODO 2). Unity 6 has no WebGL module yet (USER-TODO 1).
 
 ## Per-plan log
@@ -276,7 +354,7 @@ before falling back to the fixture (checked: the full film has 20, one per take,
 |---|---|---|---|
 | 01 | done | typecheck, unit tests, determinism 96/96, live test, sheets, rough cut duration, lint:brand | See "The stage". Drafts S37-S40, S42-S47 left for plan 08. |
 | 02 | done | typecheck, unit tests (none skipped), `pnpm dev`, real runs on both workers, no-network probes, proxy routing with both models, prompt.md module run, test:bridge, test:live, determinism, film:rough, lint:brand | See "The bridge". |
-| 03 | not started | | |
+| 03 | done, two fallbacks | full run 20261113-014545, four follow-ups under 5 s, fixtures, typecheck, tests, test:bridge, test:live, determinism, film:rough, lint:brand | Windows build until WebGL is installed; Roblox place not opened in Studio. See "The games". |
 | 04 | not started | | |
 | 05 | not started | | |
 | 06 | not started | | |

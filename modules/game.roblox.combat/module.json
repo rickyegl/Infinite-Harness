@@ -1,0 +1,26 @@
+{
+  "id": "game.roblox.combat",
+  "label": "Combat",
+  "icon": "sword",
+  "kind": "agent",
+  "summary": "Part of the Roblox game: switches on server-side swings (reach, cooldown, slow, shove, hit feed); draws the reach.",
+  "accepts": [
+    "text"
+  ],
+  "produces": [
+    "image",
+    "code"
+  ],
+  "runtime": "script",
+  "needs": [
+    "roblox"
+  ],
+  "hidden": true,
+  "mock": true,
+  "allow": {
+    "write": [
+      "$RUN",
+      "$paths.robloxProject"
+    ]
+  }
+}

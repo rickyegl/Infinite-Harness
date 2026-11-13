@@ -7,7 +7,8 @@ The showcase: ask for a racing game and watch one orchestrator build it in Unity
 request models and music from asset agents, cut a trailer, produce an ad campaign in your own voice, host the
 game in the browser and verify the lot. Then keep going: images, CAD, 3D, study guides, forecasts.
 
-> Status: the stage is built and renders the whole film from fixture events; the modules come next. See
+> Status: the stage renders the whole film from fixture events, the bridge runs real prompts, and the game
+> agents build the racing game in Unity and Roblox (`modules/game*`). The other modules come next. See
 > [plan/STATUS.md](plan/STATUS.md).
 
 ## How it works

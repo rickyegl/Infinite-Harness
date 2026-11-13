@@ -182,7 +182,7 @@ export class Run {
     try {
       const existing: Existing[] = [...this.cells.values()].filter((c) => c.id !== "root" && c.id !== "assets").map((c) => ({ id: c.id, module: c.module, label: this.labelOf(c.id) }));
       this.emit({ type: "node.step", node: "root", title: "Planning", detail: prompt, icon: "spark" });
-      const mods = [...this.runner.d.mods.values()].filter((m) => !m.manifest.id.startsWith("_"));
+      const mods = [...this.runner.d.mods.values()].filter((m) => !m.manifest.id.startsWith("_") && !m.manifest.hidden);
       const r = await route(this.cfg, prompt, summaries(mods), {
         existing,
         workDir: join(this.log.dir, "work", `router-${this.agentCalls++}`),
@@ -363,7 +363,8 @@ export class Run {
       node: id,
       manifest: cell.manifest,
       dir: cell.dir,
-      config: this.cfg as unknown as Record<string, any>,
+      // bridge.url: where this bridge really listens (the configured port can be 0 in tests and smoke runs)
+      config: { ...this.cfg, bridge: { ...this.cfg.bridge, url: this.runner.d.bridgeUrl } } as unknown as Record<string, any>,
       signal: this.abort.signal,
       mock: this.cfg.mock.enabled,
       step: (title, detail, icon) => run.emit({ type: "node.step", node: id, title, ...(detail ? { detail } : {}), ...(icon ? { icon } : {}) }),
@@ -437,7 +438,8 @@ export class Run {
 
   /** asset handoff through the "assets" hub */
   async request(from: string, moduleId: string, input: ModuleInput): Promise<ModuleOutput> {
-    const mod = this.runner.d.mods.get(moduleId);
+    // until a kind's real generator is installed, the placeholder module answers (it makes a file of that kind)
+    const mod = this.runner.d.mods.get(moduleId) ?? this.runner.d.mods.get("mock.asset");
     if (!mod) throw new Error(`no module ${moduleId} for this asset`);
     if (!this.cells.has("assets")) {
       this.addCell("assets", "root", HUB, "Assets", "");
@@ -488,12 +490,15 @@ export class Run {
       const ev = { ...rest, node } as NewEvent & Record<string, unknown>;
       if ("parent" in ev) ev.parent = map(ev.parent as string);
       if (typeof ev.to === "string" && ev.to !== "assets") ev.to = map(ev.to);
-      for (const k of ["uri", "thumb"]) {
-        const u = ev[k];
-        if (typeof u === "string" && u.startsWith("./")) {
-          const target = this.cells.get(node) ?? cell;
-          ev[k] = this.artifact({ ...target, dir: join(this.log.dir, "artifacts", node) }, join(fxDir, u));
-        }
+      const target = this.cells.get(node) ?? cell;
+      const own = (u: unknown) => (typeof u === "string" && u.startsWith("./") ? this.artifact({ ...target, dir: join(this.log.dir, "artifacts", node) }, join(fxDir, u)) : u);
+      for (const k of ["uri", "thumb"]) ev[k] = own(ev[k]);
+      // evidence meta can name more fixture files: a frame list, a before picture
+      if (ev.meta && typeof ev.meta === "object") {
+        const m = { ...(ev.meta as Record<string, unknown>) };
+        if (Array.isArray(m.frames)) m.frames = m.frames.map(own);
+        if (m.before !== undefined) m.before = own(m.before);
+        ev.meta = m;
       }
       if (ev.type === "node.spawn") {
         const m = this.runner.d.mods.get(ev.module) ?? { manifest: { ...ROOT, id: ev.module, label: ev.label, kind: ev.kind === "root" ? "orchestrator" : ev.kind } };
@@ -547,11 +552,9 @@ export class Run {
         return { summary: out.summary, files: (out.files ?? []).map((f) => ({ ...f, path: join(this.log.dir, f.uri) })) };
       }
       case "request_asset": {
-        const kind = str("kind");
-        const moduleId = this.cfg.assetKinds[kind];
-        if (!moduleId) throw new Error(`no module for asset kind ${kind}`);
+        const kind = str("kind") || "image";
         const refs = Array.isArray(args.refs) ? (args.refs as string[]).map(own) : [];
-        const out = await ctx.request(moduleId, { prompt: str("prompt"), refs });
+        const out = await ctx.request(this.cfg.assetKinds[kind] ?? `assets.${kind}`, { prompt: str("prompt"), refs, params: { kind } });
         return { summary: out.summary, files: (out.files ?? []).map((f) => ({ ...f, path: join(this.log.dir, f.uri) })) };
       }
       default:

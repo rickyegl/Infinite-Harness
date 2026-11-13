@@ -94,8 +94,12 @@ protocol package in the same commit.
   "accepts": ["text", "image"], "produces": ["image"],
   "runtime": "script",                                                               // "script" | "cli-agent"
   "needs": ["proxy"], "mock": true,
+  "hidden": false,                                                                   // optional, see below
   "allow": { "tools": ["harness.*"], "write": ["$RUN"], "network": ["proxy"] } }      // enforced, see below
 ```
+
+`hidden: true` marks a part of another module (the engine parts `game.unity.track` and so on): its parent's
+`run.ts` spawns it with `ctx.spawn`, and the router never offers it.
 
 `allow` is a hard limit applied by the worker adapter, not a suggestion in a prompt: which MCP servers and tools
 the worker may call, which folders it may write, which hosts it may reach. Workers run unattended, so anything
@@ -121,6 +125,7 @@ export default async function run(ctx: ModuleContext, input: ModuleInput): Promi
 // ctx.spawn(moduleId, input, {label})                  <- child cell under this node
 // ctx.sh(cmd, args, opts) ctx.agent(prompt, opts)      <- subprocess / headless CLI worker, events streamed
 // ctx.dir (artifact dir) ctx.config (merged config) ctx.signal (abort)
+// ctx.config.bridge.url: where this bridge really listens (the configured port can be 0 in tests)
 ```
 
 **Maker icons.** A module with `"kind": "tool"` whose output is made by a non-LLM AI generator sets `maker` to
@@ -138,7 +143,9 @@ the film pipeline never wait for a GPU, an editor or a quota.
 Fixture format: `fixtures/<name>.jsonl` holds the cell's events without `seq` and `run`. `node` is `"."` for the
 cell itself and a relative id for its children (`"formal"` becomes `<cell>.formal`); `t` is ms since the cell
 spawned, divided by `mock.speed` on replay; a `uri` of `"./<name>/<file>"` points into `fixtures/<name>/` and is
-copied into the run. Make one from a real run with `pnpm fixture <runId> <nodeId> <module> [name]`.
+copied into the run. Make one from a real run with `pnpm fixture <runId> <nodeId> <module> [name]`. The recorder
+stops at the cell's own `node.done` (follow-ups spawned under it later belong to their own modules), does not copy
+executables, and re-encodes a video over 1.5 MB to 960 px wide.
 
 ### Agents inside the graph: the harness MCP server
 

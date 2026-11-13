@@ -1,0 +1,6 @@
+{"t":1,"type":"node.state","node":".","state":"running"}
+{"t":6,"type":"node.step","node":".","title":"Designing the game","detail":"Make a crazy racing game where humanoids fight while racing, with loops, twists and hover sections, on Unity and Roblox","icon":"pencil"}
+{"t":39124,"type":"node.step","node":".","title":"Track: wavy, 960 m","detail":"2 loops, 2 twists, 22 m drop, hover sections","icon":"road"}
+{"t":39126,"type":"node.step","node":".","title":"6 karts, riders with a noodle","detail":"Zibbo, Vemli, Pogrin, Dazzu, Wiblet, Tufflo","icon":"game"}
+{"t":39127,"type":"node.evidence","node":".","kind":"doc","uri":"./default/design.md","caption":"One-page design"}
+{"t":39129,"type":"node.done","node":".","summary":"Noodle Rush: Humanoid riders swing floppy noodles through a wild daytime race packed with loops, twists and hover sections. Stay close, shove rivals sideways and chase the lead through the final plunge."}

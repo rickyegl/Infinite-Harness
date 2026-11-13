@@ -16,6 +16,8 @@ export type ModuleManifest = {
   produces: (EvidenceKind | string)[];
   runtime: "script" | "cli-agent";
   needs?: string[];
+  /** a part of another module: spawned by its parent's run.ts, never offered to the router */
+  hidden?: boolean;
   mock: boolean;
   /** hard limits enforced by the worker adapter; anything not listed is denied */
   allow: { tools?: string[]; write?: string[]; network?: string[] };
@@ -35,6 +37,7 @@ export function checkManifest(m: unknown): string | null {
   if (x.maker !== undefined && x.kind !== "tool") return "only kind \"tool\" may set maker";
   if (!Array.isArray(x.accepts) || !Array.isArray(x.produces)) return "accepts and produces must be arrays";
   if (typeof x.mock !== "boolean") return "mock must be a boolean";
+  if (x.hidden !== undefined && typeof x.hidden !== "boolean") return "hidden must be a boolean";
   if (!x.allow || typeof x.allow !== "object") return "allow is required";
   return null;
 }
