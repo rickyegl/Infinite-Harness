@@ -28,7 +28,8 @@ The film layout that all of this serves: [../video/SHOTS.md](../video/SHOTS.md).
 ```
 Read plan/00-contract.md, plan/STATUS.md and plan/LOCAL.md, then implement plan/0N-<name>.md completely.
 Do its "Verify first" items before writing code. Finish with its "Done when" checks passing, update
-plan/STATUS.md and the docs, then commit and push.
+plan/STATUS.md and the docs, then commit and push. End every commit message with the co-author trailer in
+plan/LOCAL.md ("Commit trailer").
 ```
 
 ## Order and overlap

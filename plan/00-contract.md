@@ -161,7 +161,8 @@ Their own rules still apply and are binding here:
 2. Keep assumptions visible: anything you decide that the author did not is an `ASSUMED:` line in `plan/STATUS.md`.
 3. Finish with the plan's verification command passing, then update `plan/STATUS.md` (done, how verified, open
    problems, next file) and the affected docs, then commit and push. Git is not the point: one commit per plan
-   file is fine, messages short.
+   file is fine, messages short. **Every commit message ends with the co-author trailer in `plan/LOCAL.md`
+   ("Commit trailer")**, whichever tool or model made the change (see `AGENTS.md`).
    **The film must always exist.** From plan 01 on, `pnpm film:rough` renders the whole film (its length is `total` in `video/timeline.json`, never over 180 s) from whatever
    is there (fixtures at first). It must still pass when you finish. Each plan swaps fixtures for real takes,
    shot by shot, so there is a showable film at the end of every day.

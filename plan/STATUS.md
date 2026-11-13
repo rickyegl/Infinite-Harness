@@ -30,6 +30,8 @@ what the next agent should know. Keep it short; replace stale lines instead of a
 - (2026-11-12) The two generated full-length tracks are dropped: their arc did not match the shots. The music
   is now scored to the film in short cues (see "Music cues" in `video/SHOTS.md`). The opening prompt is read in
   18-20 s. The film has no minimum length.
+- (2026-11-12) Every commit ends with the co-author trailer in `plan/LOCAL.md` ("Commit trailer"), whichever
+  tool or model made it. `AGENTS.md` at the repo root says so to every agent.
 
 ## ASSUMED (see the list at the end of 00-contract.md)
 
