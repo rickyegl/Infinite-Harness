@@ -1,5 +1,8 @@
 # Status
 
+> **packages/protocol changed (plan 02):** `src/manifest.ts` gained the types a module's `run.ts` receives:
+> `ModuleContext`, `AgentOptions`, `AgentResult`, `ShResult`, `ModuleRun`. Additive only; no event type changed.
+>
 > **packages/protocol changed (plan 01, commit 19ca915):** the package was created: event and manifest types
 > from the contract and `reduce(events, t)`. Modules import their types from `@harness/protocol`.
 
@@ -16,15 +19,24 @@ what the next agent should know. Keep it short; replace stale lines instead of a
   backend: eight views, camera, director and live modes, fixtures for every take, draft and hand-tuned direction
   files, contact sheets, the rough cut, determinism and live tests. Details under "The stage" below.
   The author looked at it and liked it (2026-11-12).
-- **Next:** the plans that make takes real (02-07), then plan 08 replaces fixtures with recorded takes and
-  finalises the draft direction files (S37-S40, S42-S47).
+- **Done (plan 02):** the bridge (`apps/bridge`): runs a prompt through the router, modules and headless
+  workers, stores and streams events; the site's live mode posts prompts and draws the run as it happens;
+  `pnpm take` turns a run into a take that replays offline. Details under "The bridge" below.
+- **Next:** the module plans (03-07), then plan 08 replaces fixtures with recorded takes and finalises the
+  draft direction files (S37-S40, S42-S47).
 
 ## Waiting on the author
 
 Agents write here what they stopped for (a program to open, a runtime to start, a sign-in, a question) and
 remove the line when it is answered. See `AGENTS.md` rule 5.
 
-- Nothing right now.
+- (plan 02) **Start the local model proxy** (port in `proxy.baseUrl`) and confirm `proxy.routerModel` in
+  `harness.local.json` and the `HARNESS_PROXY_KEY` variable. Unblocks: the router's first-choice route (it falls
+  back to a worker, about 5-6 s per prompt, until then), the "AI subscription: Connected" line in the settings
+  sheet, and the live router test. Next: re-run `pnpm --filter bridge record:router` and record the proxy latency here.
+- (plan 02) **Sign the `primary` worker CLI in again** (its session expired). Unblocks: an end-to-end run of
+  the `stream-json` adapter and its no-network probe in `pnpm --filter bridge test`. Next: run both and fix
+  whatever the adapter gets wrong.
 
 ## Verified
 
@@ -50,9 +62,69 @@ remove the line when it is answered. See `AGENTS.md` rule 5.
     driven only by `.seek()` is deterministic. three.js is driven by explicit time: each scene renders once per
     React commit with its orbit angle computed from the evidence's age, never in its own animation loop.
 
+- Plan 02 (2026-11-12), all on this machine:
+  - `pnpm typecheck` clean; `pnpm test`: protocol 13, web 7, bridge 33 passed and 2 skipped (the live proxy
+    router call: proxy down; the `primary` no-network probe: sign-in expired). Bridge tests: store (seq and t
+    monotone, restart closes open cells, torn last line, reopen keeps seq), server (401 without the token,
+    WebSocket events equal events.jsonl, replay from seq 0 and from seq 10, artifacts, dotfiles and traversal
+    refused), router table (16 recorded plans), allow (vocabulary, grants, adapter arguments).
+  - No-network probe, real `secondary` worker with no network grant asked to fetch a local URL: the local server
+    got zero requests and the answer did not contain the secret word.
+  - Real worker run (`pnpm smoke`, "say hello three ways", run 20261112-231406): the router (worker fallback)
+    planned one agent cell; the worker called `report_step` and `spawn_task` three times through the harness MCP
+    server; the three child cells appeared with their evidence. That run is take `smoke`.
+  - `pnpm test:bridge`: the site paired to a bridge in mock mode; the typed prompt starts a run; a reload mid-run
+    brings every cell back from seq 0; at the end the cells and states on screen equal `reduce(events.jsonl)`;
+    clicking a child opens its focus view; with the bridge closed, `/?director=1&take=smoke` replays all cells
+    with no request to the bridge and no page errors.
+  - `pnpm test:live` and `pnpm test:determinism` (96/96) still pass; `pnpm lint:brand` clean (now scans
+    `apps/bridge` too).
+
+## The bridge (plan 02)
+
+Run it: `pnpm dev` starts the bridge (`127.0.0.1:7411`) and the site (`127.0.0.1:5173`). Pair the browser once:
+`pnpm pair` prints a link, or paste `runs/.bridge-token` into the settings sheet (gear on the prompt screen).
+Endpoints, config keys and scripts: `apps/bridge/README.md`. The `allow` vocabulary, the fixture format and the
+harness MCP launch are in `plan/00-contract.md`.
+
+| URL | What |
+|---|---|
+| `/` | Prompt screen ("Ask for anything", mic, send). Sending starts a run and moves to `/?run=<id>`. |
+| `/?run=<id>` | The run's graph, live from the WebSocket (from seq 0, so a reload rebuilds it). Click a cell for focus; the bar at the bottom sends a follow-up (`/say`) to the same graph. |
+| `/?take=<take>` | A take on the wall clock, no bridge. |
+| `/?director=1&take=<take>` | A whole take in director mode (seek only), no shot or timeline needed. |
+
+Mock mode: `HARNESS_MOCK=1 pnpm dev` replays recorded router plans and module fixtures; nothing is called.
+Modules so far: `mock.echo`, `mock.agent` (fixture `hello`, recorded from a real run), `mock.asset`.
+
+**Hand-off.**
+
+- Worker command lines, by config key (the real paths, versions and full flags are in `plan/LOCAL.md`):
+  - `workers.secondary`, adapter `exec-jsonl`: `<cli> exec <config args> --json --skip-git-repo-check
+    --ephemeral --ignore-user-config -s workspace-write -C <cell folder> --add-dir <write grants>
+    [--output-schema <file>] <tool and network switches from allow> <harness MCP server as -c overrides> -`
+    (prompt on stdin). This machine needs one config arg for its sandbox mode (in LOCAL.md), or every write fails.
+  - `workers.primary`, adapter `stream-json`: `<cli> -p --output-format stream-json --verbose
+    --no-session-persistence --strict-mcp-config --mcp-config <cell>/.mcp-servers.json --restricted --tools
+    <granted built-ins> --allowedTools <granted tools> --permission-mode acceptEdits --add-dir <write grants>
+    [--model <id>] [--json-schema <schema>]` (prompt on stdin). Built and unit-tested; not yet run end to end.
+- Router model id key: `proxy.routerModel` (proxy route, first choice). Fallback worker: `router.worker`
+  (currently `secondary`). Recorded plans say which backend and key produced them.
+- Router latency (worker fallback; the proxy was down): 4.8-8.3 s per prompt, median about 5.8 s; the Act 1
+  prompt 15.8 s. The proxy route is not measured yet.
+- What the adapters cannot observe or enforce:
+  - Reads. `allow` has no read list; a worker can read any file the user can.
+  - Hosts. `network` names other than `*` are not enforced per host; only "no shell and no web" (no way to reach
+    a host) or `*`. On this machine the sandbox does not cut the network for shell commands, which is why
+    `shell` requires `network: ["*"]`.
+  - What an MCP server from the CLI's own config does on its side (only the call and its result are seen).
+  - Built-in tool calls appear as steps only as far as each CLI's event stream reports them; the `stream-json`
+    adapter's mapping is unverified until the primary worker is signed in again.
+
 ## The stage (plan 01)
 
-Run it: `pnpm install`, then `pnpm dev` and open `http://127.0.0.1:5173/`.
+Run it: `pnpm install`, then `pnpm dev` and open `http://127.0.0.1:5173/?fixture=main&start=40000` (`/` is now
+the bridge's prompt screen, see above).
 
 | URL | What |
 |---|---|
@@ -170,6 +242,12 @@ before falling back to the fixture (checked: the full film has 20, one per take,
   is committed. They stand in for the hand-written fixtures the plan allows; plan 08 replaces them.
 - ASSUMED (plan 01): `video/tools/score.py` used a word on the brand deny-list as a variable name; it was
   renamed (`strength`) so `pnpm lint:brand` is clean. Behaviour is unchanged.
+- ASSUMED (plan 02): in Act 1, "Game (Unity+Roblox)" is one game cell whose prompt names both engines (the game
+  module runs both); Voice is the narration of the trailer and the campaign (`router.md` rule 7).
+- ASSUMED (plan 02): the PCB board is not decided yet (S38); the router table uses "a motor driver PCB".
+- ASSUMED (plan 02): the pairing token lives in `runs/.bridge-token` (gitignored, never printed by the bridge);
+  the site keeps it in localStorage. `pnpm pair` prints a pairing link only when run in a terminal.
+- ASSUMED (plan 02): the router's worker fallback stays on `secondary` (the only signed-in worker today).
 
 ## Open problems
 
@@ -186,7 +264,7 @@ before falling back to the fixture (checked: the full film has 20, one per take,
 | Plan | State | Verified by | Notes |
 |---|---|---|---|
 | 01 | done | typecheck, unit tests, determinism 96/96, live test, sheets, rough cut duration, lint:brand | See "The stage". Drafts S37-S40, S42-S47 left for plan 08. |
-| 02 | not started | | |
+| 02 | done | typecheck, unit tests, real worker smoke run, no-network probe, test:bridge, test:live, determinism, lint:brand | See "The bridge". Waiting: proxy start, primary worker sign-in. |
 | 03 | not started | | |
 | 04 | not started | | |
 | 05 | not started | | |

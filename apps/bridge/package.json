@@ -1,0 +1,30 @@
+{
+  "name": "bridge",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/main.ts",
+    "start": "tsx src/main.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "smoke": "tsx src/smoke.ts",
+    "take": "tsx src/take.ts",
+    "fixture": "tsx src/fixture.ts",
+    "record:router": "tsx test/record-router.ts",
+    "pair": "tsx src/pair.ts"
+  },
+  "dependencies": {
+    "@harness/protocol": "workspace:*",
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "tsx": "4.23.15",
+    "ws": "8.22.0",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.1",
+    "@types/ws": "8.18.1",
+    "typescript": "5.9.3",
+    "vitest": "4.0.8"
+  }
+}

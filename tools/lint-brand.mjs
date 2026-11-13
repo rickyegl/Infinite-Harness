@@ -12,7 +12,7 @@ import { join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(fileURLToPath(import.meta.url), "..", "..");
-const ROOTS = ["apps/web", "packages", "video/direction", "video/tools", "tools", "modules"];
+const ROOTS = ["apps/web", "apps/bridge", "packages", "video/direction", "video/tools", "tools", "modules"];
 const SKIP_DIRS = new Set(["node_modules", "dist", ".vite", ".turbo", "__pycache__"]);
 const SKIP_PREFIX = ["apps/web/public/makers/"];
 const BINARY = /\.(png|jpe?g|gif|webp|woff2?|ttf|otf|glb|gltf|bin|mp4|webm|mov|wav|mp3|m4a|ico|zip)$/i;

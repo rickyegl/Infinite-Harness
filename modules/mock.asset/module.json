@@ -1,0 +1,20 @@
+{
+  "id": "mock.asset",
+  "label": "Test image",
+  "icon": "image",
+  "kind": "tool",
+  "summary": "Test module: draws a placeholder image with the prompt written on it. Use only for test prompts that ask for a test image.",
+  "accepts": [
+    "text"
+  ],
+  "produces": [
+    "image"
+  ],
+  "runtime": "script",
+  "mock": true,
+  "allow": {
+    "write": [
+      "$NODE"
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "id": "mock.echo",
+  "label": "Echo",
+  "icon": "doc",
+  "kind": "tool",
+  "summary": "Test module: writes the prompt back as a text file. Use only for test prompts that ask to echo or repeat something.",
+  "accepts": [
+    "text"
+  ],
+  "produces": [
+    "doc"
+  ],
+  "runtime": "script",
+  "mock": true,
+  "allow": {
+    "write": [
+      "$NODE"
+    ]
+  }
+}

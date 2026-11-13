@@ -1,0 +1,18 @@
+{"t":2,"type":"node.state","node":".","state":"running"}
+{"t":11934,"type":"node.step","node":".","title":"Gather three greetings"}
+{"t":11940,"type":"node.spawn","node":"english-greeting","parent":".","module":"agent","label":"English Greeting","kind":"agent","prompt":"Say hello in English. Write one short plain-text file named answer.txt in your working folder with your answer (one or two lines), then call attach_evidence with that path, kind doc and a caption of a few words, then reply with your answer."}
+{"t":11941,"type":"node.state","node":"english-greeting","state":"running"}
+{"t":18016,"type":"node.step","node":"english-greeting","title":"Wrote answer.txt","icon":"pencil"}
+{"t":21349,"type":"node.evidence","node":"english-greeting","kind":"doc","uri":"./hello/english-greeting-answer.txt","caption":"English greeting"}
+{"t":24217,"type":"node.done","node":"english-greeting","summary":"Hello!"}
+{"t":24222,"type":"node.spawn","node":"spanish-greeting","parent":".","module":"agent","label":"Spanish Greeting","kind":"agent","prompt":"Say hello in Spanish. Write one short plain-text file named answer.txt in your working folder with your answer (one or two lines), then call attach_evidence with that path, kind doc and a caption of a few words, then reply with your answer."}
+{"t":24223,"type":"node.state","node":"spanish-greeting","state":"running"}
+{"t":32453,"type":"node.step","node":"spanish-greeting","title":"Wrote answer.txt","icon":"pencil"}
+{"t":32461,"type":"node.evidence","node":"spanish-greeting","kind":"doc","uri":"./hello/spanish-greeting-answer.txt","caption":"Spanish greeting"}
+{"t":36422,"type":"node.done","node":"spanish-greeting","summary":"¡Hola!"}
+{"t":36428,"type":"node.spawn","node":"french-greeting","parent":".","module":"agent","label":"French Greeting","kind":"agent","prompt":"Say hello in French. Write one short plain-text file named answer.txt in your working folder with your answer (one or two lines), then call attach_evidence with that path, kind doc and a caption of a few words, then reply with your answer."}
+{"t":36429,"type":"node.state","node":"french-greeting","state":"running"}
+{"t":45692,"type":"node.step","node":"french-greeting","title":"Wrote answer.txt","icon":"pencil"}
+{"t":47764,"type":"node.evidence","node":"french-greeting","kind":"doc","uri":"./hello/french-greeting-answer.txt","caption":"French greeting"}
+{"t":51358,"type":"node.done","node":"french-greeting","summary":"Bonjour !"}
+{"t":54116,"type":"node.done","node":".","summary":"The three greetings are “Hello!” in English, “¡Hola!” in Spanish, and “Bonjour!” in French."}

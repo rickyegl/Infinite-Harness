@@ -1,0 +1,92 @@
+{
+  "prompt": "Make the walls red.",
+  "existing": [
+    {
+      "id": "game",
+      "module": "game",
+      "label": "Racing game"
+    },
+    {
+      "id": "voice",
+      "module": "voice",
+      "label": "Narration"
+    },
+    {
+      "id": "trailer",
+      "module": "reel.trailer",
+      "label": "Game trailer"
+    },
+    {
+      "id": "campaign",
+      "module": "campaign",
+      "label": "Ad campaign"
+    },
+    {
+      "id": "host",
+      "module": "host",
+      "label": "Browser host"
+    },
+    {
+      "id": "recorder",
+      "module": "recorder",
+      "label": "Process video"
+    },
+    {
+      "id": "verify",
+      "module": "verify",
+      "label": "Verifier"
+    },
+    {
+      "id": "house",
+      "module": "assets.image",
+      "label": "house"
+    }
+  ],
+  "catalog": [
+    "game",
+    "game.unity",
+    "game.roblox",
+    "assets.image",
+    "assets.image.edit",
+    "assets.cutout",
+    "assets.model3d",
+    "assets.video",
+    "voice",
+    "music",
+    "reel.trailer",
+    "reel.premise",
+    "reel.explainer",
+    "motion",
+    "ad.image",
+    "campaign",
+    "publish",
+    "host",
+    "verify",
+    "recorder",
+    "drafting",
+    "blender",
+    "blender.render",
+    "study",
+    "cad",
+    "sim",
+    "pcb",
+    "forecast",
+    "anomaly"
+  ],
+  "backend": "worker",
+  "modelKey": "workers.secondary",
+  "ms": 6097,
+  "recordedAt": "2026-11-13T05:00:16.286Z",
+  "plan": {
+    "nodes": [
+      {
+        "id": "red-walls",
+        "module": "assets.image.edit",
+        "label": "Wall recoloring",
+        "prompt": "Edit the existing house image to make the walls red. Keep the framing and other details unchanged.",
+        "after": [],
+        "under": "house"
+      }
+    ]
+  }
+}

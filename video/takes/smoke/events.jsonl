@@ -1,0 +1,26 @@
+{"seq":1,"t":2,"run":"20261112-231406","type":"run.start","node":"root","prompt":"say hello three ways"}
+{"seq":2,"t":4,"run":"20261112-231406","type":"node.spawn","node":"root","parent":null,"module":"root","label":"Infinite Harness","kind":"root","prompt":"say hello three ways"}
+{"seq":3,"t":5,"run":"20261112-231406","type":"node.state","node":"root","state":"running"}
+{"seq":4,"t":7,"run":"20261112-231406","type":"node.step","node":"root","title":"Planning","detail":"say hello three ways","icon":"spark"}
+{"seq":5,"t":5012,"run":"20261112-231406","type":"node.step","node":"root","title":"Planned 1 task","detail":"Greeting Variations","icon":"layers"}
+{"seq":6,"t":5015,"run":"20261112-231406","type":"node.spawn","node":"hello","parent":"root","module":"mock.agent","label":"Greeting Variations","kind":"agent","prompt":"Say hello three ways."}
+{"seq":7,"t":5016,"run":"20261112-231406","type":"node.state","node":"hello","state":"running"}
+{"seq":8,"t":15609,"run":"20261112-231406","type":"node.step","node":"hello","title":"Plan three greetings"}
+{"seq":9,"t":15616,"run":"20261112-231406","type":"node.spawn","node":"hello.friendly-hello","parent":"hello","module":"agent","label":"Friendly Hello","kind":"agent","prompt":"Say hello in a friendly way. Write one short plain-text file named answer.txt in your working folder with your answer (one or two lines), then call attach_evidence with that path, kind doc and a caption of a few words, then reply with your answer."}
+{"seq":10,"t":15617,"run":"20261112-231406","type":"node.state","node":"hello.friendly-hello","state":"running"}
+{"seq":11,"t":22881,"run":"20261112-231406","type":"node.step","node":"hello.friendly-hello","title":"Wrote answer.txt","icon":"pencil"}
+{"seq":12,"t":25085,"run":"20261112-231406","type":"node.evidence","node":"hello.friendly-hello","kind":"doc","uri":"artifacts/hello.friendly-hello/answer.txt","caption":"A friendly hello"}
+{"seq":13,"t":28106,"run":"20261112-231406","type":"node.done","node":"hello.friendly-hello","summary":"Hello! Hope you're having a wonderful day."}
+{"seq":14,"t":28111,"run":"20261112-231406","type":"node.spawn","node":"hello.formal-hello","parent":"hello","module":"agent","label":"Formal Hello","kind":"agent","prompt":"Say hello in a formal way. Write one short plain-text file named answer.txt in your working folder with your answer (one or two lines), then call attach_evidence with that path, kind doc and a caption of a few words, then reply with your answer."}
+{"seq":15,"t":28112,"run":"20261112-231406","type":"node.state","node":"hello.formal-hello","state":"running"}
+{"seq":16,"t":35459,"run":"20261112-231406","type":"node.step","node":"hello.formal-hello","title":"Wrote answer.txt","icon":"pencil"}
+{"seq":17,"t":37483,"run":"20261112-231406","type":"node.evidence","node":"hello.formal-hello","kind":"doc","uri":"artifacts/hello.formal-hello/answer.txt","caption":"Formal greeting"}
+{"seq":18,"t":40606,"run":"20261112-231406","type":"node.done","node":"hello.formal-hello","summary":"Hello. It is a pleasure to make your acquaintance."}
+{"seq":19,"t":40611,"run":"20261112-231406","type":"node.spawn","node":"hello.playful-hello","parent":"hello","module":"agent","label":"Playful Hello","kind":"agent","prompt":"Say hello in a playful way. Write one short plain-text file named answer.txt in your working folder with your answer (one or two lines), then call attach_evidence with that path, kind doc and a caption of a few words, then reply with your answer."}
+{"seq":20,"t":40612,"run":"20261112-231406","type":"node.state","node":"hello.playful-hello","state":"running"}
+{"seq":21,"t":49338,"run":"20261112-231406","type":"node.step","node":"hello.playful-hello","title":"Wrote answer.txt","icon":"pencil"}
+{"seq":22,"t":49346,"run":"20261112-231406","type":"node.evidence","node":"hello.playful-hello","kind":"doc","uri":"artifacts/hello.playful-hello/answer.txt","caption":"A playful hello"}
+{"seq":23,"t":52256,"run":"20261112-231406","type":"node.done","node":"hello.playful-hello","summary":"Hello, you magnificent human! Tiny confetti cannons are cheering your arrival!"}
+{"seq":24,"t":56341,"run":"20261112-231406","type":"node.done","node":"hello","summary":"The three greetings offered a friendly wish for a wonderful day, a formal pleasure at meeting you, and a playful welcome with tiny confetti cannons."}
+{"seq":25,"t":56343,"run":"20261112-231406","type":"node.done","node":"root","summary":"1 task finished"}
+{"seq":26,"t":56344,"run":"20261112-231406","type":"run.done","node":"root"}

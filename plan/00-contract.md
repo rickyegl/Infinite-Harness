@@ -101,6 +101,18 @@ protocol package in the same commit.
 the worker may call, which folders it may write, which hosts it may reach. Workers run unattended, so anything
 not listed is denied. Examples: `study` gets only read tools of the course server; `publish` gets no network.
 
+`allow` vocabulary (as built in plan 02; the bridge refuses a manifest that uses anything else):
+
+| Field | Values |
+|---|---|
+| `tools` | `harness.*` or `harness.<tool>` (the bridge's MCP server); `<server>.*` or `<server>.<tool>` (an MCP server from the worker CLI's own config); `shell` (run commands; **requires `network: ["*"]`**, because a shell here can reach any host); `web` (fetch and search). |
+| `write` | `$RUN` (the run folder), `$NODE` (this cell's artifact folder), `$paths.<key>` (a config path), or a repo-relative folder. The worker's own working folder is always writable. |
+| `network` | `*`, `proxy`, or host names. Without `shell` or `web` a worker has no tool that reaches a host, so names other than `*` are recorded but not enforced host by host. |
+
+The types a `run.ts` receives (`ModuleContext`, `AgentOptions`, `AgentResult`, `ShResult`, `ModuleRun`) live in
+`@harness/protocol` (`packages/protocol/src/manifest.ts`). An agent module without `run.ts` runs as one worker:
+its `prompt.md` leads and the cell's task follows.
+
 ```ts
 // run.ts
 export default async function run(ctx: ModuleContext, input: ModuleInput): Promise<ModuleOutput>;
@@ -123,6 +135,11 @@ exactly two things: the `maker` value in `module.json` and in `node.spawn` event
 Every module must run with `HARNESS_MOCK=1` (`"mock": true`): it replays `modules/<id>/fixtures/` so the UI and
 the film pipeline never wait for a GPU, an editor or a quota.
 
+Fixture format: `fixtures/<name>.jsonl` holds the cell's events without `seq` and `run`. `node` is `"."` for the
+cell itself and a relative id for its children (`"formal"` becomes `<cell>.formal`); `t` is ms since the cell
+spawned, divided by `mock.speed` on replay; a `uri` of `"./<name>/<file>"` points into `fixtures/<name>/` and is
+copied into the run. Make one from a real run with `pnpm fixture <runId> <nodeId> <module> [name]`.
+
 ### Agents inside the graph: the harness MCP server
 
 The bridge exposes its own MCP server to every CLI worker it spawns. That is how a sub-orchestrator draws its own
@@ -135,6 +152,13 @@ tree and asks other modules for assets:
 | `spawn_task(label, module?, prompt)` | child cell; runs a module or a sub-agent; returns its result |
 | `request_asset(kind, prompt, refs?)` | routes to an asset module, waits, returns a local file path |
 | `publish_output(name, path, kind, href?)` | tile on the deliverables wall |
+
+`spawn_task` with `module` runs that installed module with its own `allow`; an unknown id is an error. Without
+`module` it runs a sub-agent with the caller's grants (one level down; a sub-agent's own sub-agents lose
+`spawn_task`). `request_asset` picks the module from config `assetKinds`.
+The server is `apps/bridge/src/mcp/harness-mcp.mjs`, started per worker with `HARNESS_BRIDGE`,
+`HARNESS_TOKEN_FILE`, `HARNESS_RUN`, `HARNESS_NODE`, `HARNESS_CWD` and `HARNESS_TOOLS` (the granted tools). It
+calls back into the bridge; it never sees the token in its arguments.
 
 ### Record and replay
 

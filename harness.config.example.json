@@ -1,15 +1,27 @@
 {
-  "_comment": "Template. Copy to harness.local.json (gitignored) and fill in real values. Code reads config only through the bridge's config loader.",
-  "bridge": { "port": 7411, "host": "127.0.0.1" },
+  "_comment": "Template. Copy to harness.local.json (gitignored) and fill in real values; it is merged over this file key by key. Code reads config only through apps/bridge/src/config.ts.",
+  "bridge": { "port": 7411, "host": "127.0.0.1", "runsDir": "runs", "tokenFile": "runs/.bridge-token" },
   "proxy": {
     "baseUrl": "http://127.0.0.1:8317/v1",
     "apiKeyEnv": "HARNESS_PROXY_KEY",
     "routerModel": "<model id for the router>",
-    "imageModel": "<model id for image generation and edits>"
+    "imageModel": "<model id for image generation and edits>",
+    "signInUrl": "<the proxy's own sign-in page>",
+    "timeoutMs": 30000
   },
+  "router": { "worker": "secondary", "timeoutMs": 120000 },
   "workers": {
-    "primary": { "cmd": "<agent cli>", "args": ["<non-interactive flags>"], "mcpConfigFlag": "<flag>", "eventFormat": "<json stream flag>" },
-    "secondary": { "cmd": "<agent cli>", "args": ["<non-interactive flags>"], "mcpConfigFlag": "<flag>", "eventFormat": "<json stream flag>" }
+    "primary": { "adapter": "stream-json", "cmd": "<agent cli>", "args": [], "model": "<optional model id>", "timeoutMs": 1800000 },
+    "secondary": { "adapter": "exec-jsonl", "cmd": "<agent cli>", "args": [], "model": "<optional model id>", "timeoutMs": 1800000 }
+  },
+  "defaultWorker": "secondary",
+  "mock": { "enabled": false, "speed": 1 },
+  "assetKinds": {
+    "image": "assets.image",
+    "model3d": "assets.model3d",
+    "video": "assets.video",
+    "voice": "voice",
+    "music": "music"
   },
   "paths": {
     "studio": "<video studio project root>",

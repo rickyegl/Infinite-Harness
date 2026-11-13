@@ -1,0 +1,389 @@
+[
+ {
+  "id": "game",
+  "label": "Game",
+  "kind": "orchestrator",
+  "summary": "Builds a playable game from a description, on every engine the request names (Unity, Roblox, or both): plans the game, hands each engine to its builder and shares models and art between them.",
+  "accepts": [
+   "text",
+   "image",
+   "model3d"
+  ],
+  "produces": [
+   "code",
+   "video",
+   "link"
+  ]
+ },
+ {
+  "id": "game.unity",
+  "label": "Unity game",
+  "kind": "agent",
+  "summary": "Builds or changes one game project in the Unity editor. Used by the game module; pick it alone only to change an existing Unity project.",
+  "accepts": [
+   "text",
+   "model3d",
+   "image"
+  ],
+  "produces": [
+   "code",
+   "video"
+  ]
+ },
+ {
+  "id": "game.roblox",
+  "label": "Roblox game",
+  "kind": "agent",
+  "summary": "Builds or changes one place in Roblox Studio. Used by the game module; pick it alone only to change an existing Roblox place.",
+  "accepts": [
+   "text",
+   "model3d",
+   "image"
+  ],
+  "produces": [
+   "code",
+   "video"
+  ]
+ },
+ {
+  "id": "assets.image",
+  "label": "Image",
+  "kind": "tool",
+  "summary": "Generate a new image from a prompt.",
+  "accepts": [
+   "text",
+   "image"
+  ],
+  "produces": [
+   "image"
+  ]
+ },
+ {
+  "id": "assets.image.edit",
+  "label": "Image edit",
+  "kind": "tool",
+  "summary": "Edit an existing image from an instruction: change colours, materials, add or remove things, keep the framing.",
+  "accepts": [
+   "image",
+   "text"
+  ],
+  "produces": [
+   "image"
+  ]
+ },
+ {
+  "id": "assets.cutout",
+  "label": "Cutout",
+  "kind": "tool",
+  "summary": "Remove the background of an image, leaving the subject on a transparent background.",
+  "accepts": [
+   "image"
+  ],
+  "produces": [
+   "image"
+  ]
+ },
+ {
+  "id": "assets.model3d",
+  "label": "3D model",
+  "kind": "tool",
+  "summary": "Generate a textured, rigged 3D model (GLB) from a prompt or an image.",
+  "accepts": [
+   "text",
+   "image"
+  ],
+  "produces": [
+   "model3d"
+  ]
+ },
+ {
+  "id": "assets.video",
+  "label": "Video",
+  "kind": "tool",
+  "summary": "Turn a still image into a short video clip that brings it to life.",
+  "accepts": [
+   "image",
+   "text"
+  ],
+  "produces": [
+   "video"
+  ]
+ },
+ {
+  "id": "voice",
+  "label": "Voice",
+  "kind": "tool",
+  "summary": "Write and record narration or voice-over lines for a video.",
+  "accepts": [
+   "text"
+  ],
+  "produces": [
+   "audio"
+  ]
+ },
+ {
+  "id": "music",
+  "label": "Music",
+  "kind": "tool",
+  "summary": "Compose a music track for a video.",
+  "accepts": [
+   "text"
+  ],
+  "produces": [
+   "audio"
+  ]
+ },
+ {
+  "id": "reel.trailer",
+  "label": "Trailer",
+  "kind": "agent",
+  "summary": "Cut a game trailer from gameplay captures, narration and music.",
+  "accepts": [
+   "video",
+   "audio",
+   "text"
+  ],
+  "produces": [
+   "video"
+  ]
+ },
+ {
+  "id": "reel.premise",
+  "label": "Premise reel",
+  "kind": "agent",
+  "summary": "Make a short video that pitches an idea or premise.",
+  "accepts": [
+   "text",
+   "image",
+   "video"
+  ],
+  "produces": [
+   "video"
+  ]
+ },
+ {
+  "id": "reel.explainer",
+  "label": "Explainer",
+  "kind": "agent",
+  "summary": "Make a short explainer video of how something works.",
+  "accepts": [
+   "text",
+   "image",
+   "video"
+  ],
+  "produces": [
+   "video"
+  ]
+ },
+ {
+  "id": "motion",
+  "label": "Motion graphics",
+  "kind": "agent",
+  "summary": "Animated titles, logos and motion graphics.",
+  "accepts": [
+   "text",
+   "image"
+  ],
+  "produces": [
+   "video"
+  ]
+ },
+ {
+  "id": "ad.image",
+  "label": "Ad image",
+  "kind": "tool",
+  "summary": "Design one ad image with copy for a given audience and format.",
+  "accepts": [
+   "text",
+   "image"
+  ],
+  "produces": [
+   "image"
+  ]
+ },
+ {
+  "id": "campaign",
+  "label": "Campaign",
+  "kind": "orchestrator",
+  "summary": "Plan and produce an ad campaign for the audiences the request names: ad images, copy and short ad videos per audience and platform.",
+  "accepts": [
+   "text",
+   "image",
+   "video"
+  ],
+  "produces": [
+   "image",
+   "video",
+   "doc"
+  ]
+ },
+ {
+  "id": "publish",
+  "label": "Publish",
+  "kind": "agent",
+  "summary": "Publish finished deliverables to a store page or a channel.",
+  "accepts": [
+   "code",
+   "video",
+   "image"
+  ],
+  "produces": [
+   "link"
+  ]
+ },
+ {
+  "id": "host",
+  "label": "Host",
+  "kind": "agent",
+  "summary": "Build a game or site for the web browser and host it at a public URL.",
+  "accepts": [
+   "code"
+  ],
+  "produces": [
+   "link"
+  ]
+ },
+ {
+  "id": "verify",
+  "label": "Verifier",
+  "kind": "agent",
+  "summary": "Check other cells' results against the request: run builds and tests, open hosted pages, report and fix problems.",
+  "accepts": [
+   "code",
+   "link",
+   "video"
+  ],
+  "produces": [
+   "doc"
+  ]
+ },
+ {
+  "id": "recorder",
+  "label": "Recorder",
+  "kind": "tool",
+  "summary": "Record the screen for the whole run and cut the process into a video.",
+  "accepts": [
+   "text"
+  ],
+  "produces": [
+   "video"
+  ]
+ },
+ {
+  "id": "drafting",
+  "label": "Drafting",
+  "kind": "agent",
+  "summary": "Draw architectural drawings of a building: floor plans, elevations, dimensions.",
+  "accepts": [
+   "text",
+   "image"
+  ],
+  "produces": [
+   "doc",
+   "image"
+  ]
+ },
+ {
+  "id": "blender",
+  "label": "Blender",
+  "kind": "agent",
+  "summary": "Model, build, arrange or change 3D scenes in Blender: build from plans, place objects, combine models.",
+  "accepts": [
+   "text",
+   "image",
+   "model3d",
+   "doc"
+  ],
+  "produces": [
+   "model3d",
+   "image"
+  ]
+ },
+ {
+  "id": "blender.render",
+  "label": "Render",
+  "kind": "tool",
+  "summary": "Render a Blender scene to a realistic image.",
+  "accepts": [
+   "model3d"
+  ],
+  "produces": [
+   "image"
+  ]
+ },
+ {
+  "id": "study",
+  "label": "Study",
+  "kind": "agent",
+  "summary": "Read a course's presentations and files on Canvas and write study guides for its tests.",
+  "accepts": [
+   "text"
+  ],
+  "produces": [
+   "doc"
+  ]
+ },
+ {
+  "id": "cad",
+  "label": "CAD",
+  "kind": "agent",
+  "summary": "Design a mechanical part, assembly or robot in CAD.",
+  "accepts": [
+   "text",
+   "image"
+  ],
+  "produces": [
+   "model3d",
+   "image"
+  ]
+ },
+ {
+  "id": "sim",
+  "label": "Simulator",
+  "kind": "agent",
+  "summary": "Run a robot design in a physics simulator and capture it.",
+  "accepts": [
+   "model3d"
+  ],
+  "produces": [
+   "video"
+  ]
+ },
+ {
+  "id": "pcb",
+  "label": "PCB",
+  "kind": "agent",
+  "summary": "Design a printed circuit board: schematic, layout and a 3D view.",
+  "accepts": [
+   "text"
+  ],
+  "produces": [
+   "image",
+   "doc"
+  ]
+ },
+ {
+  "id": "forecast",
+  "label": "Forecast",
+  "kind": "tool",
+  "summary": "Forecast a time series (demand, sales, traffic) from history data.",
+  "accepts": [
+   "doc"
+  ],
+  "produces": [
+   "chart"
+  ]
+ },
+ {
+  "id": "anomaly",
+  "label": "Anomaly",
+  "kind": "tool",
+  "summary": "Detect anomalies and outliers in a time series or dataset.",
+  "accepts": [
+   "doc"
+  ],
+  "produces": [
+   "chart"
+  ]
+ }
+]

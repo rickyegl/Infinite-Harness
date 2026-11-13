@@ -41,6 +41,8 @@ const P: Record<string, string> = {
   house: "M3 11l9-7 9 7M5 9.5V20h14V9.5M10 20v-6h4v6",
   rig: "M12 3a2 2 0 1 1 0 4 2 2 0 0 1 0-4zM12 7v7M12 14l-4 6M12 14l4 6M6 10h12",
   dot: "M12 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6z",
+  mic: "M12 3a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3zM5 11a7 7 0 0 0 14 0M12 18v3M9 21h6",
+  arrow: "M5 12h14M13 6l6 6-6 6",
 };
 
 /** Module id (or prefix) -> icon. Exact match first, then the longest prefix. */

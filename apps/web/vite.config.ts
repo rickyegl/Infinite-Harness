@@ -28,7 +28,8 @@ const serveFolders = (): Connect.NextHandleFunction => (req, res, next) => {
   const mount = MOUNTS.find(([p]) => url.startsWith(p));
   if (!mount) return next();
   const file = normalize(join(mount[1], url.slice(mount[0].length)));
-  if (!file.startsWith(mount[1])) { res.statusCode = 403; return res.end(); }
+  // dotfiles (the bridge's pairing token lives at runs/.bridge-token) are never served
+  if (!file.startsWith(mount[1]) || url.split("/").some((p) => p.startsWith("."))) { res.statusCode = 403; return res.end(); }
   if (!existsSync(file) || !statSync(file).isFile()) { res.statusCode = 404; return res.end("not found"); }
   res.setHeader("Content-Type", TYPES[extname(file).toLowerCase()] ?? "application/octet-stream");
   res.setHeader("Cache-Control", "no-cache");

@@ -1,0 +1,114 @@
+{
+  "prompt": "Make a 3d racing game where humanoids fight while racing on Unity. And Roblox. Also make a game trailer. Also make an ad campaign tailored to Unity and Roblox players. Host the game on browser, and at the end show the process on a video. Make no mistakes.",
+  "existing": [],
+  "catalog": [
+    "game",
+    "game.unity",
+    "game.roblox",
+    "assets.image",
+    "assets.image.edit",
+    "assets.cutout",
+    "assets.model3d",
+    "assets.video",
+    "voice",
+    "music",
+    "reel.trailer",
+    "reel.premise",
+    "reel.explainer",
+    "motion",
+    "ad.image",
+    "campaign",
+    "publish",
+    "host",
+    "verify",
+    "recorder",
+    "drafting",
+    "blender",
+    "blender.render",
+    "study",
+    "cad",
+    "sim",
+    "pcb",
+    "forecast",
+    "anomaly"
+  ],
+  "backend": "worker",
+  "modelKey": "workers.secondary",
+  "ms": 15848,
+  "recordedAt": "2026-11-13T05:00:26.021Z",
+  "plan": {
+    "nodes": [
+      {
+        "id": "game",
+        "module": "game",
+        "label": "Racing Game",
+        "prompt": "Make a 3D racing game where humanoids fight while racing, on both Unity and Roblox. Provide gameplay captures for the game trailer and the ad campaign tailored to Unity and Roblox players.",
+        "after": [],
+        "under": null
+      },
+      {
+        "id": "voice",
+        "module": "voice",
+        "label": "Promotional Narration",
+        "prompt": "Write and record narration for a game trailer and an ad campaign tailored to Unity and Roblox players for a 3D racing game where humanoids fight while racing, on Unity and Roblox. Provide lines suitable for each video and audience.",
+        "after": [],
+        "under": null
+      },
+      {
+        "id": "trailer",
+        "module": "reel.trailer",
+        "label": "Game Trailer",
+        "prompt": "Make a game trailer for the 3D racing game where humanoids fight while racing on Unity and Roblox. Use the game cell's gameplay captures and the voice cell's trailer narration.",
+        "after": [
+          "game",
+          "voice"
+        ],
+        "under": null
+      },
+      {
+        "id": "campaign",
+        "module": "campaign",
+        "label": "Ad Campaign",
+        "prompt": "Make an ad campaign for the 3D racing game where humanoids fight while racing, tailored to Unity and Roblox players. Use the game cell's results and the voice cell's campaign narration to produce audience-specific ad images, copy and short ad videos.",
+        "after": [
+          "game",
+          "voice"
+        ],
+        "under": null
+      },
+      {
+        "id": "host",
+        "module": "host",
+        "label": "Browser Hosting",
+        "prompt": "Build and host the racing game from the game cell for play in a web browser at a public URL, accounting for both the Unity and Roblox versions and their platform capabilities.",
+        "after": [
+          "game"
+        ],
+        "under": null
+      },
+      {
+        "id": "recorder",
+        "module": "recorder",
+        "label": "Process Video",
+        "prompt": "Record the screen for the whole run and, at the end, show the process in a video: making the 3D humanoid combat racing game on Unity and Roblox, the game trailer, the ad campaign tailored to Unity and Roblox players, browser hosting, and verification.",
+        "after": [],
+        "under": null
+      },
+      {
+        "id": "verify",
+        "module": "verify",
+        "label": "Quality Checks",
+        "prompt": "Make no mistakes: check all results against the request. Test the Unity and Roblox 3D racing game where humanoids fight while racing, run builds and gameplay checks, open and test the public browser hosting URL, and review the game trailer, ad campaign tailored to Unity and Roblox players, narration and final process video. Report and fix problems.",
+        "after": [
+          "game",
+          "voice",
+          "trailer",
+          "campaign",
+          "host",
+          "recorder"
+        ],
+        "under": null
+      }
+    ]
+  }
+}

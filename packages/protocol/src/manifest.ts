@@ -38,3 +38,54 @@ export function checkManifest(m: unknown): string | null {
   if (!x.allow || typeof x.allow !== "object") return "allow is required";
   return null;
 }
+
+// ---------- what a module's run.ts receives (contract, "Module contract") ----------
+
+export type AgentOptions = {
+  /** worker name from config `workers.<name>`; default: config `defaultWorker` */
+  worker?: string;
+  /** a project folder to work in instead of a fresh folder inside the run */
+  cwd?: string;
+  /** JSON schema for the final answer; the result's `json` holds the parsed value */
+  schema?: Record<string, unknown>;
+  timeoutMs?: number;
+};
+export type AgentResult = {
+  ok: boolean;
+  /** the worker's final text */
+  text: string;
+  /** parsed final answer when `schema` was given */
+  json?: unknown;
+  /** files the worker wrote, absolute paths */
+  files: string[];
+  /** the worker's working directory */
+  cwd: string;
+};
+export type ShResult = { code: number; stdout: string; stderr: string };
+
+export interface ModuleContext {
+  run: string;
+  /** this cell's node id */
+  node: string;
+  manifest: ModuleManifest;
+  /** this cell's artifact folder (absolute); its files are served as artifacts/<node>/<name> */
+  dir: string;
+  /** merged config (apps/bridge config loader) */
+  config: Record<string, any>;
+  signal: AbortSignal;
+  /** true when HARNESS_MOCK=1 */
+  mock: boolean;
+  step(title: string, detail?: string, icon?: string): void;
+  /** copies `file` into the run when it lives elsewhere; returns its uri */
+  evidence(kind: EvidenceKind, file: string, caption?: string, meta?: Record<string, unknown>): Promise<string>;
+  output(name: string, file: string, kind: string, href?: string): Promise<string>;
+  /** asset handoff: emits node.request / node.deliver around a run of `moduleId` */
+  request(moduleId: string, input: ModuleInput): Promise<ModuleOutput>;
+  /** a child cell under this node running `moduleId` */
+  spawn(moduleId: string, input: ModuleInput, opts?: { label?: string }): Promise<ModuleOutput>;
+  sh(cmd: string, args: string[], opts?: { cwd?: string; env?: Record<string, string>; timeoutMs?: number }): Promise<ShResult>;
+  /** headless CLI worker; its tool calls stream into this cell as steps */
+  agent(prompt: string, opts?: AgentOptions): Promise<AgentResult>;
+}
+
+export type ModuleRun = (ctx: ModuleContext, input: ModuleInput) => Promise<ModuleOutput>;

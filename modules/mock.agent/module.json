@@ -1,0 +1,23 @@
+{
+  "id": "mock.agent",
+  "label": "Agent",
+  "icon": "agent",
+  "kind": "agent",
+  "summary": "Test module: a worker that splits a small text request (like saying something several ways) into three sub-tasks, each a child cell that writes one short text file.",
+  "accepts": [
+    "text"
+  ],
+  "produces": [
+    "doc"
+  ],
+  "runtime": "cli-agent",
+  "mock": true,
+  "allow": {
+    "tools": [
+      "harness.*"
+    ],
+    "write": [
+      "$NODE"
+    ]
+  }
+}

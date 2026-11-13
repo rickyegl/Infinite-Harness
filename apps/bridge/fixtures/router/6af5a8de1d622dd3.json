@@ -1,0 +1,112 @@
+{
+  "prompt": "Render it.",
+  "existing": [
+    {
+      "id": "game",
+      "module": "game",
+      "label": "Racing game"
+    },
+    {
+      "id": "voice",
+      "module": "voice",
+      "label": "Narration"
+    },
+    {
+      "id": "trailer",
+      "module": "reel.trailer",
+      "label": "Game trailer"
+    },
+    {
+      "id": "campaign",
+      "module": "campaign",
+      "label": "Ad campaign"
+    },
+    {
+      "id": "host",
+      "module": "host",
+      "label": "Browser host"
+    },
+    {
+      "id": "recorder",
+      "module": "recorder",
+      "label": "Process video"
+    },
+    {
+      "id": "verify",
+      "module": "verify",
+      "label": "Verifier"
+    },
+    {
+      "id": "house",
+      "module": "assets.image",
+      "label": "house"
+    },
+    {
+      "id": "house-red",
+      "module": "assets.image.edit",
+      "label": "house red"
+    },
+    {
+      "id": "house-cutout",
+      "module": "assets.cutout",
+      "label": "house cutout"
+    },
+    {
+      "id": "house-plan",
+      "module": "drafting",
+      "label": "house plan"
+    },
+    {
+      "id": "house-3d",
+      "module": "blender",
+      "label": "house 3d"
+    }
+  ],
+  "catalog": [
+    "game",
+    "game.unity",
+    "game.roblox",
+    "assets.image",
+    "assets.image.edit",
+    "assets.cutout",
+    "assets.model3d",
+    "assets.video",
+    "voice",
+    "music",
+    "reel.trailer",
+    "reel.premise",
+    "reel.explainer",
+    "motion",
+    "ad.image",
+    "campaign",
+    "publish",
+    "host",
+    "verify",
+    "recorder",
+    "drafting",
+    "blender",
+    "blender.render",
+    "study",
+    "cad",
+    "sim",
+    "pcb",
+    "forecast",
+    "anomaly"
+  ],
+  "backend": "worker",
+  "modelKey": "workers.secondary",
+  "ms": 5090,
+  "recordedAt": "2026-11-13T05:00:21.983Z",
+  "plan": {
+    "nodes": [
+      {
+        "id": "house-render",
+        "module": "blender.render",
+        "label": "Realistic render",
+        "prompt": "Render the existing house 3D scene from house-3d to a realistic image.",
+        "after": [],
+        "under": "house-3d"
+      }
+    ]
+  }
+}
