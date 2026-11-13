@@ -9,6 +9,7 @@
 import type { ModuleContext, ModuleInput, ModuleOutput } from "@harness/protocol";
 import { copyFileSync, readFileSync, writeFileSync } from "node:fs";
 import { join, relative, sep } from "node:path";
+import { fileURLToPath } from "node:url";
 import { type Design, unitySections } from "../../game/lib/design.ts";
 import { patchState, readState, runDirOf } from "../../game/lib/state.ts";
 import { designOf, unityFor } from "../../game.unity/lib/parts.ts";
@@ -128,7 +129,7 @@ async function buildPart(ctx: ModuleContext, d: Design): Promise<ModuleOutput> {
     "",
     `- Lint: selene, ${lint.errors} errors, ${lint.warnings} warnings`,
     `- Place file: place.rbxlx, ${kb} KB, built in ${b.seconds.toFixed(1)} s`,
-    `- Project: ${relative(process.cwd(), place.project).split(sep).join("/") || place.project}`,
+    `- Project: ${relative(fileURLToPath(new URL("../../..", import.meta.url)), place.project).split(sep).join("/") || place.project}`,
     "- Scripts: ServerScriptService.Server.Race (track, karts, AI, combat, relay), StarterPlayerScripts.Client.Client (input, camera, HUD)",
     "- Shared: Config (design), TrackData (centre line from the Unity editor), Flags (live follow-ups), Track, Look",
     "",
