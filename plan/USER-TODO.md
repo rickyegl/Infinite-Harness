@@ -37,7 +37,7 @@ Fill these into `harness.local.json` / `plan/LOCAL.md`, or tell the agent.
 | 16 | "I'm not done" 1.5 s effect -> `video/audio/sfx/not_done.*` (the score has a rewind there until then) | 09 |
 | 17 | ~~Chosen song~~: done, `video/makeasong.mp3`. Optional: a longer version in `assets/music/` for the games. | |
 | 18 | Read `video/SHOTS.md` and change any shot, order or line you want before plan 01 starts. | 01 |
-| 19 | Maker icons: one small SVG glyph per non-LLM generator -> `apps/web/public/makers/<id>.svg` (ids and the list are in `plan/LOCAL.md`). Supply them or approve the ones an agent proposes; say which tool made the chosen song. Until then those cells show a neutral glyph. | 08 (real takes) |
+| 19 | Maker icons: one small SVG glyph per non-LLM generator -> `apps/web/public/makers/<id>.svg` (ids and the list are in `plan/LOCAL.md`). Supply them or approve the ones an agent proposes. Until then those cells show a neutral glyph. | 08 (real takes) |
 
 ## Approvals agents will ask for (never assumed)
 
