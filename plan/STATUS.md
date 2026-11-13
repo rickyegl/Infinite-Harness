@@ -85,7 +85,7 @@ only seeked.
 | `wall` | `grid` or `reels` layout of evidence, `stagger` in beats, `fadeBeats`, `push`, `drift`. | The first tile in S25 (the link) shows a dark page until its URL has typed in. |
 | `banner` | Module title with icon and maker mark, the prompt typing under it, breadcrumbs, the cell's evidence full width, `graphBehind` (dimmed graph through a cutout). | One cell per banner. |
 | `rain` | Every take merged into one graph, prompts swiping through the box at `rate` per beat (`offset` into the list), a title line, zoom out. | Prompts come from `rain` in `video/timeline.json` (the resolver's list); there is no per-shot list. |
-| `title` | `fake` (small wordmark, dims), `implode` (cells converge on the wordmark in the first half beat), `end` (wordmark, `sub` line, fade to black). | |
+| `title` | `fake` (small wordmark, dims), `implode` (cells converge on the wordmark in the first half beat), `end` (wordmark, `sub` line, fade to black). | `implode` draws 64 abstract dots, not the film's real cells, so S46 does not yet show "every cell implodes". |
 
 Evidence kinds: image (resolves from blur, cross-fade from `prev`, noise), frames and video (`FrameClip`, frame
 index from age), model3d (procedural kart, house, robot, board; parts arrive per `partBeats`; orbit from age),
@@ -125,14 +125,18 @@ Example, `video/direction/S11.json` (Unity > Karts: the take runs at twice speed
 ```
 
 Hand-tuned: S01-S36 and S41. Drafts: S37-S40 and S42-S47. They render and read correctly; plan 08 tunes them.
+Sheet note: the 50% and 75% samples of S35 land exactly on the guide events (beats 8 and 12), so the sheet
+shows the first tile of a wall that fills in over the next 200 ms. That is expected, not a bug.
 
 ### Fixtures
 
 `apps/web/fixtures/main.jsonl` (190 events, the Act 2 tree) and one small file per Act 3 and Act 5 take (night,
 crossplay, realistic, music, house.*, study, cad, cad.sim, pcb, forecast, anomaly, car.house, house.game).
 Placeholder art is SVG in `apps/web/fixtures/art/`. Maker ids appear only as `maker` values on `node.spawn`
-lines. Icons belong in `apps/web/public/makers/<id>.svg`. None are there yet, so the neutral glyph is drawn and
-the browser logs one expected 404 per missing icon.
+lines. Icons belong in `apps/web/public/makers/<id>.svg`. None are there yet, so the neutral glyph is drawn.
+The tools report "page errors": all of them are 404s for `video/takes/<take>/events.jsonl`, which the stage tries
+before falling back to the fixture (checked: the full film has 20, one per take, and nothing else fails; all 48
+`?director=1&shot=<id>` URLs reach ready with no script errors). They disappear once plan 08 records the takes.
 
 ## Decisions by the author (2026-11-11)
 
