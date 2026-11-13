@@ -4,5 +4,7 @@
 2. **Every commit message ends with the co-author trailer written in `plan/LOCAL.md` under "Commit trailer".**
    This holds for every commit, whichever tool or model made the change. `plan/LOCAL.md` is not in git: if it
    is missing (a fresh clone or a worktree), ask the author for the trailer line. Do not commit without it.
-3. No vendor or model names in code, UI, docs or file names. The commit trailer is the only exception.
+3. No vendor or model names in code, UI, docs or file names. Two exceptions: the commit trailer, and the maker
+   icons of non-LLM generators (the `maker` field and `apps/web/public/makers/`; see "Maker icons" in the
+   contract). LLM vendors are never shown or named.
 4. Never print, log or commit keys or tokens.

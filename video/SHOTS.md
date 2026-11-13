@@ -16,7 +16,9 @@ because a shot needs it.
 
 Near-black stage, one accent colour, thin luminous lines, large quiet type. It should feel like a hardware reveal
 film: hard cuts on beats, flashes on drops, the camera always travelling. No chat bubbles anywhere. No provider
-or model names anywhere: cells are named by what they do (Game, Image, Voice, CAD).
+or model names anywhere: cells are named by what they do (Game, Image, Voice, CAD). The one brand mark: a cell
+whose asset comes from a non-LLM generator (image, 3D model, video, voice, music, forecast) carries that
+generator's small single-colour icon. The agents themselves stay unbranded.
 
 ## The eight views (this is the app's whole UI)
 

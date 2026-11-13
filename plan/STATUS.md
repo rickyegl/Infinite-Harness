@@ -32,10 +32,14 @@ what the next agent should know. Keep it short; replace stale lines instead of a
   18-20 s. The film has no minimum length.
 - (2026-11-12) Every commit ends with the co-author trailer in `plan/LOCAL.md` ("Commit trailer"), whichever
   tool or model made it. `AGENTS.md` at the repo root says so to every agent.
+- (2026-11-12) Cells of non-LLM generators show their maker's icon in the graph (contract, "Maker icons").
+  LLM vendors stay unnamed and unshown.
 
 ## ASSUMED (see the list at the end of 00-contract.md)
 
-Nothing beyond that list yet.
+- ASSUMED: the maker mark is an icon only (no name in text), on every non-LLM generator cell including Image
+  and Forecast, whose makers also make LLMs. Non-AI tools (render, host, recorder) get none.
+- ASSUMED: icon files are not fetched by agents; the author supplies or approves them (USER-TODO 19).
 
 ## Open problems
 

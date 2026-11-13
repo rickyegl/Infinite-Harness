@@ -18,10 +18,11 @@ run it locally.
    upload, spend).
 3. **Clean-up.** Remove dead fixtures and stray files; make sure `.gitignore`d things are not tracked
    (`git ls-files` against the ignore list); run the brand lint across the whole repo including docs and
-   committed takes; confirm no keys, tokens, e-mail addresses, course data or absolute machine paths are
+   committed takes (it skips only the `maker` values and `apps/web/public/makers/`, see the contract); confirm no keys, tokens, e-mail addresses, course data or absolute machine paths are
    committed (`git grep` for drive letters, `@`, `key`, `token`).
 4. **Licence and credits.** Add a licence the author picks. Credits list engines and partner tools by name;
-   model providers stay unnamed ("Built with AI").
+   model providers stay unnamed ("Built with AI"). The maker icons in the graph are the one exception and
+   stay icons: do not add their names to the README or docs.
 5. **Fresh-clone test.** Clone into a temp folder, `pnpm i`, `HARNESS_MOCK=1 pnpm dev`, run the Act 1 prompt,
    watch the mock graph, open replay mode. Fix whatever a stranger would trip on.
 6. **Repo visibility.** The repo is private. Making it public is the author's call: ask, do not do it.

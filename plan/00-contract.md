@@ -22,7 +22,7 @@ other projects, so module work is "wrap what exists", not "write from scratch".
 | Agent runtime | Headless agent CLIs spawned as workers (subscription sign-in and MCP servers come from the CLIs' own config). The router and tiny text tasks go through the local model proxy. |
 | Unity | Unity 6 (6000.2.x) with the WebGL module, URP. Browser build is WebGL. |
 | Where things run | About 90% on this computer. GPU jobs on a Colab runtime. Static site and public links through Cloudflare (Pages + tunnels). |
-| Naming | **Brandless.** UI, film, README and docs name cells by capability (Game, Image, Voice). Model vendors are never named in the repo; their CLI names, model ids and paths live in `harness.local.json` and `plan/LOCAL.md` (both gitignored). Engines and partner tools (Unity, Roblox, Blender, SurfaceCAD) are named normally. |
+| Naming | **Brandless text, with one mark (changed 2026-11-12).** UI, film, README and docs name cells by capability (Game, Image, Voice). Model vendors are never named in text; their CLI names, model ids and paths live in `harness.local.json` and `plan/LOCAL.md` (both gitignored). **Exception: a cell whose asset is made by a non-LLM generator (image, cutout, 3D model, video, voice, music, forecast) shows that generator's icon**, see "Maker icons" below. Agent and orchestrator cells (the LLM workers) show no maker. Engines and partner tools (Unity, Roblox, Blender, SurfaceCAD) are named normally. |
 
 ## Repo layout
 
@@ -64,7 +64,8 @@ type Base = { seq: number; t: number /* ms since run start */; run: string; node
 type Event = Base & (
   | { type: "run.start"; prompt: string }
   | { type: "node.spawn"; parent: string | null; module: string; label: string;
-      kind: "root" | "orchestrator" | "agent" | "tool"; prompt?: string }
+      kind: "root" | "orchestrator" | "agent" | "tool"; prompt?: string;
+      maker?: string }                                    // icon id of the non-LLM generator, see "Maker icons"
   | { type: "node.state"; state: "queued" | "running" | "waiting" | "done" | "failed" }
   | { type: "node.step"; title: string; detail?: string; icon?: string }   // a tick in the step ticker
   | { type: "node.evidence"; kind: "image" | "frames" | "video" | "model3d" | "audio" | "chart" | "doc" | "code" | "link";
@@ -79,7 +80,8 @@ type Event = Base & (
 ```
 
 `uri` is relative to the run folder (`artifacts/...`) and served by the bridge at `/runs/<run>/<uri>`. `label`
-is what the UI prints: a capability word, never a vendor. Adding an event type means editing this file and the
+is what the UI prints: a capability word, never a vendor. `maker` is never printed as text: it only picks an
+icon. Adding an event type means editing this file and the
 protocol package in the same commit.
 
 ### Module contract (`modules/<id>/`)
@@ -87,6 +89,7 @@ protocol package in the same commit.
 ```jsonc
 // module.json
 { "id": "assets.image", "label": "Image", "icon": "image", "kind": "tool",          // or "agent" | "orchestrator"
+  "maker": "<icon id>",                                                              // only for non-LLM generators
   "summary": "Generate or edit an image from a prompt.",                             // read by the router
   "accepts": ["text", "image"], "produces": ["image"],
   "runtime": "script",                                                               // "script" | "cli-agent"
@@ -107,6 +110,15 @@ export default async function run(ctx: ModuleContext, input: ModuleInput): Promi
 // ctx.sh(cmd, args, opts) ctx.agent(prompt, opts)      <- subprocess / headless CLI worker, events streamed
 // ctx.dir (artifact dir) ctx.config (merged config) ctx.signal (abort)
 ```
+
+**Maker icons.** A module with `"kind": "tool"` whose output is made by a non-LLM AI generator sets `maker` to
+an icon id. The bridge copies it from the manifest into that cell's `node.spawn` (workers cannot set it), so it
+is recorded in every take and replays in the film. The UI draws `apps/web/public/makers/<maker>.svg` as a small
+single-colour badge on the cell, with a neutral glyph when the file is missing. This is the only place a
+generator's brand may appear: the icon is its glyph, not its wordmark, and its name is never printed in labels,
+captions, steps or docs. Modules with `"kind": "agent"` or `"orchestrator"` never set it. The brand lint skips
+exactly two things: the `maker` value in `module.json` and in `node.spawn` events, and the files in
+`apps/web/public/makers/`. Which generator sits behind each module is listed in `plan/LOCAL.md`.
 
 Every module must run with `HARNESS_MOCK=1` (`"mock": true`): it replays `modules/<id>/fixtures/` so the UI and
 the film pipeline never wait for a GPU, an editor or a quota.

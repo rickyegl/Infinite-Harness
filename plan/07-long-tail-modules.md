@@ -28,6 +28,8 @@ adapters. Budget: about 45 minutes each. If one fights back, keep its mock, writ
 3. Router table tests: add every Act 5 prompt with its expected module.
 4. The `chart` evidence format is plain JSON (`{history: [[t,v]], forecast: [[t,v]], band: [[t,lo,hi]],
    anomalies: [t]}`) so the UI draws it natively and it animates with the clock.
+5. `forecast` and `anomaly` set `maker` in their `module.json` (contract, "Maker icons"; id in
+   `plan/LOCAL.md`). The other rows are agents or non-AI tools and set none; `assets.video` has its own.
 
 ## Verify first
 

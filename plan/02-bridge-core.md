@@ -18,7 +18,8 @@ address).
 3. **Config loader.** Merges `harness.config.example.json` and `harness.local.json`; typed; one import for all
    code. Write the example file with every key the plans mention.
 4. **Module loader and runner.** Discovers `modules/*/module.json`, validates against the protocol types, builds
-   `ModuleContext` (contract section "Module contract"). `HARNESS_MOCK=1` replays a module's fixtures with their
+   `ModuleContext` (contract section "Module contract"). It copies the manifest's `maker`, if any, into the
+   cell's `node.spawn`; a worker cannot set or change it. `HARNESS_MOCK=1` replays a module's fixtures with their
    original timing scaled by `HARNESS_MOCK_SPEED`.
 5. **Router.** Input: prompt + module summaries. Output: a plan `{nodes: [{id, module, label, prompt,
    after: []}]}` as strict JSON. First choice: one call to the local proxy's chat-completions endpoint with a

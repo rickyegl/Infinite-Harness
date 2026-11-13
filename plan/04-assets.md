@@ -33,6 +33,9 @@ orchestrators receive real assets from them through `request_asset`.
      and replace the placeholder".
 5. **Asset request batching.** The game orchestrator asks once for the shared art list; the bridge runs asset
    jobs in parallel where the backend allows (images) and serially where it does not (one GPU).
+6. **Maker icons.** Every module in the table above is a non-LLM generator: set `maker` in its `module.json`
+   (contract, "Maker icons"; the id for each is in `plan/LOCAL.md`). `music` takes the maker of the chosen
+   song. Check in the graph that each asset cell shows its badge.
 
 ## Verify first
 

@@ -56,7 +56,8 @@ the beat, flash + shake + punch-in on the drop, slower and dimmer before it.
 - `pnpm film` produces the mp4 from a clean checkout plus the local takes, with no manual steps.
 - `qa.mjs` passes; the contact sheet of cut frames shows the right shot on each cut.
 - The author has watched it and signed off, or their notes are in `STATUS.md` as a fix list.
-- No vendor or model name is visible in any frame (scan the cut-frame sheets).
+- No vendor or model name is visible as text in any frame (scan the cut-frame sheets). The maker badges on
+  non-LLM generator cells are the only brand marks, and no agent or orchestrator cell has one.
 
 ## Hand off
 

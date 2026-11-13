@@ -26,5 +26,5 @@
   },
   "colab": { "session": "forge", "gpu": "L4", "keepAlive": false },
   "voice": { "envFile": "<path to the .env that holds the voice key and voice id>" },
-  "brandDenyList": ["<vendor and model names that must never appear in UI, docs or frames>"]
+  "brandDenyList": ["<vendor and model names that must never appear as text in UI, docs or frames; maker icons are exempt by path, see the contract>"]
 }

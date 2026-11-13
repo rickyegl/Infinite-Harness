@@ -22,7 +22,9 @@ with no backend. When this is done, any shot in the film can be previewed by URL
      plus a small offset seeded by node id so it reads as organic, not gridded. Sub-orchestrators lay out their
      children the same way inside their own region. New cells ease from their parent's position. Edges are
      curves with a travelling light for `node.request` / `node.deliver`.
-   - Cell: icon, label, state ring (queued, running, waiting, done, failed), live thumbnail from the latest
+   - Cell: icon, label, state ring (queued, running, waiting, done, failed), a maker badge when its
+     `node.spawn` has `maker` (contract, "Maker icons": about 18 px, single colour, lower-right corner, a
+     neutral glyph if the icon file is missing; also shown in the focus view's facts column), live thumbnail from the latest
      evidence, child count.
    - `focus`: camera tween into a cell; step ticker, evidence stage, facts column (elapsed, files, tools used
      as icons).
@@ -66,8 +68,11 @@ with no backend. When this is done, any shot in the film can be previewed by URL
 - `pnpm shots:sheet` produces sheets where all 47 shots are recognisable against the table in `SHOTS.md`.
 - `pnpm film:rough` writes an mp4 whose duration matches `total` in `video/timeline.json` (check with ffprobe) in which cuts fall on the click track.
 - Live mode with a fixture: clicking a cell zooms into its focus view and Escape returns (Playwright test).
-- No vendor or model name appears anywhere in `apps/web` (`pnpm lint:brand` greps a deny-list read from
-  `harness.local.json`, so the list itself is not in the repo).
+- No vendor or model name appears as text anywhere in `apps/web` (`pnpm lint:brand` greps a deny-list read from
+  `harness.local.json`, so the list itself is not in the repo). It skips only the `maker` value in manifests
+  and `node.spawn` events and the files in `apps/web/public/makers/`.
+- The fixture's Image, Voice, 3D Model and Video cells carry `maker` and show a badge; agent and orchestrator
+  cells show none.
 
 ## Hand off
 
