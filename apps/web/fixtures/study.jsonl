@@ -1,0 +1,11 @@
+{"seq":1,"t":0,"run":"study","node":"root","type":"run.start","prompt":"Check all presentations on Canvas and make a study guide for every single test."}
+{"seq":2,"t":0,"run":"study","node":"root","type":"node.spawn","parent":null,"module":"root","label":"Check all presentations on Canvas and make a study guide for every single test.","kind":"root"}
+{"seq":3,"t":0,"run":"study","node":"root","type":"node.state","state":"running"}
+{"seq":4,"t":100,"run":"study","node":"cell","type":"node.spawn","parent":"root","module":"study","label":"Study","kind":"agent"}
+{"seq":5,"t":150,"run":"study","node":"cell","type":"node.state","state":"running"}
+{"seq":6,"t":300,"run":"study","node":"cell","type":"node.evidence","kind":"doc","uri":"/fixtures/art/deck_0.svg","caption":"course decks","meta":{"pages":["/fixtures/art/deck_0.svg","/fixtures/art/deck_1.svg","/fixtures/art/deck_2.svg","/fixtures/art/deck_3.svg","/fixtures/art/deck_4.svg","/fixtures/art/deck_5.svg"]}}
+{"seq":7,"t":3750,"run":"study","node":"cell","type":"node.evidence","kind":"doc","uri":"/fixtures/art/guide.svg","caption":"1 guide","meta":{"guides":1,"pages":["/fixtures/art/guide.svg"]}}
+{"seq":8,"t":4688,"run":"study","node":"cell","type":"node.evidence","kind":"doc","uri":"/fixtures/art/guide.svg","caption":"a row of guides","meta":{"guides":6,"pages":["/fixtures/art/guide.svg"]}}
+{"seq":9,"t":5625,"run":"study","node":"cell","type":"node.evidence","kind":"doc","uri":"/fixtures/art/guide.svg","caption":"every test","meta":{"guides":24,"pages":["/fixtures/art/guide.svg"]}}
+{"seq":10,"t":5675,"run":"study","node":"cell","type":"node.done","summary":"done"}
+{"seq":11,"t":5725,"run":"study","node":"root","type":"run.done"}

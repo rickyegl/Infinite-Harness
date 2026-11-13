@@ -1,0 +1,32 @@
+{
+  "draft": false,
+  "shot": "S20",
+  "view": "split",
+  "take": "main",
+  "events": {
+    "at": [
+      [
+        0,
+        34000
+      ],
+      [
+        8,
+        38000
+      ]
+    ]
+  },
+  "params": {
+    "left": {
+      "node": "u.build",
+      "kind": "frames"
+    },
+    "right": {
+      "node": "r.build",
+      "kind": "frames"
+    },
+    "full": true,
+    "cuts": true,
+    "mini": false
+  },
+  "note": "Full-bleed gameplay, hard cuts on every beat in each half."
+}

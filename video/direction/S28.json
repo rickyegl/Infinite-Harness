@@ -1,0 +1,22 @@
+{
+  "draft": false,
+  "shot": "S28",
+  "view": "banner",
+  "take": "house.image",
+  "events": {
+    "at": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        468.75
+      ]
+    ]
+  },
+  "params": {
+    "title": "IMAGE",
+    "say": "Show me a house."
+  }
+}

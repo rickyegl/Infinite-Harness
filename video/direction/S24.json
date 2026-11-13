@@ -1,0 +1,40 @@
+{
+  "draft": false,
+  "shot": "S24",
+  "view": "split",
+  "take": "music",
+  "events": {
+    "at": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        468.75
+      ]
+    ]
+  },
+  "camera": [
+    {
+      "beat": 0,
+      "target": "all",
+      "dur": 0
+    }
+  ],
+  "params": {
+    "left": {
+      "node": "unity",
+      "label": "Gameplay"
+    },
+    "right": {
+      "node": "music",
+      "kind": "audio",
+      "label": "Music"
+    },
+    "lit": [
+      "music"
+    ]
+  },
+  "note": "The song lands on the second downbeat."
+}

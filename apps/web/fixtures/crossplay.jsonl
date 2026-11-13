@@ -1,0 +1,16 @@
+{"seq":1,"t":0,"run":"crossplay","node":"root","type":"run.start","prompt":"Add crossplay."}
+{"seq":2,"t":0,"run":"crossplay","node":"root","type":"node.spawn","parent":null,"module":"root","label":"Add crossplay.","kind":"root"}
+{"seq":3,"t":0,"run":"crossplay","node":"root","type":"node.state","state":"running"}
+{"seq":4,"t":200,"run":"crossplay","node":"unity","type":"node.spawn","parent":"root","module":"game.unity","label":"Unity","kind":"orchestrator"}
+{"seq":5,"t":220,"run":"crossplay","node":"unity","type":"node.state","state":"running"}
+{"seq":6,"t":250,"run":"crossplay","node":"roblox","type":"node.spawn","parent":"root","module":"game.roblox","label":"Roblox","kind":"orchestrator"}
+{"seq":7,"t":270,"run":"crossplay","node":"roblox","type":"node.state","state":"running"}
+{"seq":8,"t":300,"run":"crossplay","node":"unity","type":"node.evidence","kind":"frames","uri":"/fixtures/art/cross_unity_0.svg","meta":{"frames":["/fixtures/art/cross_unity_0.svg","/fixtures/art/cross_unity_1.svg","/fixtures/art/cross_unity_2.svg","/fixtures/art/cross_unity_3.svg","/fixtures/art/cross_unity_4.svg","/fixtures/art/cross_unity_5.svg","/fixtures/art/cross_unity_6.svg","/fixtures/art/cross_unity_7.svg"],"fps":8,"loop":true}}
+{"seq":9,"t":300,"run":"crossplay","node":"roblox","type":"node.evidence","kind":"frames","uri":"/fixtures/art/cross_roblox_0.svg","meta":{"frames":["/fixtures/art/cross_roblox_0.svg","/fixtures/art/cross_roblox_1.svg","/fixtures/art/cross_roblox_2.svg","/fixtures/art/cross_roblox_3.svg","/fixtures/art/cross_roblox_4.svg","/fixtures/art/cross_roblox_5.svg","/fixtures/art/cross_roblox_6.svg","/fixtures/art/cross_roblox_7.svg"],"fps":8,"loop":true}}
+{"seq":10,"t":400,"run":"crossplay","node":"relay","type":"node.spawn","parent":"root","module":"game.relay","label":"Relay","kind":"agent"}
+{"seq":11,"t":420,"run":"crossplay","node":"relay","type":"node.state","state":"running"}
+{"seq":12,"t":600,"run":"crossplay","node":"relay","type":"node.step","title":"Shared race state over a relay"}
+{"seq":13,"t":1875,"run":"crossplay","node":"unity","type":"node.evidence","kind":"frames","uri":"/fixtures/art/cross_unity_0_g.svg","caption":"Roblox racer in Unity","meta":{"frames":["/fixtures/art/cross_unity_0_g.svg","/fixtures/art/cross_unity_1_g.svg","/fixtures/art/cross_unity_2_g.svg","/fixtures/art/cross_unity_3_g.svg","/fixtures/art/cross_unity_4_g.svg","/fixtures/art/cross_unity_5_g.svg","/fixtures/art/cross_unity_6_g.svg","/fixtures/art/cross_unity_7_g.svg"],"fps":8,"loop":true}}
+{"seq":14,"t":1875,"run":"crossplay","node":"roblox","type":"node.evidence","kind":"frames","uri":"/fixtures/art/cross_roblox_0_g.svg","caption":"Unity racer in Roblox","meta":{"frames":["/fixtures/art/cross_roblox_0_g.svg","/fixtures/art/cross_roblox_1_g.svg","/fixtures/art/cross_roblox_2_g.svg","/fixtures/art/cross_roblox_3_g.svg","/fixtures/art/cross_roblox_4_g.svg","/fixtures/art/cross_roblox_5_g.svg","/fixtures/art/cross_roblox_6_g.svg","/fixtures/art/cross_roblox_7_g.svg"],"fps":8,"loop":true}}
+{"seq":15,"t":1875,"run":"crossplay","node":"relay","type":"node.done","summary":"crossplay on"}
+{"seq":16,"t":4000,"run":"crossplay","node":"root","type":"run.done"}

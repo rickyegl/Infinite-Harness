@@ -1,0 +1,33 @@
+{
+  "draft": false,
+  "shot": "S25",
+  "view": "wall",
+  "take": "main",
+  "events": {
+    "at": [
+      [
+        0,
+        40000
+      ],
+      [
+        1,
+        40000
+      ]
+    ]
+  },
+  "params": {
+    "layout": "grid",
+    "items": [
+      "Play in browser",
+      "Roblox game",
+      "Trailer",
+      "Trailer (vertical)",
+      "Explainer",
+      "Premise reel",
+      "Ad image"
+    ],
+    "stagger": 0.5,
+    "drift": 30
+  },
+  "note": "One tile per half beat."
+}

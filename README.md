@@ -7,7 +7,8 @@ The showcase: ask for a racing game and watch one orchestrator build it in Unity
 request models and music from asset agents, cut a trailer, produce an ad campaign in your own voice, host the
 game in the browser and verify the lot. Then keep going: images, CAD, 3D, study guides, forecasts.
 
-> Status: planning complete, implementation starting. See [plan/STATUS.md](plan/STATUS.md).
+> Status: the stage is built and renders the whole film from fixture events; the modules come next. See
+> [plan/STATUS.md](plan/STATUS.md).
 
 ## How it works
 
@@ -28,7 +29,33 @@ prompt -> router -> module cells (agents, tools, sub-orchestrators) -> event str
 |---|---|
 | [video/SHOTS.md](video/SHOTS.md) | The demo film (3 minutes at most), shot by shot, keyed to the music's beats. The product is designed from it. |
 | [plan/](plan/README.md) | Ordered build plan, one file per agent session. |
+| [apps/web](apps/web) | The stage: the interface, a pure function of events and a clock. |
+| [packages/protocol](packages/protocol) | Event and manifest types, and `reduce(events, t)`. |
+| `video/direction/` | One direction file per shot: view, camera and how the shot reads its take. |
 | `harness.config.example.json` | Configuration template. |
+
+## Running the stage
+
+```bash
+pnpm install
+pnpm dev
+```
+
+Then open `http://127.0.0.1:5173/?fixture=main&start=40000` (live: click a cell to focus it, Escape to go back)
+or `http://127.0.0.1:5173/?director=1&shot=S11` (one shot of the film; `&from=S09&to=S20` for a range,
+`&play=1` to play it).
+
+| Command | What |
+|---|---|
+| `pnpm shots:sheet` | Contact sheets of every shot: `video/renders/sheet_*.png`. |
+| `pnpm film:rough` | The rough cut, captured frame by frame with the click track and score: `video/renders/rough.mp4`. |
+| `node video/tools/capture.mjs --shot S11` | One shot (or `--from`/`--to`) at 60 fps, full size. |
+| `pnpm shots:direct` | Draft direction files for shots that have no hand-tuned one. |
+| `pnpm test`, `pnpm test:determinism`, `pnpm test:live` | Unit tests, byte-identical seeks, the live click-through. |
+| `pnpm lint:brand` | No vendor or model names in the repo. |
+
+The capture tools need Playwright's Chromium (`pnpm exec playwright install chromium`) and ffmpeg (on `PATH`,
+`FFMPEG`, or `paths.ffmpeg` in `harness.local.json`).
 
 ## Film timing
 

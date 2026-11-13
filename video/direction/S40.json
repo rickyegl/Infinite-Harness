@@ -1,0 +1,30 @@
+{
+  "shot": "S40",
+  "draft": true,
+  "view": "banner",
+  "take": "anomaly",
+  "events": {
+    "at": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        468.75
+      ]
+    ]
+  },
+  "params": {
+    "title": "ANOMALY",
+    "say": "Detect anomaly."
+  },
+  "camera": [
+    {
+      "beat": 0,
+      "target": "all",
+      "dur": 0
+    }
+  ],
+  "note": "draft from shots.json: Same chart: red markers snap onto the outliers."
+}

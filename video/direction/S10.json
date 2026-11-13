@@ -1,0 +1,61 @@
+{
+  "draft": false,
+  "shot": "S10",
+  "view": "graph",
+  "take": "main",
+  "events": {
+    "at": [
+      [
+        0,
+        3750
+      ],
+      [
+        8,
+        7700
+      ]
+    ]
+  },
+  "camera": [
+    {
+      "beat": 0,
+      "target": [
+        "root",
+        "game",
+        "trailer",
+        "campaign",
+        "voice",
+        "host",
+        "recorder",
+        "verifier"
+      ],
+      "zoom": 0.9,
+      "dx": 60,
+      "dy": -20,
+      "dur": 0
+    },
+    {
+      "beat": 1,
+      "target": [
+        "game",
+        "design",
+        "unity",
+        "roblox",
+        "u.track",
+        "r.track",
+        "u.karts",
+        "r.karts",
+        "u.combat",
+        "r.combat",
+        "u.humanoids",
+        "r.humanoids",
+        "u.ui",
+        "r.ui",
+        "u.build",
+        "r.build"
+      ],
+      "zoom": 1,
+      "dur": 4
+    }
+  ],
+  "note": "Push into Game while its subtree grows; edges draw with travelling light."
+}

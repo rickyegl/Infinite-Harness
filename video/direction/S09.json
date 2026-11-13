@@ -1,0 +1,70 @@
+{
+  "draft": false,
+  "shot": "S09",
+  "view": "graph",
+  "take": "main",
+  "events": {
+    "at": [
+      [
+        0,
+        0
+      ],
+      [
+        8,
+        3750
+      ]
+    ]
+  },
+  "camera": [
+    {
+      "beat": 0,
+      "target": [
+        "root",
+        "game",
+        "trailer",
+        "campaign",
+        "voice",
+        "host",
+        "recorder",
+        "verifier"
+      ],
+      "zoom": 0.8,
+      "dur": 0
+    },
+    {
+      "beat": 0,
+      "target": [
+        "root",
+        "game",
+        "trailer",
+        "campaign",
+        "voice",
+        "host",
+        "recorder",
+        "verifier"
+      ],
+      "zoom": 0.9,
+      "dx": 60,
+      "dy": -20,
+      "dur": 8,
+      "ease": "none"
+    }
+  ],
+  "fx": [
+    {
+      "type": "flash",
+      "beat": 0,
+      "dur": 0.75
+    },
+    {
+      "type": "shake",
+      "beat": 0,
+      "dur": 1,
+      "amp": 22
+    }
+  ],
+  "params": {
+    "intro": "collapse"
+  },
+  "note": "DROP. The box collapses into the root; one ring cell per beat."
+}

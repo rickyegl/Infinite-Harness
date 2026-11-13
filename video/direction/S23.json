@@ -1,0 +1,35 @@
+{
+  "draft": false,
+  "shot": "S23",
+  "view": "split",
+  "take": "realistic",
+  "events": {
+    "at": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        468.75
+      ]
+    ]
+  },
+  "camera": [
+    {
+      "beat": 0,
+      "target": "all",
+      "dur": 0
+    }
+  ],
+  "params": {
+    "left": {
+      "node": "unity",
+      "label": "Unity"
+    },
+    "lit": [
+      "shaders"
+    ]
+  },
+  "note": "The wipe starts on the second downbeat and lasts 2 beats."
+}

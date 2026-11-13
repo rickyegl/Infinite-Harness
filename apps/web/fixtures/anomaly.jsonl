@@ -1,0 +1,8 @@
+{"seq":1,"t":0,"run":"anomaly","node":"root","type":"run.start","prompt":"Detect anomaly."}
+{"seq":2,"t":0,"run":"anomaly","node":"root","type":"node.spawn","parent":null,"module":"root","label":"Detect anomaly.","kind":"root"}
+{"seq":3,"t":0,"run":"anomaly","node":"root","type":"node.state","state":"running"}
+{"seq":4,"t":100,"run":"anomaly","node":"cell","type":"node.spawn","parent":"root","module":"anomaly","label":"Anomaly","kind":"tool","maker":"timesfm"}
+{"seq":5,"t":150,"run":"anomaly","node":"cell","type":"node.state","state":"running"}
+{"seq":6,"t":300,"run":"anomaly","node":"cell","type":"node.evidence","kind":"chart","uri":"anomaly.json","caption":"4 outliers","meta":{"history":[106,106.4,107.9,121.6,128.7,122.4,122.5,130.6,126.6,80.7,114.6,118.3,109,100.5,106.8,111.6,105.5,107.5,121.9,128.1,126.3,136.1,189,152,149.3,158.5,164.8,156.2,150.7,156.2,153.3,106.4,138.1,144.2,139.5,132.1,139.8,150,148.1,150.1,203.4,175,172.8,178.6,192,192.7,185.4,189.3],"anomalies":[9,22,31,40],"drawBeats":0.01,"anomalyAt":0}}
+{"seq":7,"t":350,"run":"anomaly","node":"cell","type":"node.done","summary":"done"}
+{"seq":8,"t":400,"run":"anomaly","node":"root","type":"run.done"}

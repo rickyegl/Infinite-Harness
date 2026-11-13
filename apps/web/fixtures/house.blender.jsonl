@@ -1,0 +1,8 @@
+{"seq":1,"t":0,"run":"house.blender","node":"root","type":"run.start","prompt":"Build it on Blender."}
+{"seq":2,"t":0,"run":"house.blender","node":"root","type":"node.spawn","parent":null,"module":"root","label":"Build it on Blender.","kind":"root"}
+{"seq":3,"t":0,"run":"house.blender","node":"root","type":"node.state","state":"running"}
+{"seq":4,"t":100,"run":"house.blender","node":"cell","type":"node.spawn","parent":"root","module":"blender","label":"3D","kind":"agent"}
+{"seq":5,"t":150,"run":"house.blender","node":"cell","type":"node.state","state":"running"}
+{"seq":6,"t":300,"run":"house.blender","node":"cell","type":"node.evidence","kind":"frames","uri":"/fixtures/art/blender_0.svg","caption":"viewport","meta":{"frames":["/fixtures/art/blender_0.svg","/fixtures/art/blender_1.svg","/fixtures/art/blender_2.svg","/fixtures/art/blender_3.svg"],"fps":2.133,"loop":false}}
+{"seq":7,"t":350,"run":"house.blender","node":"cell","type":"node.done","summary":"done"}
+{"seq":8,"t":400,"run":"house.blender","node":"root","type":"run.done"}

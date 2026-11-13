@@ -1,0 +1,190 @@
+{"seq":1,"t":0,"run":"main","node":"root","type":"run.start","prompt":"Make a 3d racing game where humanoids fight while racing on Unity. And Roblox. Also make a game trailer. Also make an ad campaign tailored to Unity and Roblox players. Host the game on browser, and at the end show the process on a video. Make no mistakes."}
+{"seq":2,"t":0,"run":"main","node":"root","type":"node.spawn","parent":null,"module":"root","label":"Infinite Harness","kind":"root","prompt":"Make a 3d racing game where humanoids fight while racing on Unity. And Roblox. Also make a game trailer. Also make an ad campaign tailored to Unity and Roblox players. Host the game on browser, and at the end show the process on a video. Make no mistakes."}
+{"seq":3,"t":0,"run":"main","node":"root","type":"node.state","state":"running"}
+{"seq":4,"t":470,"run":"main","node":"game","type":"node.spawn","parent":"root","module":"game","label":"Game","kind":"orchestrator"}
+{"seq":5,"t":530,"run":"main","node":"game","type":"node.state","state":"running"}
+{"seq":6,"t":700,"run":"main","node":"game","type":"node.step","title":"Split the game into engines","detail":"design doc, then Unity and Roblox","icon":"game"}
+{"seq":7,"t":939,"run":"main","node":"trailer","type":"node.spawn","parent":"root","module":"trailer","label":"Trailer","kind":"agent"}
+{"seq":8,"t":999,"run":"main","node":"trailer","type":"node.state","state":"running"}
+{"seq":9,"t":1300,"run":"main","node":"trailer","type":"node.step","title":"Waiting for gameplay","icon":"film"}
+{"seq":10,"t":1408,"run":"main","node":"campaign","type":"node.spawn","parent":"root","module":"campaign","label":"Campaign","kind":"orchestrator"}
+{"seq":11,"t":1468,"run":"main","node":"campaign","type":"node.state","state":"running"}
+{"seq":12,"t":1700,"run":"main","node":"campaign","type":"node.step","title":"Plan three reels and an ad","icon":"megaphone"}
+{"seq":13,"t":1877,"run":"main","node":"voice","type":"node.spawn","parent":"root","module":"voice","label":"Voice","kind":"tool","maker":"elevenlabs"}
+{"seq":14,"t":1937,"run":"main","node":"voice","type":"node.state","state":"running"}
+{"seq":15,"t":2200,"run":"main","node":"voice","type":"node.step","title":"Load the cloned voice","icon":"wave"}
+{"seq":16,"t":2346,"run":"main","node":"host","type":"node.spawn","parent":"root","module":"host","label":"Host","kind":"agent"}
+{"seq":17,"t":2406,"run":"main","node":"host","type":"node.state","state":"running"}
+{"seq":18,"t":2700,"run":"main","node":"host","type":"node.step","title":"Prepare the web build","icon":"globe"}
+{"seq":19,"t":2815,"run":"main","node":"recorder","type":"node.spawn","parent":"root","module":"recorder","label":"Recorder","kind":"agent"}
+{"seq":20,"t":2875,"run":"main","node":"recorder","type":"node.state","state":"running"}
+{"seq":21,"t":3200,"run":"main","node":"recorder","type":"node.step","title":"Recording the run","icon":"record"}
+{"seq":22,"t":3284,"run":"main","node":"verifier","type":"node.spawn","parent":"root","module":"verifier","label":"Verifier","kind":"agent"}
+{"seq":23,"t":3344,"run":"main","node":"verifier","type":"node.state","state":"waiting"}
+{"seq":24,"t":4000,"run":"main","node":"design","type":"node.spawn","parent":"game","module":"game.design","label":"Design","kind":"agent"}
+{"seq":25,"t":4050,"run":"main","node":"design","type":"node.state","state":"running"}
+{"seq":26,"t":4100,"run":"main","node":"design","type":"node.step","title":"Write the design doc","detail":"karts, combat, two engines"}
+{"seq":27,"t":4450,"run":"main","node":"unity","type":"node.spawn","parent":"game","module":"game.unity","label":"Unity","kind":"orchestrator"}
+{"seq":28,"t":4500,"run":"main","node":"unity","type":"node.state","state":"running"}
+{"seq":29,"t":4700,"run":"main","node":"roblox","type":"node.spawn","parent":"game","module":"game.roblox","label":"Roblox","kind":"orchestrator"}
+{"seq":30,"t":4750,"run":"main","node":"roblox","type":"node.state","state":"running"}
+{"seq":31,"t":5000,"run":"main","node":"u.track","type":"node.spawn","parent":"unity","module":"game.unity.track","label":"Track","kind":"agent"}
+{"seq":32,"t":5050,"run":"main","node":"u.track","type":"node.state","state":"running"}
+{"seq":33,"t":5115,"run":"main","node":"r.track","type":"node.spawn","parent":"roblox","module":"game.roblox.track","label":"Track","kind":"agent"}
+{"seq":34,"t":5165,"run":"main","node":"r.track","type":"node.state","state":"running"}
+{"seq":35,"t":5230,"run":"main","node":"u.karts","type":"node.spawn","parent":"unity","module":"game.unity.karts","label":"Karts","kind":"agent"}
+{"seq":36,"t":5280,"run":"main","node":"u.karts","type":"node.state","state":"running"}
+{"seq":37,"t":5345,"run":"main","node":"r.karts","type":"node.spawn","parent":"roblox","module":"game.roblox.karts","label":"Karts","kind":"agent"}
+{"seq":38,"t":5395,"run":"main","node":"r.karts","type":"node.state","state":"running"}
+{"seq":39,"t":5460,"run":"main","node":"u.combat","type":"node.spawn","parent":"unity","module":"game.unity.combat","label":"Combat","kind":"agent"}
+{"seq":40,"t":5510,"run":"main","node":"u.combat","type":"node.state","state":"running"}
+{"seq":41,"t":5575,"run":"main","node":"r.combat","type":"node.spawn","parent":"roblox","module":"game.roblox.combat","label":"Combat","kind":"agent"}
+{"seq":42,"t":5625,"run":"main","node":"r.combat","type":"node.state","state":"running"}
+{"seq":43,"t":5690,"run":"main","node":"u.humanoids","type":"node.spawn","parent":"unity","module":"game.unity.humanoids","label":"Humanoids","kind":"agent"}
+{"seq":44,"t":5740,"run":"main","node":"u.humanoids","type":"node.state","state":"running"}
+{"seq":45,"t":5805,"run":"main","node":"r.humanoids","type":"node.spawn","parent":"roblox","module":"game.roblox.humanoids","label":"Humanoids","kind":"agent"}
+{"seq":46,"t":5855,"run":"main","node":"r.humanoids","type":"node.state","state":"running"}
+{"seq":47,"t":5920,"run":"main","node":"u.ui","type":"node.spawn","parent":"unity","module":"game.unity.ui","label":"UI","kind":"agent"}
+{"seq":48,"t":5970,"run":"main","node":"u.ui","type":"node.state","state":"running"}
+{"seq":49,"t":6035,"run":"main","node":"r.ui","type":"node.spawn","parent":"roblox","module":"game.roblox.ui","label":"UI","kind":"agent"}
+{"seq":50,"t":6085,"run":"main","node":"r.ui","type":"node.state","state":"running"}
+{"seq":51,"t":6150,"run":"main","node":"u.build","type":"node.spawn","parent":"unity","module":"game.unity.build","label":"Build","kind":"agent"}
+{"seq":52,"t":6200,"run":"main","node":"u.build","type":"node.state","state":"running"}
+{"seq":53,"t":6265,"run":"main","node":"r.build","type":"node.spawn","parent":"roblox","module":"game.roblox.build","label":"Build","kind":"agent"}
+{"seq":54,"t":6315,"run":"main","node":"r.build","type":"node.state","state":"running"}
+{"seq":55,"t":6600,"run":"main","node":"design","type":"node.evidence","kind":"doc","uri":"/fixtures/art/deck_0.svg","caption":"design.md","meta":{"pages":["/fixtures/art/deck_0.svg","/fixtures/art/deck_1.svg"]}}
+{"seq":56,"t":6800,"run":"main","node":"design","type":"node.done","summary":"Design doc: 6 systems, 2 engines"}
+{"seq":57,"t":7300,"run":"main","node":"assets","type":"node.spawn","parent":"root","module":"assets","label":"Assets","kind":"orchestrator"}
+{"seq":58,"t":7350,"run":"main","node":"assets","type":"node.state","state":"waiting"}
+{"seq":59,"t":7400,"run":"main","node":"assets","type":"node.step","title":"Ready for requests"}
+{"seq":60,"t":8000,"run":"main","node":"u.karts","type":"node.step","title":"Open the scene","icon":"cube"}
+{"seq":61,"t":8200,"run":"main","node":"u.track","type":"node.step","title":"Build track"}
+{"seq":62,"t":8300,"run":"main","node":"u.karts","type":"node.evidence","kind":"frames","uri":"/fixtures/art/unity_karts_0.svg","caption":"editor viewport","meta":{"frames":["/fixtures/art/unity_karts_0.svg","/fixtures/art/unity_karts_1.svg","/fixtures/art/unity_karts_2.svg","/fixtures/art/unity_karts_3.svg","/fixtures/art/unity_karts_4.svg","/fixtures/art/unity_karts_5.svg","/fixtures/art/unity_karts_6.svg","/fixtures/art/unity_karts_7.svg"],"fps":8,"loop":true}}
+{"seq":63,"t":8470,"run":"main","node":"u.karts","type":"node.step","title":"Import kart controller","icon":"cube"}
+{"seq":64,"t":8800,"run":"main","node":"u.combat","type":"node.step","title":"Build combat"}
+{"seq":65,"t":8940,"run":"main","node":"u.karts","type":"node.step","title":"Tune drift and boost","detail":"KartController.cs","icon":"cube"}
+{"seq":66,"t":9400,"run":"main","node":"u.humanoids","type":"node.step","title":"Build humanoids"}
+{"seq":67,"t":9410,"run":"main","node":"u.karts","type":"node.step","title":"Add driver seat","icon":"cube"}
+{"seq":68,"t":9700,"run":"main","node":"u.karts","type":"node.evidence","kind":"code","uri":"KartController.cs","caption":"KartController.cs","meta":{"lines":[[" ","public class KartController : MonoBehaviour {"],["-","  float drift = 0.2f;"],["+","  float drift = 0.45f;"],["+","  float boost = 1.8f;"],[" ","  void FixedUpdate() {"],["+","    if (Input.GetButton(\"Swing\")) driver.Swing();"],[" ","  }"],[" ","}"]]}}
+{"seq":69,"t":9880,"run":"main","node":"u.karts","type":"node.step","title":"Hook combat input","icon":"cube"}
+{"seq":70,"t":10000,"run":"main","node":"u.ui","type":"node.step","title":"Build ui"}
+{"seq":71,"t":10350,"run":"main","node":"u.karts","type":"node.step","title":"Play test lap","icon":"play"}
+{"seq":72,"t":10400,"run":"main","node":"u.karts","type":"node.evidence","kind":"frames","uri":"/fixtures/art/unity_karts_3.svg","caption":"play test","meta":{"frames":["/fixtures/art/unity_karts_3.svg","/fixtures/art/unity_karts_4.svg","/fixtures/art/unity_karts_5.svg","/fixtures/art/unity_karts_6.svg","/fixtures/art/unity_karts_7.svg","/fixtures/art/unity_karts_0.svg","/fixtures/art/unity_karts_1.svg","/fixtures/art/unity_karts_2.svg"],"fps":8,"loop":true}}
+{"seq":73,"t":11200,"run":"main","node":"r.combat","type":"node.step","title":"Open Studio place","icon":"sword"}
+{"seq":74,"t":11400,"run":"main","node":"r.track","type":"node.step","title":"Build track"}
+{"seq":75,"t":11500,"run":"main","node":"r.combat","type":"node.evidence","kind":"frames","uri":"/fixtures/art/roblox_combat_0.svg","caption":"studio viewport","meta":{"frames":["/fixtures/art/roblox_combat_0.svg","/fixtures/art/roblox_combat_1.svg","/fixtures/art/roblox_combat_2.svg","/fixtures/art/roblox_combat_3.svg","/fixtures/art/roblox_combat_4.svg","/fixtures/art/roblox_combat_5.svg","/fixtures/art/roblox_combat_6.svg","/fixtures/art/roblox_combat_7.svg"],"fps":8,"loop":true}}
+{"seq":76,"t":11670,"run":"main","node":"r.combat","type":"node.step","title":"Script sword swing","detail":"SwingServer.lua","icon":"sword"}
+{"seq":77,"t":11900,"run":"main","node":"r.karts","type":"node.step","title":"Build karts"}
+{"seq":78,"t":12140,"run":"main","node":"r.combat","type":"node.step","title":"Hit boxes on karts","icon":"sword"}
+{"seq":79,"t":12400,"run":"main","node":"r.humanoids","type":"node.step","title":"Build humanoids"}
+{"seq":80,"t":12610,"run":"main","node":"r.combat","type":"node.step","title":"Knockback on hit","icon":"sword"}
+{"seq":81,"t":12900,"run":"main","node":"r.ui","type":"node.step","title":"Build ui"}
+{"seq":82,"t":13080,"run":"main","node":"r.combat","type":"node.step","title":"Test in Play mode","icon":"play"}
+{"seq":83,"t":14000,"run":"main","node":"u.karts","type":"node.state","state":"waiting"}
+{"seq":84,"t":14000,"run":"main","node":"u.karts","type":"node.request","to":"assets","what":"kart + driver models","requestId":"q1"}
+{"seq":85,"t":14200,"run":"main","node":"r.karts","type":"node.state","state":"waiting"}
+{"seq":86,"t":14200,"run":"main","node":"r.karts","type":"node.request","to":"assets","what":"kart + driver models","requestId":"q2"}
+{"seq":87,"t":14600,"run":"main","node":"assets","type":"node.state","state":"running"}
+{"seq":88,"t":14700,"run":"main","node":"assets","type":"node.step","title":"Concept, cutout, mesh, rig"}
+{"seq":89,"t":14800,"run":"main","node":"a.image","type":"node.spawn","parent":"assets","module":"assets.image","label":"Image","kind":"tool","maker":"nano-banana"}
+{"seq":90,"t":14850,"run":"main","node":"a.image","type":"node.state","state":"running"}
+{"seq":91,"t":15000,"run":"main","node":"a.cutout","type":"node.spawn","parent":"assets","module":"assets.cutout","label":"Cutout","kind":"tool","maker":"birefnet"}
+{"seq":92,"t":15050,"run":"main","node":"a.cutout","type":"node.state","state":"queued"}
+{"seq":93,"t":15200,"run":"main","node":"a.mesh","type":"node.spawn","parent":"assets","module":"assets.model3d","label":"3D Model","kind":"tool","maker":"hunyuan3d"}
+{"seq":94,"t":15250,"run":"main","node":"a.mesh","type":"node.state","state":"queued"}
+{"seq":95,"t":15400,"run":"main","node":"a.rig","type":"node.spawn","parent":"assets","module":"assets.rig","label":"Rig","kind":"agent"}
+{"seq":96,"t":15450,"run":"main","node":"a.rig","type":"node.state","state":"queued"}
+{"seq":97,"t":15600,"run":"main","node":"a.video","type":"node.spawn","parent":"assets","module":"assets.video","label":"Video","kind":"tool","maker":"qwen"}
+{"seq":98,"t":15650,"run":"main","node":"a.video","type":"node.state","state":"queued"}
+{"seq":99,"t":16000,"run":"main","node":"a.image","type":"node.evidence","kind":"image","uri":"/fixtures/art/concept_kart.svg","caption":"concept"}
+{"seq":100,"t":16010,"run":"main","node":"a.image","type":"node.state","state":"waiting"}
+{"seq":101,"t":16020,"run":"main","node":"a.cutout","type":"node.state","state":"running"}
+{"seq":102,"t":16470,"run":"main","node":"a.cutout","type":"node.evidence","kind":"image","uri":"/fixtures/art/cutout_kart.svg","caption":"cutout","meta":{"before":"/fixtures/art/concept_kart.svg","reveal":"wipe","wipeBeats":0.5}}
+{"seq":103,"t":16480,"run":"main","node":"a.cutout","type":"node.state","state":"waiting"}
+{"seq":104,"t":16490,"run":"main","node":"a.mesh","type":"node.state","state":"running"}
+{"seq":105,"t":16940,"run":"main","node":"a.mesh","type":"node.evidence","kind":"model3d","uri":"kart.glb","caption":"mesh","meta":{"procedural":"kart","color":"#ff2e63","orbit":0.6}}
+{"seq":106,"t":16950,"run":"main","node":"a.mesh","type":"node.state","state":"waiting"}
+{"seq":107,"t":16960,"run":"main","node":"a.rig","type":"node.state","state":"running"}
+{"seq":108,"t":17410,"run":"main","node":"a.rig","type":"node.evidence","kind":"image","uri":"/fixtures/art/rig_driver.svg","caption":"rig"}
+{"seq":109,"t":17420,"run":"main","node":"a.rig","type":"node.state","state":"waiting"}
+{"seq":110,"t":17500,"run":"main","node":"assets","type":"node.evidence","kind":"model3d","uri":"kart_rigged.glb","caption":"kart + driver","meta":{"procedural":"kart","color":"#ff2e63","orbit":0.5}}
+{"seq":111,"t":18200,"run":"main","node":"assets","type":"node.deliver","to":"u.karts","requestId":"q1","uri":"kart_rigged.glb"}
+{"seq":112,"t":18200,"run":"main","node":"assets","type":"node.deliver","to":"r.karts","requestId":"q2","uri":"kart_rigged.glb"}
+{"seq":113,"t":18300,"run":"main","node":"assets","type":"node.state","state":"waiting"}
+{"seq":114,"t":19100,"run":"main","node":"u.karts","type":"node.state","state":"running"}
+{"seq":115,"t":19100,"run":"main","node":"r.karts","type":"node.state","state":"running"}
+{"seq":116,"t":19100,"run":"main","node":"u.karts","type":"node.evidence","kind":"model3d","uri":"kart_rigged.glb","caption":"Unity · imported","meta":{"procedural":"kart","color":"#ff2e63","angle":0.3,"orbit":0.5}}
+{"seq":117,"t":19100,"run":"main","node":"r.karts","type":"node.evidence","kind":"model3d","uri":"kart_rigged.glb","caption":"Roblox · imported","meta":{"procedural":"kart","color":"#ff2e63","angle":2.2,"orbit":0.5}}
+{"seq":118,"t":20000,"run":"main","node":"trailer","type":"node.step","title":"Capture gameplay","icon":"film"}
+{"seq":119,"t":20000,"run":"main","node":"trailer","type":"node.state","state":"running"}
+{"seq":120,"t":20400,"run":"main","node":"trailer","type":"node.evidence","kind":"frames","uri":"/fixtures/art/trailer_0.svg","caption":"cut on the beat","meta":{"frames":["/fixtures/art/trailer_0.svg","/fixtures/art/trailer_1.svg","/fixtures/art/trailer_2.svg","/fixtures/art/trailer_3.svg","/fixtures/art/trailer_4.svg","/fixtures/art/trailer_5.svg","/fixtures/art/trailer_6.svg","/fixtures/art/trailer_7.svg"],"fps":2.133,"loop":true}}
+{"seq":121,"t":20470,"run":"main","node":"trailer","type":"node.step","title":"Beat grid at 128 BPM","detail":"8 bars","icon":"film"}
+{"seq":122,"t":20940,"run":"main","node":"trailer","type":"node.step","title":"Snap cuts to beats","icon":"film"}
+{"seq":123,"t":21410,"run":"main","node":"trailer","type":"node.step","title":"Title cards","icon":"film"}
+{"seq":124,"t":21880,"run":"main","node":"trailer","type":"node.step","title":"Render 1080p","icon":"film"}
+{"seq":125,"t":22400,"run":"main","node":"trailer","type":"node.output","name":"Trailer","uri":"/fixtures/art/trailer_0.svg","kind":"video"}
+{"seq":126,"t":22600,"run":"main","node":"c.explainer","type":"node.spawn","parent":"campaign","module":"campaign.reel","label":"Explainer","kind":"agent"}
+{"seq":127,"t":22650,"run":"main","node":"c.explainer","type":"node.state","state":"running"}
+{"seq":128,"t":22750,"run":"main","node":"c.premise","type":"node.spawn","parent":"campaign","module":"campaign.reel","label":"Premise reel","kind":"agent"}
+{"seq":129,"t":22800,"run":"main","node":"c.premise","type":"node.state","state":"running"}
+{"seq":130,"t":22900,"run":"main","node":"c.ad","type":"node.spawn","parent":"campaign","module":"assets.image","label":"Ad image","kind":"tool","maker":"nano-banana"}
+{"seq":131,"t":22950,"run":"main","node":"c.ad","type":"node.state","state":"running"}
+{"seq":132,"t":23000,"run":"main","node":"campaign","type":"node.step","title":"Script three reels","icon":"megaphone"}
+{"seq":133,"t":23300,"run":"main","node":"voice","type":"node.evidence","kind":"audio","uri":"voice.wav","caption":"cloned voice","meta":{"durationMs":3500,"peaks":[0.2,0.7,0.9,0.7,0.4,0.3,0.3,0.2,0.3,0.2,0.6,0.8,0.8,0.5,0.5,0.9,0.9,0.6,0.2,0.4,0.3,0.3,0.3,0.4,0.7,0.9,0.7,0.2,0.7,0.9,0.7,0.4,0.4,0.4,0.2,0.3,0.2,0.5,0.8,0.8,0.4,0.5,0.9,0.9,0.6,0.2,0.4,0.3,0.2,0.3,0.4,0.7,0.8,0.6,0.3,0.8,1,0.8,0.3,0.4,0.4,0.3,0.3,0.2]}}
+{"seq":134,"t":23470,"run":"main","node":"campaign","type":"node.step","title":"Cast the cloned voice","icon":"megaphone"}
+{"seq":135,"t":23500,"run":"main","node":"campaign","type":"node.evidence","kind":"image","uri":"/fixtures/art/reel_explainer_0.svg","caption":"three reels","meta":{"fit":"contain"}}
+{"seq":136,"t":23700,"run":"main","node":"c.explainer","type":"node.evidence","kind":"frames","uri":"/fixtures/art/reel_explainer_0.svg","meta":{"frames":["/fixtures/art/reel_explainer_0.svg","/fixtures/art/reel_explainer_1.svg","/fixtures/art/reel_explainer_2.svg","/fixtures/art/reel_explainer_3.svg","/fixtures/art/reel_explainer_4.svg","/fixtures/art/reel_explainer_5.svg"],"fps":4,"loop":true}}
+{"seq":137,"t":23900,"run":"main","node":"c.premise","type":"node.evidence","kind":"frames","uri":"/fixtures/art/reel_premise_0.svg","meta":{"frames":["/fixtures/art/reel_premise_0.svg","/fixtures/art/reel_premise_1.svg","/fixtures/art/reel_premise_2.svg","/fixtures/art/reel_premise_3.svg","/fixtures/art/reel_premise_4.svg","/fixtures/art/reel_premise_5.svg"],"fps":4,"loop":true}}
+{"seq":138,"t":23940,"run":"main","node":"campaign","type":"node.step","title":"Cut vertical 9:16","icon":"megaphone"}
+{"seq":139,"t":24100,"run":"main","node":"c.ad","type":"node.evidence","kind":"image","uri":"/fixtures/art/ad_image.svg","caption":"ad image"}
+{"seq":140,"t":24300,"run":"main","node":"campaign","type":"node.evidence","kind":"frames","uri":"/fixtures/art/reel_premise_0.svg","caption":"three reels","meta":{"frames":["/fixtures/art/reel_trailer_0.svg","/fixtures/art/reel_explainer_0.svg","/fixtures/art/reel_premise_0.svg"],"fps":2.133,"loop":true}}
+{"seq":141,"t":25000,"run":"main","node":"c.explainer","type":"node.output","name":"Explainer","uri":"/fixtures/art/reel_explainer_0.svg","kind":"video"}
+{"seq":142,"t":25200,"run":"main","node":"c.premise","type":"node.output","name":"Premise reel","uri":"/fixtures/art/reel_premise_0.svg","kind":"video"}
+{"seq":143,"t":25400,"run":"main","node":"c.ad","type":"node.output","name":"Ad image","uri":"/fixtures/art/ad_image.svg","kind":"image"}
+{"seq":144,"t":25500,"run":"main","node":"trailer","type":"node.output","name":"Trailer (vertical)","uri":"/fixtures/art/reel_trailer_0.svg","kind":"video"}
+{"seq":145,"t":26000,"run":"main","node":"host","type":"node.state","state":"running"}
+{"seq":146,"t":26000,"run":"main","node":"host","type":"node.step","title":"WebGL build","icon":"globe"}
+{"seq":147,"t":26200,"run":"main","node":"host","type":"node.evidence","kind":"link","uri":"https://play.kartbrawl.test","caption":"play in browser","meta":{"url":"https://play.kartbrawl.test","buildBeats":2,"frames":["/fixtures/art/unity_play_0.svg","/fixtures/art/unity_play_1.svg","/fixtures/art/unity_play_2.svg","/fixtures/art/unity_play_3.svg","/fixtures/art/unity_play_4.svg","/fixtures/art/unity_play_5.svg","/fixtures/art/unity_play_6.svg","/fixtures/art/unity_play_7.svg","/fixtures/art/unity_play_8.svg","/fixtures/art/unity_play_9.svg","/fixtures/art/unity_play_10.svg","/fixtures/art/unity_play_11.svg"],"fps":8}}
+{"seq":148,"t":26470,"run":"main","node":"host","type":"node.step","title":"Compress and upload","icon":"globe"}
+{"seq":149,"t":26940,"run":"main","node":"host","type":"node.step","title":"Open a tunnel","icon":"link"}
+{"seq":150,"t":27200,"run":"main","node":"host","type":"node.output","name":"Play in browser","uri":"/fixtures/art/unity_play_0.svg","kind":"link","href":"https://play.kartbrawl.test"}
+{"seq":151,"t":27410,"run":"main","node":"host","type":"node.step","title":"Public URL","icon":"globe"}
+{"seq":152,"t":28000,"run":"main","node":"recorder","type":"node.evidence","kind":"frames","uri":"/fixtures/art/recorder_0.svg","caption":"recording","meta":{"frames":["/fixtures/art/recorder_0.svg","/fixtures/art/recorder_1.svg","/fixtures/art/recorder_2.svg","/fixtures/art/recorder_3.svg","/fixtures/art/recorder_4.svg","/fixtures/art/recorder_5.svg"],"fps":4,"loop":true}}
+{"seq":153,"t":28600,"run":"main","node":"verifier","type":"node.state","state":"running"}
+{"seq":154,"t":28600,"run":"main","node":"verifier","type":"node.step","title":"Check every output","icon":"check"}
+{"seq":155,"t":28650,"run":"main","node":"u.build","type":"node.evidence","kind":"frames","uri":"/fixtures/art/unity_play_0.svg","caption":"browser build","meta":{"frames":["/fixtures/art/unity_play_0.svg","/fixtures/art/unity_play_1.svg","/fixtures/art/unity_play_2.svg","/fixtures/art/unity_play_3.svg","/fixtures/art/unity_play_4.svg","/fixtures/art/unity_play_5.svg","/fixtures/art/unity_play_6.svg","/fixtures/art/unity_play_7.svg","/fixtures/art/unity_play_8.svg","/fixtures/art/unity_play_9.svg","/fixtures/art/unity_play_10.svg","/fixtures/art/unity_play_11.svg"],"fps":8,"loop":true}}
+{"seq":156,"t":28700,"run":"main","node":"r.build","type":"node.evidence","kind":"link","uri":"https://roblox.test/games/kart-brawl","caption":"Roblox game","meta":{"url":"roblox.test/games/kart-brawl","buildBeats":1,"frames":["/fixtures/art/roblox_play_0.svg","/fixtures/art/roblox_play_1.svg","/fixtures/art/roblox_play_2.svg","/fixtures/art/roblox_play_3.svg","/fixtures/art/roblox_play_4.svg","/fixtures/art/roblox_play_5.svg","/fixtures/art/roblox_play_6.svg","/fixtures/art/roblox_play_7.svg","/fixtures/art/roblox_play_8.svg","/fixtures/art/roblox_play_9.svg","/fixtures/art/roblox_play_10.svg","/fixtures/art/roblox_play_11.svg"],"fps":8}}
+{"seq":157,"t":28720,"run":"main","node":"r.build","type":"node.evidence","kind":"frames","uri":"/fixtures/art/roblox_play_0.svg","caption":"Roblox · play","meta":{"frames":["/fixtures/art/roblox_play_0.svg","/fixtures/art/roblox_play_1.svg","/fixtures/art/roblox_play_2.svg","/fixtures/art/roblox_play_3.svg","/fixtures/art/roblox_play_4.svg","/fixtures/art/roblox_play_5.svg","/fixtures/art/roblox_play_6.svg","/fixtures/art/roblox_play_7.svg","/fixtures/art/roblox_play_8.svg","/fixtures/art/roblox_play_9.svg","/fixtures/art/roblox_play_10.svg","/fixtures/art/roblox_play_11.svg"],"fps":8,"loop":true}}
+{"seq":158,"t":28750,"run":"main","node":"r.build","type":"node.output","name":"Roblox game","uri":"/fixtures/art/roblox_play_0.svg","kind":"link","href":"https://roblox.test/games/kart-brawl"}
+{"seq":159,"t":29000,"run":"main","node":"u.track","type":"node.done","summary":"verified"}
+{"seq":160,"t":29117,"run":"main","node":"u.karts","type":"node.done","summary":"verified"}
+{"seq":161,"t":29234,"run":"main","node":"u.combat","type":"node.done","summary":"verified"}
+{"seq":162,"t":29351,"run":"main","node":"u.humanoids","type":"node.done","summary":"verified"}
+{"seq":163,"t":29468,"run":"main","node":"u.ui","type":"node.done","summary":"verified"}
+{"seq":164,"t":29585,"run":"main","node":"u.build","type":"node.done","summary":"verified"}
+{"seq":165,"t":29702,"run":"main","node":"unity","type":"node.done","summary":"verified"}
+{"seq":166,"t":29819,"run":"main","node":"r.track","type":"node.done","summary":"verified"}
+{"seq":167,"t":29936,"run":"main","node":"r.karts","type":"node.done","summary":"verified"}
+{"seq":168,"t":30053,"run":"main","node":"r.combat","type":"node.done","summary":"verified"}
+{"seq":169,"t":30170,"run":"main","node":"r.humanoids","type":"node.done","summary":"verified"}
+{"seq":170,"t":30287,"run":"main","node":"r.ui","type":"node.done","summary":"verified"}
+{"seq":171,"t":30404,"run":"main","node":"r.build","type":"node.done","summary":"verified"}
+{"seq":172,"t":30521,"run":"main","node":"roblox","type":"node.done","summary":"verified"}
+{"seq":173,"t":30638,"run":"main","node":"game","type":"node.done","summary":"verified"}
+{"seq":174,"t":30755,"run":"main","node":"a.image","type":"node.done","summary":"verified"}
+{"seq":175,"t":30872,"run":"main","node":"a.cutout","type":"node.done","summary":"verified"}
+{"seq":176,"t":30989,"run":"main","node":"a.mesh","type":"node.done","summary":"verified"}
+{"seq":177,"t":31106,"run":"main","node":"a.rig","type":"node.done","summary":"verified"}
+{"seq":178,"t":31223,"run":"main","node":"a.video","type":"node.done","summary":"verified"}
+{"seq":179,"t":31340,"run":"main","node":"assets","type":"node.done","summary":"verified"}
+{"seq":180,"t":31457,"run":"main","node":"trailer","type":"node.done","summary":"verified"}
+{"seq":181,"t":31574,"run":"main","node":"c.explainer","type":"node.done","summary":"verified"}
+{"seq":182,"t":31691,"run":"main","node":"c.premise","type":"node.done","summary":"verified"}
+{"seq":183,"t":31808,"run":"main","node":"c.ad","type":"node.done","summary":"verified"}
+{"seq":184,"t":31925,"run":"main","node":"voice","type":"node.done","summary":"verified"}
+{"seq":185,"t":32042,"run":"main","node":"campaign","type":"node.done","summary":"verified"}
+{"seq":186,"t":32159,"run":"main","node":"host","type":"node.done","summary":"verified"}
+{"seq":187,"t":32276,"run":"main","node":"recorder","type":"node.done","summary":"verified"}
+{"seq":188,"t":32513,"run":"main","node":"verifier","type":"node.done","summary":"30 cells verified"}
+{"seq":189,"t":32693,"run":"main","node":"root","type":"node.done","summary":"all done"}
+{"seq":190,"t":32793,"run":"main","node":"root","type":"run.done"}

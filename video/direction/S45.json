@@ -1,0 +1,48 @@
+{
+  "shot": "S45",
+  "draft": true,
+  "view": "rain",
+  "take": "main",
+  "mergeTakes": [
+    "night",
+    "crossplay",
+    "realistic",
+    "music",
+    "house.image",
+    "house.red",
+    "house.cutout",
+    "house.plan",
+    "house.blender",
+    "house.render",
+    "house.video",
+    "study",
+    "cad",
+    "cad.sim",
+    "pcb",
+    "forecast",
+    "anomaly",
+    "car.house",
+    "house.game"
+  ],
+  "params": {
+    "rate": 4,
+    "offset": 16,
+    "title": "and anything..."
+  },
+  "camera": [
+    {
+      "beat": 0,
+      "target": "all",
+      "zoom": 1,
+      "dur": 0
+    },
+    {
+      "beat": 0,
+      "target": "all",
+      "zoom": 0.7000000000000001,
+      "dur": 8,
+      "ease": "none"
+    }
+  ],
+  "note": "draft from shots.json: Prompts every quarter beat, blurring. Title: 'and anything...'"
+}

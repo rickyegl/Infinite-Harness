@@ -1,0 +1,8 @@
+{"seq":1,"t":0,"run":"house.render","node":"root","type":"run.start","prompt":"Render it."}
+{"seq":2,"t":0,"run":"house.render","node":"root","type":"node.spawn","parent":null,"module":"root","label":"Render it.","kind":"root"}
+{"seq":3,"t":0,"run":"house.render","node":"root","type":"node.state","state":"running"}
+{"seq":4,"t":100,"run":"house.render","node":"cell","type":"node.spawn","parent":"root","module":"blender.render","label":"Render","kind":"agent"}
+{"seq":5,"t":150,"run":"house.render","node":"cell","type":"node.state","state":"running"}
+{"seq":6,"t":300,"run":"house.render","node":"cell","type":"node.evidence","kind":"image","uri":"/fixtures/art/house_render.svg","meta":{"reveal":"noise","revealBeats":3,"fit":"cover"}}
+{"seq":7,"t":350,"run":"house.render","node":"cell","type":"node.done","summary":"done"}
+{"seq":8,"t":400,"run":"house.render","node":"root","type":"run.done"}

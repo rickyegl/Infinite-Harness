@@ -1,0 +1,42 @@
+{
+  "draft": false,
+  "shot": "S19",
+  "view": "split",
+  "take": "main",
+  "events": {
+    "at": [
+      [
+        0,
+        32300
+      ],
+      [
+        4,
+        34000
+      ]
+    ]
+  },
+  "camera": [
+    {
+      "beat": 0,
+      "target": "all",
+      "dur": 0
+    }
+  ],
+  "params": {
+    "left": {
+      "node": "host",
+      "kind": "link",
+      "label": "Play in browser"
+    },
+    "right": {
+      "node": "r.build",
+      "kind": "link",
+      "label": "Roblox"
+    },
+    "rise": true,
+    "lit": [
+      "host",
+      "r.build"
+    ]
+  }
+}

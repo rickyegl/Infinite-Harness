@@ -1,0 +1,22 @@
+{
+  "draft": false,
+  "shot": "S34",
+  "view": "banner",
+  "take": "house.video",
+  "events": {
+    "at": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        468.75
+      ]
+    ]
+  },
+  "params": {
+    "title": "VIDEO",
+    "say": "Make it a video."
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "draft": false,
+  "shot": "S27",
+  "view": "prompt",
+  "params": {
+    "say": "I'm not done.",
+    "slam": true,
+    "glitch": [
+      0,
+      0.75
+    ],
+    "typeBeats": [
+      0.5,
+      2
+    ]
+  },
+  "fx": [
+    {
+      "type": "punch",
+      "beat": 0,
+      "dur": 0.5,
+      "amount": 0.08
+    }
+  ],
+  "note": "Wordmark glitches, the box slams back."
+}

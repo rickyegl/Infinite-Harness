@@ -1,0 +1,40 @@
+{
+  "draft": false,
+  "shot": "S22",
+  "view": "split",
+  "take": "crossplay",
+  "events": {
+    "at": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        468.75
+      ]
+    ]
+  },
+  "camera": [
+    {
+      "beat": 0,
+      "target": "all",
+      "dur": 0
+    }
+  ],
+  "params": {
+    "left": {
+      "node": "unity",
+      "label": "Unity"
+    },
+    "right": {
+      "node": "roblox",
+      "label": "Roblox"
+    },
+    "lit": [
+      "relay"
+    ],
+    "link": 4
+  },
+  "note": "A line links the windows on the second downbeat."
+}

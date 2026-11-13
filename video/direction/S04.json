@@ -1,0 +1,39 @@
+{
+  "draft": false,
+  "shot": "S04",
+  "view": "prompt",
+  "take": "main",
+  "events": {
+    "at": [
+      [
+        0,
+        0
+      ],
+      [
+        4,
+        0
+      ]
+    ]
+  },
+  "params": {
+    "say": "Also make a game trailer.",
+    "typeBeats": [
+      0,
+      2
+    ],
+    "chipsBefore": [
+      {
+        "label": "Unity"
+      },
+      {
+        "label": "Roblox"
+      }
+    ],
+    "chips": [
+      {
+        "label": "Trailer",
+        "beat": 2
+      }
+    ]
+  }
+}

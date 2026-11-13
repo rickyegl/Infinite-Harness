@@ -1,0 +1,47 @@
+{
+  "shot": "S43",
+  "draft": true,
+  "view": "rain",
+  "take": "main",
+  "mergeTakes": [
+    "night",
+    "crossplay",
+    "realistic",
+    "music",
+    "house.image",
+    "house.red",
+    "house.cutout",
+    "house.plan",
+    "house.blender",
+    "house.render",
+    "house.video",
+    "study",
+    "cad",
+    "cad.sim",
+    "pcb",
+    "forecast",
+    "anomaly",
+    "car.house",
+    "house.game"
+  ],
+  "params": {
+    "rate": 1,
+    "offset": 0
+  },
+  "camera": [
+    {
+      "beat": 0,
+      "target": "all",
+      "zoom": 1.6,
+      "dur": 0
+    },
+    {
+      "beat": 0,
+      "target": "all",
+      "zoom": 1.3,
+      "dur": 8,
+      "ease": "none"
+    }
+  ],
+  "note": "draft from shots.json: Slow zoom out. The graph now holds every cell from the film. Evidence fades. Prompts swipe through the text box, one per beat."
+}

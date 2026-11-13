@@ -1,0 +1,30 @@
+{
+  "draft": false,
+  "shot": "S41",
+  "view": "banner",
+  "take": "car.house",
+  "events": {
+    "at": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        468.75
+      ]
+    ]
+  },
+  "params": {
+    "title": "3D",
+    "say": "Put the car on the house."
+  },
+  "fx": [
+    {
+      "type": "shake",
+      "beat": 4,
+      "dur": 0.5,
+      "amp": 16
+    }
+  ]
+}

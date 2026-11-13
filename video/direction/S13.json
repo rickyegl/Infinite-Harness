@@ -1,0 +1,65 @@
+{
+  "draft": false,
+  "shot": "S13",
+  "view": "graph",
+  "take": "main",
+  "events": {
+    "at": [
+      [
+        0,
+        14000
+      ],
+      [
+        4,
+        16000
+      ],
+      [
+        8,
+        17900
+      ]
+    ]
+  },
+  "camera": [
+    {
+      "beat": 0,
+      "target": [
+        "unity",
+        "u.karts",
+        "r.karts"
+      ],
+      "zoom": 1,
+      "dur": 0
+    },
+    {
+      "beat": 0.25,
+      "target": [
+        "u.karts",
+        "r.karts",
+        "assets"
+      ],
+      "dur": 1.75
+    },
+    {
+      "beat": 3,
+      "target": [
+        "assets",
+        "a.image",
+        "a.cutout",
+        "a.mesh",
+        "a.rig",
+        "a.video"
+      ],
+      "zoom": 0.95,
+      "dur": 1
+    }
+  ],
+  "fx": [
+    {
+      "type": "punch",
+      "beat": 0,
+      "dur": 0.5,
+      "amount": 0.03
+    }
+  ],
+  "note": "Requests fire on the first downbeat; follow them to Assets; thumbnails pop on beats 1-4 of bar 2."
+}

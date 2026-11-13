@@ -1,0 +1,43 @@
+{
+  "draft": false,
+  "shot": "S18",
+  "view": "graph",
+  "take": "main",
+  "events": {
+    "at": [
+      [
+        0,
+        28000
+      ],
+      [
+        1,
+        29000
+      ],
+      [
+        4,
+        32200
+      ]
+    ]
+  },
+  "camera": [
+    {
+      "beat": 0,
+      "target": [
+        "host",
+        "recorder",
+        "verifier"
+      ],
+      "zoom": 1,
+      "dur": 0
+    },
+    {
+      "beat": 0,
+      "target": "all",
+      "dur": 1
+    }
+  ],
+  "params": {
+    "verify": true
+  },
+  "note": "Recorder picture in picture, then one check per 16th note."
+}

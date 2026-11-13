@@ -1,0 +1,41 @@
+{
+  "draft": false,
+  "shot": "S11",
+  "view": "focus",
+  "take": "main",
+  "focus": "u.karts",
+  "events": {
+    "at": [
+      [
+        0,
+        8000
+      ],
+      [
+        4,
+        11750
+      ]
+    ]
+  },
+  "camera": [
+    {
+      "beat": 0,
+      "target": [
+        "unity",
+        "u.karts"
+      ],
+      "zoom": 1,
+      "dur": 0
+    },
+    {
+      "beat": 0,
+      "target": "u.karts",
+      "zoom": 2.4,
+      "dur": 1,
+      "ease": "power3.in"
+    }
+  ],
+  "params": {
+    "revealMs": 300
+  },
+  "note": "Unity > Karts: steps on 8th notes (take runs 2x), frames, then the code diff."
+}

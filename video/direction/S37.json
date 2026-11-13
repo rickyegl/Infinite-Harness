@@ -1,0 +1,30 @@
+{
+  "shot": "S37",
+  "draft": true,
+  "view": "banner",
+  "take": "cad.sim",
+  "events": {
+    "at": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        468.75
+      ]
+    ]
+  },
+  "params": {
+    "title": "SIM",
+    "say": ""
+  },
+  "camera": [
+    {
+      "beat": 0,
+      "target": "all",
+      "dur": 0
+    }
+  ],
+  "note": "draft from shots.json: The robot shooting inside the FRC simulator."
+}

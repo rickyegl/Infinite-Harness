@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="1280" viewBox="0 0 720 1280">
+    <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0e1a2e"/><stop offset="1" stop-color="#123a52"/></linearGradient></defs>
+    <rect width="720" height="1280" fill="url(#g)"/>
+    
+    <g transform="translate(0,382.8224001611973)"><g transform="translate(360,300) scale(3.2)">
+    <rect x="-46" y="-18" width="92" height="26" rx="8" fill="#00a2ff"/>
+    <rect x="-30" y="-30" width="40" height="14" rx="5" fill="#00a2ff" opacity="0.85"/>
+    <circle cx="-30" cy="10" r="11" fill="#111"/><circle cx="30" cy="10" r="11" fill="#111"/>
+    <circle cx="-8" cy="-48" r="11" fill="#ffd166"/>
+    <line x1="-8" y1="-38" x2="-8" y2="-22" stroke="#ffd166" stroke-width="8" stroke-linecap="round"/>
+    <line x1="-8" y1="-34" x2="11.2" y2="-47.8" stroke="#ffd166" stroke-width="6" stroke-linecap="round"/>
+  </g></g>
+    <rect x="60" y="980" width="600" height="8" rx="4" fill="#00a2ff" opacity="0.8"/>
+    <text x="60" y="1080" font-family="sans-serif" font-weight="700" font-size="64" fill="#fff">Kart Brawl</text>
+    <text x="60" y="1150" font-family="sans-serif" font-size="34" fill="#cfd8e8">now on Roblox</text></svg>

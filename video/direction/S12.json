@@ -1,0 +1,46 @@
+{
+  "draft": false,
+  "shot": "S12",
+  "view": "focus",
+  "take": "main",
+  "focus": "r.combat",
+  "events": {
+    "at": [
+      [
+        0,
+        11200
+      ],
+      [
+        4,
+        14000
+      ]
+    ]
+  },
+  "camera": [
+    {
+      "beat": 0,
+      "target": "u.karts",
+      "zoom": 2.4,
+      "dur": 0
+    },
+    {
+      "beat": 0,
+      "target": "r.combat",
+      "zoom": 2.4,
+      "dur": 0.5,
+      "ease": "power4.inOut"
+    }
+  ],
+  "fx": [
+    {
+      "type": "blur",
+      "beat": 0,
+      "dur": 0.5,
+      "amount": 14
+    }
+  ],
+  "params": {
+    "revealMs": 240
+  },
+  "note": "Whip-pan from Unity to Roblox > Combat."
+}

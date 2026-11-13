@@ -1,0 +1,8 @@
+{"seq":1,"t":0,"run":"house.video","node":"root","type":"run.start","prompt":"Make it a video."}
+{"seq":2,"t":0,"run":"house.video","node":"root","type":"node.spawn","parent":null,"module":"root","label":"Make it a video.","kind":"root"}
+{"seq":3,"t":0,"run":"house.video","node":"root","type":"node.state","state":"running"}
+{"seq":4,"t":100,"run":"house.video","node":"cell","type":"node.spawn","parent":"root","module":"assets.video","label":"Video","kind":"tool","maker":"qwen"}
+{"seq":5,"t":150,"run":"house.video","node":"cell","type":"node.state","state":"running"}
+{"seq":6,"t":300,"run":"house.video","node":"cell","type":"node.evidence","kind":"frames","uri":"/fixtures/art/house_video_0.svg","meta":{"frames":["/fixtures/art/house_video_0.svg","/fixtures/art/house_video_1.svg","/fixtures/art/house_video_2.svg","/fixtures/art/house_video_3.svg","/fixtures/art/house_video_4.svg","/fixtures/art/house_video_5.svg","/fixtures/art/house_video_6.svg","/fixtures/art/house_video_7.svg","/fixtures/art/house_video_8.svg","/fixtures/art/house_video_9.svg"],"fps":6,"loop":true,"fit":"cover"}}
+{"seq":7,"t":350,"run":"house.video","node":"cell","type":"node.done","summary":"done"}
+{"seq":8,"t":400,"run":"house.video","node":"root","type":"run.done"}

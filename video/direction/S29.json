@@ -1,0 +1,23 @@
+{
+  "draft": false,
+  "shot": "S29",
+  "view": "banner",
+  "take": "house.red",
+  "events": {
+    "at": [
+      [
+        0,
+        300
+      ],
+      [
+        1,
+        768.75
+      ]
+    ]
+  },
+  "params": {
+    "title": "IMAGE EDIT",
+    "say": "Make the walls red."
+  },
+  "note": "Match cut on the first downbeat."
+}

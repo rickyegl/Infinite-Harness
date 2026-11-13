@@ -1,0 +1,17 @@
+{"seq":1,"t":0,"run":"night","node":"root","type":"run.start","prompt":"Make it night."}
+{"seq":2,"t":0,"run":"night","node":"root","type":"node.spawn","parent":null,"module":"root","label":"Make it night.","kind":"root"}
+{"seq":3,"t":0,"run":"night","node":"root","type":"node.state","state":"running"}
+{"seq":4,"t":200,"run":"night","node":"roblox","type":"node.spawn","parent":"root","module":"game.roblox","label":"Roblox","kind":"orchestrator"}
+{"seq":5,"t":220,"run":"night","node":"roblox","type":"node.state","state":"running"}
+{"seq":6,"t":300,"run":"night","node":"roblox","type":"node.evidence","kind":"frames","uri":"/fixtures/art/roblox_play_0.svg","meta":{"frames":["/fixtures/art/roblox_play_0.svg","/fixtures/art/roblox_play_1.svg","/fixtures/art/roblox_play_2.svg","/fixtures/art/roblox_play_3.svg","/fixtures/art/roblox_play_4.svg","/fixtures/art/roblox_play_5.svg","/fixtures/art/roblox_play_6.svg","/fixtures/art/roblox_play_7.svg","/fixtures/art/roblox_play_8.svg","/fixtures/art/roblox_play_9.svg","/fixtures/art/roblox_play_10.svg","/fixtures/art/roblox_play_11.svg"],"fps":8,"loop":true}}
+{"seq":7,"t":400,"run":"night","node":"lighting","type":"node.spawn","parent":"roblox","module":"game.roblox.lighting","label":"Lighting","kind":"agent"}
+{"seq":8,"t":420,"run":"night","node":"lighting","type":"node.state","state":"running"}
+{"seq":9,"t":500,"run":"night","node":"premise","type":"node.spawn","parent":"root","module":"campaign.reel","label":"Premise reel","kind":"agent"}
+{"seq":10,"t":520,"run":"night","node":"premise","type":"node.state","state":"running"}
+{"seq":11,"t":600,"run":"night","node":"premise","type":"node.evidence","kind":"frames","uri":"/fixtures/art/reel_premise_0.svg","caption":"premise ad","meta":{"frames":["/fixtures/art/reel_premise_0.svg","/fixtures/art/reel_premise_1.svg","/fixtures/art/reel_premise_2.svg","/fixtures/art/reel_premise_3.svg","/fixtures/art/reel_premise_4.svg","/fixtures/art/reel_premise_5.svg"],"fps":4,"loop":true}}
+{"seq":12,"t":800,"run":"night","node":"lighting","type":"node.step","title":"Night sky, headlights, neon"}
+{"seq":13,"t":1875,"run":"night","node":"roblox","type":"node.evidence","kind":"frames","uri":"/fixtures/art/night_play_0.svg","meta":{"frames":["/fixtures/art/night_play_0.svg","/fixtures/art/night_play_1.svg","/fixtures/art/night_play_2.svg","/fixtures/art/night_play_3.svg","/fixtures/art/night_play_4.svg","/fixtures/art/night_play_5.svg","/fixtures/art/night_play_6.svg","/fixtures/art/night_play_7.svg"],"fps":8,"loop":true}}
+{"seq":14,"t":1875,"run":"night","node":"premise","type":"node.evidence","kind":"frames","uri":"/fixtures/art/reel_premise_night_0.svg","caption":"premise ad · night","meta":{"frames":["/fixtures/art/reel_premise_night_0.svg","/fixtures/art/reel_premise_night_1.svg","/fixtures/art/reel_premise_night_2.svg","/fixtures/art/reel_premise_night_3.svg","/fixtures/art/reel_premise_night_4.svg","/fixtures/art/reel_premise_night_5.svg"],"fps":4,"loop":true}}
+{"seq":15,"t":1875,"run":"night","node":"lighting","type":"node.done","summary":"night"}
+{"seq":16,"t":1900,"run":"night","node":"premise","type":"node.output","name":"Premise reel (night)","uri":"/fixtures/art/reel_premise_night_0.svg","kind":"video"}
+{"seq":17,"t":4000,"run":"night","node":"root","type":"run.done"}

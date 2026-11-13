@@ -1,0 +1,11 @@
+{
+  "draft": false,
+  "shot": "S01",
+  "view": "prompt",
+  "params": {
+    "say": "",
+    "push": 0.02,
+    "appear": 0
+  },
+  "note": "Box alone, caret on the beat, 2% push."
+}

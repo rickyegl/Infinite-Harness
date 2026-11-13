@@ -1,0 +1,40 @@
+{
+  "draft": false,
+  "shot": "S21",
+  "view": "split",
+  "take": "night",
+  "events": {
+    "at": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        468.75
+      ]
+    ]
+  },
+  "camera": [
+    {
+      "beat": 0,
+      "target": "all",
+      "dur": 0
+    }
+  ],
+  "params": {
+    "say": "Make it night.",
+    "left": {
+      "node": "premise",
+      "label": "Premise ad"
+    },
+    "right": {
+      "node": "roblox",
+      "label": "Roblox"
+    },
+    "lit": [
+      "lighting"
+    ]
+  },
+  "note": "Day to night as a match cut on the second downbeat."
+}

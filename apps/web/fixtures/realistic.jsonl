@@ -1,0 +1,12 @@
+{"seq":1,"t":0,"run":"realistic","node":"root","type":"run.start","prompt":"Make it realistic."}
+{"seq":2,"t":0,"run":"realistic","node":"root","type":"node.spawn","parent":null,"module":"root","label":"Make it realistic.","kind":"root"}
+{"seq":3,"t":0,"run":"realistic","node":"root","type":"node.state","state":"running"}
+{"seq":4,"t":200,"run":"realistic","node":"unity","type":"node.spawn","parent":"root","module":"game.unity","label":"Unity","kind":"orchestrator"}
+{"seq":5,"t":220,"run":"realistic","node":"unity","type":"node.state","state":"running"}
+{"seq":6,"t":300,"run":"realistic","node":"unity","type":"node.evidence","kind":"image","uri":"/fixtures/art/unity_play_2.svg","caption":"Unity"}
+{"seq":7,"t":400,"run":"realistic","node":"shaders","type":"node.spawn","parent":"unity","module":"game.unity.shaders","label":"Shaders","kind":"agent"}
+{"seq":8,"t":420,"run":"realistic","node":"shaders","type":"node.state","state":"running"}
+{"seq":9,"t":600,"run":"realistic","node":"shaders","type":"node.step","title":"Post-processing, reflections, lighting"}
+{"seq":10,"t":1875,"run":"realistic","node":"unity","type":"node.evidence","kind":"image","uri":"/fixtures/art/real_play_2.svg","caption":"Unity · upgraded","meta":{"reveal":"wipe","wipeBeats":2}}
+{"seq":11,"t":1875,"run":"realistic","node":"shaders","type":"node.done","summary":"HDRP look"}
+{"seq":12,"t":4000,"run":"realistic","node":"root","type":"run.done"}

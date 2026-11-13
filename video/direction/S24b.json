@@ -1,0 +1,30 @@
+{
+  "draft": false,
+  "shot": "S24b",
+  "view": "wall",
+  "take": "main",
+  "events": {
+    "at": [
+      [
+        0,
+        40000
+      ],
+      [
+        1,
+        40000
+      ]
+    ]
+  },
+  "params": {
+    "layout": "reels",
+    "items": [
+      "Trailer (vertical)",
+      "Explainer",
+      "Premise reel"
+    ],
+    "stagger": 4,
+    "fadeBeats": 1,
+    "push": 0.02
+  },
+  "note": "One reel per bar, each fading in over one beat."
+}

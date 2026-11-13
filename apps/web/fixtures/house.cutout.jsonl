@@ -1,0 +1,8 @@
+{"seq":1,"t":0,"run":"house.cutout","node":"root","type":"run.start","prompt":"Transparent background."}
+{"seq":2,"t":0,"run":"house.cutout","node":"root","type":"node.spawn","parent":null,"module":"root","label":"Transparent background.","kind":"root"}
+{"seq":3,"t":0,"run":"house.cutout","node":"root","type":"node.state","state":"running"}
+{"seq":4,"t":100,"run":"house.cutout","node":"cell","type":"node.spawn","parent":"root","module":"assets.cutout","label":"Cutout","kind":"tool","maker":"birefnet"}
+{"seq":5,"t":150,"run":"house.cutout","node":"cell","type":"node.state","state":"running"}
+{"seq":6,"t":300,"run":"house.cutout","node":"cell","type":"node.evidence","kind":"image","uri":"/fixtures/art/house_cutout.svg","meta":{"before":"/fixtures/art/house_red.svg","reveal":"fade","fit":"contain"}}
+{"seq":7,"t":350,"run":"house.cutout","node":"cell","type":"node.done","summary":"done"}
+{"seq":8,"t":400,"run":"house.cutout","node":"root","type":"run.done"}

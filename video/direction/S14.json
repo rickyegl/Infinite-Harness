@@ -1,0 +1,48 @@
+{
+  "draft": false,
+  "shot": "S14",
+  "view": "split",
+  "take": "main",
+  "events": {
+    "at": [
+      [
+        0,
+        18000
+      ],
+      [
+        1,
+        19100
+      ],
+      [
+        4,
+        20000
+      ]
+    ]
+  },
+  "camera": [
+    {
+      "beat": 0,
+      "target": "all",
+      "dur": 0
+    }
+  ],
+  "params": {
+    "left": {
+      "node": "u.karts",
+      "kind": "model3d",
+      "label": "Unity"
+    },
+    "right": {
+      "node": "r.karts",
+      "kind": "model3d",
+      "label": "Roblox"
+    },
+    "lit": [
+      "assets",
+      "u.karts",
+      "r.karts"
+    ],
+    "rise": true
+  },
+  "note": "The same model lands in both engines on beat 2; both viewports flash."
+}

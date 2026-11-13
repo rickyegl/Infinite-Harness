@@ -1,0 +1,10 @@
+{
+  "shot": "S47",
+  "draft": true,
+  "view": "title",
+  "params": {
+    "mode": "end",
+    "sub": "Built with AI"
+  },
+  "note": "draft from shots.json: 'Built with AI' under the wordmark. Fade to black."
+}

@@ -1,0 +1,30 @@
+{
+  "shot": "S42",
+  "draft": true,
+  "view": "banner",
+  "take": "house.game",
+  "events": {
+    "at": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        468.75
+      ]
+    ]
+  },
+  "params": {
+    "title": "GAME",
+    "say": "Put the house on the game."
+  },
+  "camera": [
+    {
+      "beat": 0,
+      "target": "all",
+      "dur": 0
+    }
+  ],
+  "note": "draft from shots.json: The house, kart still on its roof, stands beside the Unity track as racers fight past it."
+}

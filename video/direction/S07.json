@@ -1,0 +1,56 @@
+{
+  "draft": false,
+  "shot": "S07",
+  "view": "prompt",
+  "take": "main",
+  "events": {
+    "at": [
+      [
+        0,
+        0
+      ],
+      [
+        8,
+        0
+      ]
+    ]
+  },
+  "params": {
+    "say": "oh, and at the end Show the process on a video.",
+    "typeBeats": [
+      0,
+      5
+    ],
+    "chipsBefore": [
+      {
+        "label": "Unity"
+      },
+      {
+        "label": "Roblox"
+      },
+      {
+        "label": "Trailer"
+      },
+      {
+        "label": "Campaign",
+        "sub": [
+          "Explainer",
+          "Reel",
+          "Image"
+        ]
+      },
+      {
+        "label": "Host",
+        "globe": true
+      }
+    ],
+    "chips": [
+      {
+        "label": "Recorder",
+        "dot": true,
+        "beat": 4
+      }
+    ]
+  },
+  "note": "The record dot starts blinking here and blinks for the rest of the film (REC mark in the graph views)."
+}

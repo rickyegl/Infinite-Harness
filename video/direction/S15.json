@@ -1,0 +1,35 @@
+{
+  "draft": false,
+  "shot": "S15",
+  "view": "focus",
+  "take": "main",
+  "focus": "trailer",
+  "events": {
+    "at": [
+      [
+        0,
+        20000
+      ],
+      [
+        4,
+        22500
+      ]
+    ]
+  },
+  "camera": [
+    {
+      "beat": 0,
+      "target": "all",
+      "dur": 0
+    },
+    {
+      "beat": 0,
+      "target": "trailer",
+      "zoom": 2.4,
+      "dur": 1
+    }
+  ],
+  "params": {
+    "revealMs": 380
+  }
+}

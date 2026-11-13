@@ -1,0 +1,34 @@
+{
+  "draft": false,
+  "shot": "S30",
+  "view": "banner",
+  "take": "house.cutout",
+  "events": {
+    "at": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        468.75
+      ]
+    ]
+  },
+  "params": {
+    "title": "CUTOUT",
+    "say": "Transparent background.",
+    "graphBehind": true
+  },
+  "mergeTakes": [
+    "main"
+  ],
+  "camera": [
+    {
+      "beat": 0,
+      "target": "all",
+      "zoom": 1.1,
+      "dur": 0
+    }
+  ]
+}

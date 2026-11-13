@@ -1,0 +1,9 @@
+{"seq":1,"t":0,"run":"pcb","node":"root","type":"run.start","prompt":"Make a PCB."}
+{"seq":2,"t":0,"run":"pcb","node":"root","type":"node.spawn","parent":null,"module":"root","label":"Make a PCB.","kind":"root"}
+{"seq":3,"t":0,"run":"pcb","node":"root","type":"node.state","state":"running"}
+{"seq":4,"t":100,"run":"pcb","node":"cell","type":"node.spawn","parent":"root","module":"pcb","label":"PCB","kind":"agent"}
+{"seq":5,"t":150,"run":"pcb","node":"cell","type":"node.state","state":"running"}
+{"seq":6,"t":300,"run":"pcb","node":"cell","type":"node.evidence","kind":"frames","uri":"/fixtures/art/pcb_0.svg","caption":"routing","meta":{"frames":["/fixtures/art/pcb_0.svg","/fixtures/art/pcb_1.svg","/fixtures/art/pcb_2.svg","/fixtures/art/pcb_3.svg","/fixtures/art/pcb_4.svg","/fixtures/art/pcb_5.svg"],"fps":6,"loop":false}}
+{"seq":7,"t":938,"run":"pcb","node":"cell","type":"node.evidence","kind":"model3d","uri":"board.step","caption":"3D view","meta":{"procedural":"board","angle":0.2,"orbit":0.6}}
+{"seq":8,"t":988,"run":"pcb","node":"cell","type":"node.done","summary":"done"}
+{"seq":9,"t":1038,"run":"pcb","node":"root","type":"run.done"}

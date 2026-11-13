@@ -1,0 +1,27 @@
+{
+  "draft": false,
+  "shot": "S35",
+  "view": "banner",
+  "take": "study",
+  "events": {
+    "at": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        468.75
+      ]
+    ]
+  },
+  "params": {
+    "title": "STUDY",
+    "say": "Check all presentations on Canvas and make a study guide for every... single... test.",
+    "typeBeats": [
+      0,
+      8
+    ]
+  },
+  "note": "Hits on every (beat 8), single (beat 10), test (beat 12)."
+}

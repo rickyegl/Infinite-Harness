@@ -1,0 +1,8 @@
+{"seq":1,"t":0,"run":"forecast","node":"root","type":"run.start","prompt":"Forecast demand."}
+{"seq":2,"t":0,"run":"forecast","node":"root","type":"node.spawn","parent":null,"module":"root","label":"Forecast demand.","kind":"root"}
+{"seq":3,"t":0,"run":"forecast","node":"root","type":"node.state","state":"running"}
+{"seq":4,"t":100,"run":"forecast","node":"cell","type":"node.spawn","parent":"root","module":"forecast","label":"Forecast","kind":"tool","maker":"timesfm"}
+{"seq":5,"t":150,"run":"forecast","node":"cell","type":"node.state","state":"running"}
+{"seq":6,"t":300,"run":"forecast","node":"cell","type":"node.evidence","kind":"chart","uri":"forecast.json","caption":"demand · 16 weeks ahead","meta":{"history":[106,106.4,107.9,121.6,128.7,122.4,122.5,130.6,126.6,114.7,114.6,118.3,109,100.5,106.8,111.6,105.5,107.5,121.9,128.1,126.3,136.1,151,152,149.3,158.5,164.8,156.2,150.7,156.2,153.3,140.4,138.1,144.2,139.5,132.1,139.8,150,148.1,150.1,165.4,175,172.8,178.6,192,192.7,185.4,189.3],"forecast":[200.1,198.1,195.6,192.9,190.6,188.9,188.3,189,190.9,194.2,198.7,204.1,210,216.1,221.8,226.9],"band":[[196.1,204.1],[193.3,202.9],[190,201.2],[186.5,199.3],[183.4,197.8],[180.9,196.9],[179.5,197.1],[179.4,198.6],[180.5,201.3],[183,205.4],[186.7,210.7],[191.3,216.9],[196.4,223.6],[201.7,230.5],[206.6,237],[210.9,242.9]],"drawBeats":1.5}}
+{"seq":7,"t":350,"run":"forecast","node":"cell","type":"node.done","summary":"done"}
+{"seq":8,"t":400,"run":"forecast","node":"root","type":"run.done"}

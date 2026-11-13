@@ -1,0 +1,47 @@
+{
+  "draft": false,
+  "shot": "S05",
+  "view": "prompt",
+  "take": "main",
+  "events": {
+    "at": [
+      [
+        0,
+        0
+      ],
+      [
+        8,
+        0
+      ]
+    ]
+  },
+  "params": {
+    "say": "also Make an ad campaign tailored to Unity and Roblox players",
+    "typeBeats": [
+      0,
+      5
+    ],
+    "chipsBefore": [
+      {
+        "label": "Unity"
+      },
+      {
+        "label": "Roblox"
+      },
+      {
+        "label": "Trailer"
+      }
+    ],
+    "chips": [
+      {
+        "label": "Campaign",
+        "sub": [
+          "Explainer",
+          "Reel",
+          "Image"
+        ],
+        "beat": 4
+      }
+    ]
+  }
+}

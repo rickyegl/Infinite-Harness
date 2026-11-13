@@ -1,0 +1,22 @@
+{
+  "draft": false,
+  "shot": "S31",
+  "view": "banner",
+  "take": "house.plan",
+  "events": {
+    "at": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        468.75
+      ]
+    ]
+  },
+  "params": {
+    "title": "DRAFTING",
+    "say": "Design the house."
+  }
+}

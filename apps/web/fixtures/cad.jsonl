@@ -1,0 +1,8 @@
+{"seq":1,"t":0,"run":"cad","node":"root","type":"run.start","prompt":"CAD a drum shooter FRC robot prototype."}
+{"seq":2,"t":0,"run":"cad","node":"root","type":"node.spawn","parent":null,"module":"root","label":"CAD a drum shooter FRC robot prototype.","kind":"root"}
+{"seq":3,"t":0,"run":"cad","node":"root","type":"node.state","state":"running"}
+{"seq":4,"t":100,"run":"cad","node":"cell","type":"node.spawn","parent":"root","module":"cad","label":"CAD","kind":"agent"}
+{"seq":5,"t":150,"run":"cad","node":"cell","type":"node.state","state":"running"}
+{"seq":6,"t":300,"run":"cad","node":"cell","type":"node.evidence","kind":"model3d","uri":"robot.step","caption":"frame · drum · flywheel · hood","meta":{"procedural":"robot","partBeats":0.5,"orbit":0.4}}
+{"seq":7,"t":350,"run":"cad","node":"cell","type":"node.done","summary":"done"}
+{"seq":8,"t":400,"run":"cad","node":"root","type":"run.done"}

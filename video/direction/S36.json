@@ -1,0 +1,23 @@
+{
+  "draft": false,
+  "shot": "S36",
+  "view": "banner",
+  "take": "cad",
+  "events": {
+    "at": [
+      [
+        4,
+        300
+      ],
+      [
+        5,
+        768.75
+      ]
+    ]
+  },
+  "params": {
+    "title": "CAD",
+    "say": "CAD a drum shooter FRC robot prototype."
+  },
+  "note": "Parts one per beat in the second bar."
+}

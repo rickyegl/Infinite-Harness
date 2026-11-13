@@ -1,0 +1,9 @@
+{
+  "shot": "S46",
+  "draft": true,
+  "view": "title",
+  "params": {
+    "mode": "implode"
+  },
+  "note": "draft from shots.json: Every cell implodes into the wordmark: Infinite Harness."
+}

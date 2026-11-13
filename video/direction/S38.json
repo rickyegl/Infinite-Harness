@@ -1,0 +1,30 @@
+{
+  "shot": "S38",
+  "draft": true,
+  "view": "banner",
+  "take": "pcb",
+  "events": {
+    "at": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        468.75
+      ]
+    ]
+  },
+  "params": {
+    "title": "PCB",
+    "say": "Make a [board to be decided] PCB."
+  },
+  "camera": [
+    {
+      "beat": 0,
+      "target": "all",
+      "dur": 0
+    }
+  ],
+  "note": "draft from shots.json: Board layout: traces route themselves, then the board flips to a 3D view."
+}

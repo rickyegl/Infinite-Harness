@@ -1,0 +1,32 @@
+{
+  "draft": false,
+  "shot": "S02",
+  "view": "prompt",
+  "take": "main",
+  "events": {
+    "at": [
+      [
+        0,
+        0
+      ],
+      [
+        8,
+        0
+      ]
+    ]
+  },
+  "params": {
+    "say": "Make a 3d racing game where humanoids fight while racing...",
+    "typeBeats": [
+      0,
+      5
+    ],
+    "chips": [
+      {
+        "label": "Game",
+        "beat": 4
+      }
+    ]
+  },
+  "note": "Game chip on the second downbeat."
+}

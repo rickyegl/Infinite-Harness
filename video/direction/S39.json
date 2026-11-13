@@ -1,0 +1,30 @@
+{
+  "shot": "S39",
+  "draft": true,
+  "view": "banner",
+  "take": "forecast",
+  "events": {
+    "at": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        468.75
+      ]
+    ]
+  },
+  "params": {
+    "title": "FORECAST",
+    "say": "Forecast demand."
+  },
+  "camera": [
+    {
+      "beat": 0,
+      "target": "all",
+      "dur": 0
+    }
+  ],
+  "note": "draft from shots.json: History line draws, then the forecast and its band extend to the right."
+}

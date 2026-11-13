@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720"><defs><linearGradient id="s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8ecbff"/><stop offset="1" stop-color="#e8f6ff"/></linearGradient></defs>
+    <rect width="1280" height="720" fill="url(#s)"/><rect y="520" width="1280" height="200" fill="#69b55a"/>
+    <path d="M0 520 C 200 500 400 510 640 505 C 900 500 1100 515 1280 505 L1280 520 L0 520Z" fill="#4f8a43"/>
+    <rect x="420" y="300" width="440" height="240" fill="#c83a32"/>
+    <path d="M390 310 L640 150 L890 310Z" fill="#5b4636"/>
+    <rect x="600" y="410" width="80" height="130" fill="#5a3b2a"/>
+    <rect x="470" y="350" width="90" height="70" fill="#9fd3ff" stroke="#fff" stroke-width="6"/>
+    <rect x="720" y="350" width="90" height="70" fill="#9fd3ff" stroke="#fff" stroke-width="6"/>
+    <rect x="760" y="190" width="40" height="80" fill="#5b4636"/>
+    <g transform="translate(690,200) scale(1.2)">
+    <rect x="-46" y="-18" width="92" height="26" rx="8" fill="#ff2e63"/>
+    <rect x="-30" y="-30" width="40" height="14" rx="5" fill="#ff2e63" opacity="0.85"/>
+    <circle cx="-30" cy="10" r="11" fill="#111"/><circle cx="30" cy="10" r="11" fill="#111"/>
+    <circle cx="-8" cy="-48" r="11" fill="#ffd166"/>
+    <line x1="-8" y1="-38" x2="-8" y2="-22" stroke="#ffd166" stroke-width="8" stroke-linecap="round"/>
+    <line x1="-8" y1="-34" x2="17" y2="-52.4" stroke="#ffd166" stroke-width="6" stroke-linecap="round"/>
+  </g></svg>

@@ -1,0 +1,51 @@
+{
+  "draft": false,
+  "shot": "S06",
+  "view": "prompt",
+  "take": "main",
+  "events": {
+    "at": [
+      [
+        0,
+        0
+      ],
+      [
+        4,
+        0
+      ]
+    ]
+  },
+  "params": {
+    "say": "Host the game on browser,and.",
+    "typeBeats": [
+      0,
+      2
+    ],
+    "chipsBefore": [
+      {
+        "label": "Unity"
+      },
+      {
+        "label": "Roblox"
+      },
+      {
+        "label": "Trailer"
+      },
+      {
+        "label": "Campaign",
+        "sub": [
+          "Explainer",
+          "Reel",
+          "Image"
+        ]
+      }
+    ],
+    "chips": [
+      {
+        "label": "Host",
+        "globe": true,
+        "beat": 2
+      }
+    ]
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "draft": false,
+  "shot": "S08",
+  "view": "prompt",
+  "take": "main",
+  "events": {
+    "at": [
+      [
+        0,
+        0
+      ],
+      [
+        8,
+        0
+      ]
+    ]
+  },
+  "params": {
+    "say": "Make no mistakes.",
+    "typeBeats": [
+      0,
+      2
+    ],
+    "chipsBefore": [
+      {
+        "label": "Unity"
+      },
+      {
+        "label": "Roblox"
+      },
+      {
+        "label": "Trailer"
+      },
+      {
+        "label": "Campaign",
+        "sub": [
+          "Explainer",
+          "Reel",
+          "Image"
+        ]
+      },
+      {
+        "label": "Host",
+        "globe": true
+      },
+      {
+        "label": "Recorder",
+        "dot": true
+      }
+    ],
+    "chips": [
+      {
+        "label": "Verifier",
+        "beat": 4
+      }
+    ],
+    "ring": [
+      4,
+      7
+    ]
+  },
+  "note": "Ring closes over the second bar; its last beat is silent. Enter lands on S09's first beat."
+}

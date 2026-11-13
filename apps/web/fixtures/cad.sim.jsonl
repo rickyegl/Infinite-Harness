@@ -1,0 +1,8 @@
+{"seq":1,"t":0,"run":"cad.sim","node":"root","type":"run.start","prompt":""}
+{"seq":2,"t":0,"run":"cad.sim","node":"root","type":"node.spawn","parent":null,"module":"root","label":"Sim","kind":"root"}
+{"seq":3,"t":0,"run":"cad.sim","node":"root","type":"node.state","state":"running"}
+{"seq":4,"t":100,"run":"cad.sim","node":"cell","type":"node.spawn","parent":"root","module":"sim","label":"Sim","kind":"agent"}
+{"seq":5,"t":150,"run":"cad.sim","node":"cell","type":"node.state","state":"running"}
+{"seq":6,"t":300,"run":"cad.sim","node":"cell","type":"node.evidence","kind":"frames","uri":"/fixtures/art/sim_0.svg","caption":"FRC simulator","meta":{"frames":["/fixtures/art/sim_0.svg","/fixtures/art/sim_1.svg","/fixtures/art/sim_2.svg","/fixtures/art/sim_3.svg","/fixtures/art/sim_4.svg","/fixtures/art/sim_5.svg","/fixtures/art/sim_6.svg","/fixtures/art/sim_7.svg","/fixtures/art/sim_8.svg","/fixtures/art/sim_9.svg"],"fps":6,"loop":true}}
+{"seq":7,"t":350,"run":"cad.sim","node":"cell","type":"node.done","summary":"done"}
+{"seq":8,"t":400,"run":"cad.sim","node":"root","type":"run.done"}

@@ -1,0 +1,36 @@
+{
+  "draft": false,
+  "shot": "S16",
+  "view": "focus",
+  "take": "main",
+  "focus": "campaign",
+  "events": {
+    "at": [
+      [
+        0,
+        23000
+      ],
+      [
+        4,
+        25600
+      ]
+    ]
+  },
+  "camera": [
+    {
+      "beat": 0,
+      "target": "trailer",
+      "zoom": 2.4,
+      "dur": 0
+    },
+    {
+      "beat": 0,
+      "target": "campaign",
+      "zoom": 2.4,
+      "dur": 1
+    }
+  ],
+  "params": {
+    "revealMs": 380
+  }
+}

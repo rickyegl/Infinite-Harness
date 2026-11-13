@@ -1,0 +1,22 @@
+{
+  "draft": false,
+  "shot": "S33",
+  "view": "banner",
+  "take": "house.render",
+  "events": {
+    "at": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        468.75
+      ]
+    ]
+  },
+  "params": {
+    "title": "RENDER",
+    "say": "Render it."
+  }
+}

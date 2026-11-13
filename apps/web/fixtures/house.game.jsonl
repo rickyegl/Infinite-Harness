@@ -1,0 +1,8 @@
+{"seq":1,"t":0,"run":"house.game","node":"root","type":"run.start","prompt":"Put the house on the game."}
+{"seq":2,"t":0,"run":"house.game","node":"root","type":"node.spawn","parent":null,"module":"root","label":"Put the house on the game.","kind":"root"}
+{"seq":3,"t":0,"run":"house.game","node":"root","type":"node.state","state":"running"}
+{"seq":4,"t":100,"run":"house.game","node":"cell","type":"node.spawn","parent":"root","module":"game.unity","label":"Unity","kind":"orchestrator"}
+{"seq":5,"t":150,"run":"house.game","node":"cell","type":"node.state","state":"running"}
+{"seq":6,"t":300,"run":"house.game","node":"cell","type":"node.evidence","kind":"frames","uri":"/fixtures/art/house_game_0.svg","meta":{"frames":["/fixtures/art/house_game_0.svg","/fixtures/art/house_game_1.svg","/fixtures/art/house_game_2.svg","/fixtures/art/house_game_3.svg","/fixtures/art/house_game_4.svg","/fixtures/art/house_game_5.svg","/fixtures/art/house_game_6.svg","/fixtures/art/house_game_7.svg","/fixtures/art/house_game_8.svg","/fixtures/art/house_game_9.svg"],"fps":8,"loop":true,"fit":"cover"}}
+{"seq":7,"t":350,"run":"house.game","node":"cell","type":"node.done","summary":"done"}
+{"seq":8,"t":400,"run":"house.game","node":"root","type":"run.done"}

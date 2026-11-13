@@ -1,0 +1,9 @@
+{"seq":1,"t":0,"run":"car.house","node":"root","type":"run.start","prompt":"Put the car on the house."}
+{"seq":2,"t":0,"run":"car.house","node":"root","type":"node.spawn","parent":null,"module":"root","label":"Put the car on the house.","kind":"root"}
+{"seq":3,"t":0,"run":"car.house","node":"root","type":"node.state","state":"running"}
+{"seq":4,"t":100,"run":"car.house","node":"cell","type":"node.spawn","parent":"root","module":"blender","label":"3D","kind":"agent"}
+{"seq":5,"t":150,"run":"car.house","node":"cell","type":"node.state","state":"running"}
+{"seq":6,"t":300,"run":"car.house","node":"cell","type":"node.evidence","kind":"image","uri":"/fixtures/art/house_red.svg","meta":{"fit":"cover"}}
+{"seq":7,"t":1875,"run":"car.house","node":"cell","type":"node.evidence","kind":"image","uri":"/fixtures/art/car_house.svg","caption":"kart on the roof","meta":{"reveal":"cut","fit":"cover"}}
+{"seq":8,"t":1925,"run":"car.house","node":"cell","type":"node.done","summary":"done"}
+{"seq":9,"t":1975,"run":"car.house","node":"root","type":"run.done"}

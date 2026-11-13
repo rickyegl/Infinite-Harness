@@ -36,29 +36,29 @@ def s_of(t):
 
 
 # ---------------------------------------------------------------- measuring
-def onset_flux(mono):
+def onset_strength(mono):
     hop, win = 512, 2048
     n = (len(mono) - win) // hop
     fr = np.lib.stride_tricks.as_strided(mono, (n, win), (mono.strides[0] * hop, mono.strides[0]))
     mag = np.log1p(100 * np.abs(np.fft.rfft(fr * np.hanning(win), axis=1)))
-    flux = np.maximum(np.diff(mag, axis=0), 0).sum(1)
-    # flux[i] rises when an onset reaches the centre of frame i+1: that is time i*hop + hop + win/2
-    return (flux - flux.mean()) / (flux.std() + 1e-9), SR / hop, (hop + win / 2) / SR
+    strength = np.maximum(np.diff(mag, axis=0), 0).sum(1)
+    # strength[i] rises when an onset reaches the centre of frame i+1: that is time i*hop + hop + win/2
+    return (strength - strength.mean()) / (strength.std() + 1e-9), SR / hop, (hop + win / 2) / SR
 
 
 def measure(x, lo_bpm=118, hi_bpm=138):
     """Beat length and phase of a stereo signal, searched only near the film tempo (no half/double time)."""
     mono = np.ascontiguousarray(x.mean(1) if x.ndim > 1 else x).astype(np.float64)
     mono /= np.abs(mono).max() + 1e-9
-    flux, fps, lag = onset_flux(mono)
+    strength, fps, lag = onset_strength(mono)
     dur = len(mono) / SR
 
     def fit(beat):
         best = (-1e9, 0.0)
         for o in np.arange(0, beat, 0.002):
             i = np.round((np.arange(o, dur, beat) - lag) * fps).astype(int)
-            i = i[(i >= 0) & (i < len(flux))]
-            best = max(best, (flux[i].mean(), o))
+            i = i[(i >= 0) & (i < len(strength))]
+            best = max(best, (strength[i].mean(), o))
         return best
 
     cands = np.arange(60 / hi_bpm, 60 / lo_bpm, 0.001)

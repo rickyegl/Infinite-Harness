@@ -1,0 +1,8 @@
+{"seq":1,"t":0,"run":"house.plan","node":"root","type":"run.start","prompt":"Design the house."}
+{"seq":2,"t":0,"run":"house.plan","node":"root","type":"node.spawn","parent":null,"module":"root","label":"Design the house.","kind":"root"}
+{"seq":3,"t":0,"run":"house.plan","node":"root","type":"node.state","state":"running"}
+{"seq":4,"t":100,"run":"house.plan","node":"cell","type":"node.spawn","parent":"root","module":"drafting","label":"Drafting","kind":"agent"}
+{"seq":5,"t":150,"run":"house.plan","node":"cell","type":"node.state","state":"running"}
+{"seq":6,"t":300,"run":"house.plan","node":"cell","type":"node.evidence","kind":"doc","uri":"plan.dxf","caption":"floor plan · 12 x 9 m","meta":{"lines":[[150,100,850,100],[850,100,850,600],[850,600,150,600],[150,600,150,100],[450,100,450,380],[150,380,600,380],[650,380,850,380],[600,380,600,600],[250,600,330,560],[700,380,760,330],[150,650,850,650],[150,640,150,660],[850,640,850,660],[900,100,900,600],[890,100,910,100],[890,600,910,600]],"lineBeats":0.125}}
+{"seq":7,"t":350,"run":"house.plan","node":"cell","type":"node.done","summary":"done"}
+{"seq":8,"t":400,"run":"house.plan","node":"root","type":"run.done"}

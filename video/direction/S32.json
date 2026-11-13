@@ -1,0 +1,22 @@
+{
+  "draft": false,
+  "shot": "S32",
+  "view": "banner",
+  "take": "house.blender",
+  "events": {
+    "at": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        468.75
+      ]
+    ]
+  },
+  "params": {
+    "title": "3D",
+    "say": "Build it on Blender."
+  }
+}

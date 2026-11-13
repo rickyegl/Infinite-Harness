@@ -1,0 +1,12 @@
+{"seq":1,"t":0,"run":"music","node":"root","type":"run.start","prompt":"Add music."}
+{"seq":2,"t":0,"run":"music","node":"root","type":"node.spawn","parent":null,"module":"root","label":"Add music.","kind":"root"}
+{"seq":3,"t":0,"run":"music","node":"root","type":"node.state","state":"running"}
+{"seq":4,"t":200,"run":"music","node":"unity","type":"node.spawn","parent":"root","module":"game.unity","label":"Unity","kind":"orchestrator"}
+{"seq":5,"t":220,"run":"music","node":"unity","type":"node.state","state":"running"}
+{"seq":6,"t":300,"run":"music","node":"unity","type":"node.evidence","kind":"frames","uri":"/fixtures/art/unity_play_0.svg","meta":{"frames":["/fixtures/art/unity_play_0.svg","/fixtures/art/unity_play_1.svg","/fixtures/art/unity_play_2.svg","/fixtures/art/unity_play_3.svg","/fixtures/art/unity_play_4.svg","/fixtures/art/unity_play_5.svg","/fixtures/art/unity_play_6.svg","/fixtures/art/unity_play_7.svg","/fixtures/art/unity_play_8.svg","/fixtures/art/unity_play_9.svg","/fixtures/art/unity_play_10.svg","/fixtures/art/unity_play_11.svg"],"fps":8,"loop":true}}
+{"seq":7,"t":400,"run":"music","node":"music","type":"node.spawn","parent":"root","module":"music","label":"Music","kind":"tool","maker":"suno"}
+{"seq":8,"t":420,"run":"music","node":"music","type":"node.state","state":"running"}
+{"seq":9,"t":600,"run":"music","node":"music","type":"node.step","title":"Write a song for the game"}
+{"seq":10,"t":1875,"run":"music","node":"music","type":"node.evidence","kind":"audio","uri":"song.mp3","caption":"the song","meta":{"durationMs":1875,"peaks":[0.3,0.8,0.9,0.6,0.6,1,0.8,0.3,0.8,0.9,0.5,0.5,0.7,0.5,0.3,0.4,0.3,0.3,0.3,0.5,0.5,0.3,0.7,0.8,0.5,0.6,0.9,0.8,0.3,0.9,1,0.5,0.6,0.9,0.7,0.3,0.6,0.6,0.3,0.3,0.3,0.3,0.3,0.4,0.6,0.4,0.5,0.8,0.7,0.3,0.8,0.9,0.5,0.7,1,0.7,0.3,0.8,0.8,0.4,0.5,0.6,0.4,0.3,0.3,0.3,0.3,0.4,0.6,0.5,0.3,0.7,0.8,0.4,0.7,1,0.7,0.4,0.9,0.9,0.4,0.6,0.8,0.6,0.3,0.6,0.5,0.3,0.3,0.3,0.3,0.3,0.5,0.6,0.4,0.6]}}
+{"seq":11,"t":3800,"run":"music","node":"music","type":"node.done","summary":"song"}
+{"seq":12,"t":4000,"run":"music","node":"root","type":"run.done"}

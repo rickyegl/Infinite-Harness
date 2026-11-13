@@ -35,7 +35,7 @@ Needs the author present (approvals, the voice, and looking at results).
    reorder nothing within a node, and compress time. It must refuse to add events that are not in the source
    run. Output: `video/takes/<take>/events.film.jsonl`.
 4. **Direction files**: finalise the drafts from plan 01 against the real takes.
-   `video/direction/<shot>.json` for all 47 shots: view, camera keyframes in beats, which
+   `video/direction/<shot>.json` for all 48 shots: view, camera keyframes in beats, which
    node is in focus, which evidence items appear on which beat, typed text and its word timings (from the
    voice recordings, see below), flashes and shakes in beats.
 5. **Clips to frames.** `video/tools/frames.mjs`: every video the film shows becomes numbered JPEG frames at
@@ -56,7 +56,7 @@ Needs the author present (approvals, the voice, and looking at results).
 
 ## Done when
 
-- `node video/tools/resolve.mjs --check` passes and `pnpm shots:sheet` shows all 47 shots rendering from real
+- `node video/tools/resolve.mjs --check` passes and `pnpm shots:sheet` shows all 48 shots rendering from real
   takes (no fixture fallback warnings, except shots listed as mock in the honesty sheet).
 - `/?director=1&from=S01&to=S47` plays the whole film silently in the browser at the right timings.
 - The Colab runtime and tunnels are stopped.

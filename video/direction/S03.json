@@ -1,0 +1,51 @@
+{
+  "draft": false,
+  "shot": "S03",
+  "view": "prompt",
+  "take": "main",
+  "events": {
+    "at": [
+      [
+        0,
+        0
+      ],
+      [
+        4,
+        0
+      ]
+    ]
+  },
+  "params": {
+    "prior": "Make a 3d racing game where humanoids fight while racing",
+    "say": "...on Unity. And Roblox.",
+    "typeBeats": [
+      0,
+      2.5
+    ],
+    "chipsBefore": [
+      {
+        "label": "Game"
+      }
+    ],
+    "chips": [
+      {
+        "label": "Unity",
+        "beat": 0,
+        "replaces": "Game"
+      },
+      {
+        "label": "Roblox",
+        "beat": 2
+      }
+    ]
+  },
+  "fx": [
+    {
+      "type": "punch",
+      "beat": 2,
+      "dur": 0.5,
+      "amount": 0.03
+    }
+  ],
+  "note": "Game splits: Unity on beat 1, Roblox on beat 3 with a small impact."
+}
