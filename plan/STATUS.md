@@ -77,8 +77,13 @@ remove the line when it is answered. See `AGENTS.md` rule 5.
     brings every cell back from seq 0; at the end the cells and states on screen equal `reduce(events.jsonl)`;
     clicking a child opens its focus view; with the bridge closed, `/?director=1&take=smoke` replays all cells
     with no request to the bridge and no page errors.
-  - `pnpm test:live` and `pnpm test:determinism` (96/96) still pass; `pnpm lint:brand` clean (now scans
-    `apps/bridge` too).
+  - An agent module with only `prompt.md` (a throwaway module in a temp folder, real `secondary` worker): the
+    router picked it, and the cell's answer followed an instruction that was only in `prompt.md`.
+  - `pnpm dev` brings up both: the bridge answers `/health` with the token, the site answers `/`.
+  - `pnpm test:live` and `pnpm test:determinism` (96/96) still pass; `pnpm film:rough` writes 140.625 s with
+    every cut on a beat; `pnpm lint:brand` clean (now scans `apps/bridge` too). The recorded take, the
+    `hello` fixture and the router plans hold no vendor names or local paths (checked by grep; `video/takes/` is
+    outside the lint's folders).
 
 ## The bridge (plan 02)
 
@@ -264,7 +269,7 @@ before falling back to the fixture (checked: the full film has 20, one per take,
 | Plan | State | Verified by | Notes |
 |---|---|---|---|
 | 01 | done | typecheck, unit tests, determinism 96/96, live test, sheets, rough cut duration, lint:brand | See "The stage". Drafts S37-S40, S42-S47 left for plan 08. |
-| 02 | done | typecheck, unit tests, real worker smoke run, no-network probe, test:bridge, test:live, determinism, lint:brand | See "The bridge". Waiting: proxy start, primary worker sign-in. |
+| 02 | done, two parts unverified | typecheck, unit tests, `pnpm dev`, real worker smoke run, no-network probe, prompt.md module run, test:bridge, test:live, determinism, film:rough, lint:brand | See "The bridge". The proxy route of the router and the `stream-json` adapter have not run for real (proxy down, primary sign-in expired); see "Waiting on the author". |
 | 03 | not started | | |
 | 04 | not started | | |
 | 05 | not started | | |

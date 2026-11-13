@@ -30,6 +30,8 @@ prompt -> router -> module cells (agents, tools, sub-orchestrators) -> event str
 | [video/SHOTS.md](video/SHOTS.md) | The demo film (3 minutes at most), shot by shot, keyed to the music's beats. The product is designed from it. |
 | [plan/](plan/README.md) | Ordered build plan, one file per agent session. |
 | [apps/web](apps/web) | The stage: the interface, a pure function of events and a clock. |
+| [apps/bridge](apps/bridge/README.md) | The local daemon: routes a prompt to modules and agent workers, records and streams the run. |
+| `modules/` | One folder per module (`module.json`, `run.ts` or `prompt.md`, fixtures). |
 | [packages/protocol](packages/protocol) | Event and manifest types, and `reduce(events, t)`. |
 | `video/direction/` | One direction file per shot: view, camera and how the shot reads its take. |
 | `harness.config.example.json` | Configuration template. |
@@ -41,7 +43,11 @@ pnpm install
 pnpm dev
 ```
 
-Then open `http://127.0.0.1:5173/?fixture=main&start=40000` (live: click a cell to focus it, Escape to go back)
+This starts the bridge and the site. `http://127.0.0.1:5173/` is the prompt screen: pair it once (`pnpm pair`
+prints the link, or the gear opens the settings sheet), type or say a prompt and watch the run's graph. With
+`HARNESS_MOCK=1` nothing real is called. See [apps/bridge/README.md](apps/bridge/README.md).
+
+Without the bridge, open `http://127.0.0.1:5173/?fixture=main&start=40000` (live: click a cell to focus it, Escape to go back)
 or `http://127.0.0.1:5173/?director=1&shot=S11` (one shot of the film; `&from=S09&to=S20` for a range,
 `&play=1` to play it).
 
