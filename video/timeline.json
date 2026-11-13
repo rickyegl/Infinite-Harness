@@ -4,7 +4,13 @@
     "beatsPerBar": 4,
     "bpm": 128,
     "offset": 0,
-    "music": []
+    "music": [
+      {
+        "file": "audio/score.wav",
+        "at": 0,
+        "until": 136.875
+      }
+    ]
   },
   "total": 136.875,
   "shots": [

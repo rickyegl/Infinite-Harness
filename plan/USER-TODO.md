@@ -31,7 +31,7 @@ Fill these into `harness.local.json` / `plan/LOCAL.md`, or tell the agent.
 
 | # | Item | Blocks |
 |---|---|---|
-| 13 | Music: open again. It is scored to the film in cues (`video/SHOTS.md`, Music cues); nothing to do until asked. | 09 |
+| 13 | Music: a first score is built (`video/audio/score.wav`, in the preview). Listen and say which cue is wrong; each is retuned in `video/score/cues.json`. | 09 |
 | 14 | Beat timings: fixed at 128 BPM. Nothing to do. | 08 (retiming), 09 |
 | 15 | Voice lines recorded fast, one file per line named by shot (`S02.wav` ...) or one take -> `video/audio/voice/` | 08 (typing sync), 09 |
 | 16 | "I'm not done" 1.5 s effect -> `video/audio/sfx/not_done.*` | 09 |

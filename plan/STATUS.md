@@ -7,15 +7,18 @@ what the next agent should know. Keep it short; replace stale lines instead of a
 
 - **Done:** repository created; film shot layout (`video/SHOTS.md`, `video/shots.json`, resolver script);
   plan files 00-10; music marker tool; text-card preview render; **film re-cut faster on one steady tempo**
-  (128 BPM, 73 bars, 2:17). 3:00 is a limit, not a target.
+  (128 BPM, 73 bars, 2:17). 3:00 is a limit, not a target. **First score** built from generated takes and
+  in the preview (`video/tools/score.py`, `video/score/cues.json`).
 - **Next:** author reviews `video/SHOTS.md` and `plan/USER-TODO.md`, then plan 01.
 - **Not started:** all application code.
 
 ## Verified
 
 - `node video/tools/resolve.mjs`: 47 shots, 73 bars, 136.9 s; fastest voice line 2.9 words per second.
-- `node video/tools/preview.mjs` renders `video/renders/shots-preview.mp4` (click track only; duration checked
+- `node video/tools/preview.mjs` renders `video/renders/shots-preview.mp4` with `score.wav` (duration checked
   with ffprobe against `timeline.json`).
+- `python video/tools/score.py`: every take measured at 128.0 BPM; each cue's span within 8 ms of the grid.
+  Not yet checked by ear.
 
 ## Decisions by the author (2026-11-11)
 
@@ -33,8 +36,8 @@ Nothing beyond that list yet.
 
 ## Open problems
 
-- There is no music yet: the cues in `video/SHOTS.md` have to be made and joined on the grid. How they are
-  generated is undecided. `video/tools/marker.html` still offers the old two-track marks.
+- The score is unheard by its author: beat 1 is detected, not confirmed, for each take (the second drop was
+  moved two beats on the detector's evidence). `video/tools/marker.html` still offers the old two-track marks.
 - The opening line no longer asks for a cloned voice, but the Voice cell still appears in S09 and S16.
 - Audio files are not in git (`video/audio/` is ignored).
 - Unity automation path on this machine is unconfirmed (USER-TODO 6).

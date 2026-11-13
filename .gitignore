@@ -17,6 +17,8 @@ video/takes/**/artifacts/
 video/audio/*.wav
 video/audio/*.mp3
 video/audio/*.m4a
+video/audio/takes/
+video/audio/cues/
 !video/audio/README.md
 
 # tooling

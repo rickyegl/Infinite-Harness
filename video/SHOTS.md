@@ -52,6 +52,15 @@ The music is scored to the film: about ten short cues, one mood each, all at 128
 bar lines with a reverse swell into a hit at every join. A sound-effect layer driven by the shot list (a blip
 per chip, a hit per cell, ticks for the verifier) sits on top. No cue has an arc of its own; the film has it.
 
+How it is built: [score/cues.json](score/cues.json) lists five generated takes (intro, build, drop, break,
+second drop: instrumental, 128 BPM, A minor, one shared style sentence) and which whole bars of each take go on
+which film bars. `python video/tools/score.py` conforms every take to the grid (measures its tempo, stretches it
+to exactly 128 BPM, finds beat 1), cuts the bars, adds the per-bar colour, the stutters and the synthesized
+effects, and writes `video/audio/score.wav` at the film's exact length. It then checks each cue's span against
+the grid and fails if one is more than 25 ms off. Takes live in `video/audio/takes/` (not committed); the
+`seed` in `cues.json` says which candidate was kept, and `downbeat` (seconds) overrides beat 1 for a take that
+sounds a beat late.
+
 | Cue | Shots | Bars | Starts | What the music says |
 |---|---|---|---|---|
 | 1. The empty box | S01-S04 | 1-5 | 0:00 | Almost nothing: a pulse on the cursor. Each chip adds one small sound. |
