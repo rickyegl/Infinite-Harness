@@ -345,9 +345,22 @@
       "fx": "Line in the first bar. The song lands on the next downbeat and the score ducks under it, then slams back on the bar after."
     },
     {
-      "id": "S25",
+      "id": "S24b",
       "act": 3,
       "bar": 38,
+      "beats": 12,
+      "view": "wall",
+      "source": "replay",
+      "take": "main",
+      "say": "",
+      "screen": "The three finished reels stand up side by side, each fading in on its own downbeat: the trailer (vertical cut), then the 2D explainer, then the Roblox premise reel (night version). Each keeps playing after the next one appears.",
+      "camera": "Locked, slow 2% push in.",
+      "fx": "One reel per bar, each fading in over one beat on its downbeat. The sound switches to the newest reel on its downbeat while the earlier ones keep playing silently. The score stays underneath, ducked as under the song, with a hit on each downbeat."
+    },
+    {
+      "id": "S25",
+      "act": 3,
+      "bar": 41,
       "beats": 4,
       "view": "wall",
       "source": "replay",
@@ -360,7 +373,7 @@
     {
       "id": "S26",
       "act": 3,
-      "bar": 39,
+      "bar": 42,
       "beats": 4,
       "view": "title",
       "source": "ui",
@@ -373,7 +386,7 @@
     {
       "id": "S27",
       "act": 4,
-      "bar": 40,
+      "bar": 43,
       "beats": 4,
       "view": "prompt",
       "source": "ui",
@@ -385,7 +398,7 @@
     {
       "id": "S28",
       "act": 5,
-      "bar": 41,
+      "bar": 44,
       "beats": 4,
       "view": "banner",
       "source": "replay",
@@ -399,7 +412,7 @@
     {
       "id": "S29",
       "act": 5,
-      "bar": 42,
+      "bar": 45,
       "beats": 4,
       "view": "banner",
       "source": "replay",
@@ -413,7 +426,7 @@
     {
       "id": "S30",
       "act": 5,
-      "bar": 43,
+      "bar": 46,
       "beats": 4,
       "view": "banner",
       "source": "replay",
@@ -427,7 +440,7 @@
     {
       "id": "S31",
       "act": 5,
-      "bar": 44,
+      "bar": 47,
       "beats": 4,
       "view": "banner",
       "source": "replay",
@@ -441,7 +454,7 @@
     {
       "id": "S32",
       "act": 5,
-      "bar": 45,
+      "bar": 48,
       "beats": 4,
       "view": "banner",
       "source": "replay",
@@ -455,7 +468,7 @@
     {
       "id": "S33",
       "act": 5,
-      "bar": 46,
+      "bar": 49,
       "beats": 4,
       "view": "banner",
       "source": "replay",
@@ -469,7 +482,7 @@
     {
       "id": "S34",
       "act": 5,
-      "bar": 47,
+      "bar": 50,
       "beats": 8,
       "view": "banner",
       "source": "clip",
@@ -483,7 +496,7 @@
     {
       "id": "S35",
       "act": 5,
-      "bar": 49,
+      "bar": 52,
       "beats": 16,
       "view": "banner",
       "source": "replay",
@@ -497,7 +510,7 @@
     {
       "id": "S36",
       "act": 5,
-      "bar": 53,
+      "bar": 56,
       "beats": 8,
       "view": "banner",
       "source": "replay",
@@ -511,7 +524,7 @@
     {
       "id": "S37",
       "act": 5,
-      "bar": 55,
+      "bar": 58,
       "beats": 4,
       "view": "banner",
       "source": "supplied",
@@ -525,7 +538,7 @@
     {
       "id": "S38",
       "act": 5,
-      "bar": 56,
+      "bar": 59,
       "beats": 4,
       "view": "banner",
       "source": "replay",
@@ -539,7 +552,7 @@
     {
       "id": "S39",
       "act": 5,
-      "bar": 57,
+      "bar": 60,
       "beats": 4,
       "view": "banner",
       "source": "replay",
@@ -553,7 +566,7 @@
     {
       "id": "S40",
       "act": 5,
-      "bar": 58,
+      "bar": 61,
       "beats": 4,
       "view": "banner",
       "source": "replay",
@@ -567,7 +580,7 @@
     {
       "id": "S41",
       "act": 5,
-      "bar": 59,
+      "bar": 62,
       "beats": 8,
       "view": "banner",
       "source": "replay",
@@ -581,7 +594,7 @@
     {
       "id": "S42",
       "act": 5,
-      "bar": 61,
+      "bar": 64,
       "beats": 8,
       "view": "banner",
       "source": "clip",
@@ -596,7 +609,7 @@
     {
       "id": "S43",
       "act": 6,
-      "bar": 63,
+      "bar": 66,
       "beats": 8,
       "view": "rain",
       "source": "ui",
@@ -609,7 +622,7 @@
     {
       "id": "S44",
       "act": 6,
-      "bar": 65,
+      "bar": 68,
       "beats": 8,
       "view": "rain",
       "source": "ui",
@@ -621,7 +634,7 @@
     {
       "id": "S45",
       "act": 6,
-      "bar": 67,
+      "bar": 70,
       "beats": 8,
       "view": "rain",
       "source": "ui",
@@ -633,7 +646,7 @@
     {
       "id": "S46",
       "act": 7,
-      "bar": 69,
+      "bar": 72,
       "beats": 8,
       "view": "title",
       "source": "ui",
@@ -646,7 +659,7 @@
     {
       "id": "S47",
       "act": 7,
-      "bar": 71,
+      "bar": 74,
       "beats": 8,
       "view": "title",
       "source": "ui",

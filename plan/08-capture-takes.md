@@ -11,7 +11,7 @@ Needs the author present (approvals, the voice, and looking at results).
 
 | Take | Prompt(s) | Shots |
 |---|---|---|
-| `main` | The Act 1 prompt, exactly as spoken | S02-S20, S25 |
+| `main` | The Act 1 prompt, exactly as spoken | S02-S20, S24b, S25 |
 | `night` | "make it night" on `main` | S21 |
 | `crossplay` | "add crossplay" on `main` | S22 |
 | `realistic` | "make it realistic" on `main` | S23 |

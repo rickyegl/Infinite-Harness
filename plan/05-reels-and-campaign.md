@@ -30,6 +30,10 @@ tools with their own working directory.
    harness that gate is a `waiting` state on the cell with the script as `doc` evidence and Approve in the focus
    view. `HARNESS_AUTO_APPROVE=1` (set only for take capture, with the author present) skips it.
 
+5. The film's S24b shows the trailer's 9:16 cut, the explainer and the premise reel (night version) side by
+   side, one bar of each one's sound in turn. So each reel's first 2 s must already sound like it (no silent
+   lead-in), and all three must be 9:16. Hand-off: copy the three mp4s' audio to `video/audio/reels/`.
+
 ## Verify first
 
 - The studio tools' current command lines (they changed recently per its docs): run each with `--help`.

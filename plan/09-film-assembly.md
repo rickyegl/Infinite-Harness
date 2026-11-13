@@ -27,7 +27,10 @@ the beat, flash + shake + punch-in on the drop, slower and dimmer before it.
 4. **Audio** (ffmpeg, scripted in `video/tools/mix.mjs`): the music is `video/audio/score.wav`, approved by
    the author on 2026-11-12. It already holds the hits, risers, the rewind and the S24 song
    (`video/makeasong.mp3` with the score ducked under it), so do not add those again. Put the author's 1.5 s
-   S27 effect in `cues.json` `clips` at bar 40 beat 1 and rebuild the score, rather than placing it in the mix.
+   S27 effect in `cues.json` `clips` at bar 43 beat 1 and rebuild the score, rather than placing it in the mix.
+   Likewise extract the three reels' sound into `video/audio/reels/` (see `video/audio/README.md`) and rebuild,
+   so S24b switches the sound to each reel as it fades in. In the plates, the three reels in S24b start from
+   their first frame at their own fade-in and keep playing (silent in the plate; the score carries the sound).
    The mix adds voice lines at their shots' start with sidechain-style ducking of the score under speech, and
    short UI ticks on chip pops and cell spawns, kept quiet and on-grid. Loudness is normalised to about
    -14 LUFS with true peak under -1 dB.

@@ -456,7 +456,15 @@ def build():
     # clips: finished audio dropped in at a beat, at the score's own level
     ref = np.sqrt(np.mean(music[music != 0] ** 2)) + 1e-9
     for cl in spec.get("clips", []):
-        y = load(os.path.join(ROOT, cl["file"]))
+        path = os.path.join(ROOT, cl["file"])
+        if not os.path.exists(path):
+            if cl.get("optional"):
+                print(f"clip {cl['file']}: not there yet, skipped")
+                continue
+            raise FileNotFoundError(path)
+        y = load(path)
+        if cl.get("bars"):   # play only this many bars, then a short fade (the next clip takes over)
+            y = fade_edges(y[: s_of(cl["bars"] * BAR)].copy(), 10)
         y = y * (ref / (np.sqrt(np.mean(y ** 2)) + 1e-9)) * db(cl.get("gain", 0))
         a = s_of(t_of(*cl["at"]))
         y = y[: N - a]

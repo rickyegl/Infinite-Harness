@@ -136,11 +136,31 @@
       ]
     },
     {
+      "id": 5.5,
+      "name": "The reels play",
+      "bars": [
+        38,
+        40
+      ],
+      "take": "drop",
+      "from": "middle",
+      "gain": 0,
+      "colour": [
+        {
+          "bars": [
+            38,
+            40
+          ],
+          "do": "duck"
+        }
+      ]
+    },
+    {
       "id": 6,
       "name": "Fake ending",
       "bars": [
-        38,
-        38
+        41,
+        41
       ],
       "take": "drop",
       "from": "middle",
@@ -151,24 +171,24 @@
       "id": 8,
       "name": "Everything",
       "bars": [
-        41,
-        62
+        44,
+        65
       ],
       "take": "drop2",
       "from": "middle",
       "gain": 0,
       "steps": [
-        49,
-        53,
-        57
+        52,
+        56,
+        60
       ]
     },
     {
       "id": 9,
       "name": "Anything",
       "bars": [
-        63,
-        68
+        66,
+        71
       ],
       "take": "drop2",
       "from": "end",
@@ -176,29 +196,29 @@
       "stutter": [
         {
           "bars": [
-            65,
-            66
+            68,
+            69
           ],
           "every": 0.5
         },
         {
           "bars": [
-            67,
-            67
+            70,
+            70
           ],
           "every": 0.25
         },
         {
           "bars": [
-            68,
-            68
+            71,
+            71
           ],
           "every": 0.125
         }
       ],
       "muteBeats": [
         [
-          68,
+          71,
           4,
           1
         ]
@@ -386,7 +406,7 @@
     },
     {
       "at": [
-        38,
+        41,
         1
       ],
       "do": "swell",
@@ -395,7 +415,7 @@
     },
     {
       "at": [
-        39,
+        42,
         1
       ],
       "do": "chord",
@@ -404,7 +424,7 @@
     },
     {
       "at": [
-        40,
+        43,
         1
       ],
       "do": "rewind",
@@ -412,32 +432,11 @@
     },
     {
       "at": [
-        41,
+        44,
         1
       ],
       "do": "impact",
       "gain": 0
-    },
-    {
-      "at": [
-        42,
-        1
-      ],
-      "do": "whoosh"
-    },
-    {
-      "at": [
-        43,
-        1
-      ],
-      "do": "whoosh"
-    },
-    {
-      "at": [
-        44,
-        1
-      ],
-      "do": "whoosh"
     },
     {
       "at": [
@@ -462,7 +461,28 @@
     },
     {
       "at": [
-        51,
+        48,
+        1
+      ],
+      "do": "whoosh"
+    },
+    {
+      "at": [
+        49,
+        1
+      ],
+      "do": "whoosh"
+    },
+    {
+      "at": [
+        50,
+        1
+      ],
+      "do": "whoosh"
+    },
+    {
+      "at": [
+        54,
         1
       ],
       "do": "hit",
@@ -470,7 +490,7 @@
     },
     {
       "at": [
-        51,
+        54,
         3
       ],
       "do": "hit",
@@ -478,7 +498,7 @@
     },
     {
       "at": [
-        52,
+        55,
         1
       ],
       "do": "impact",
@@ -486,28 +506,7 @@
     },
     {
       "at": [
-        53,
-        1
-      ],
-      "do": "whoosh"
-    },
-    {
-      "at": [
-        55,
-        1
-      ],
-      "do": "whoosh"
-    },
-    {
-      "at": [
         56,
-        1
-      ],
-      "do": "whoosh"
-    },
-    {
-      "at": [
-        57,
         1
       ],
       "do": "whoosh"
@@ -521,11 +520,17 @@
     },
     {
       "at": [
+        59,
+        1
+      ],
+      "do": "whoosh"
+    },
+    {
+      "at": [
         60,
         1
       ],
-      "do": "impact",
-      "gain": -3
+      "do": "whoosh"
     },
     {
       "at": [
@@ -539,12 +544,27 @@
         63,
         1
       ],
+      "do": "impact",
+      "gain": -3
+    },
+    {
+      "at": [
+        64,
+        1
+      ],
+      "do": "whoosh"
+    },
+    {
+      "at": [
+        66,
+        1
+      ],
       "do": "hit",
       "gain": -3
     },
     {
       "at": [
-        65,
+        68,
         1
       ],
       "do": "riser",
@@ -553,7 +573,7 @@
     },
     {
       "at": [
-        69,
+        72,
         1
       ],
       "do": "impact",
@@ -561,7 +581,7 @@
     },
     {
       "at": [
-        69,
+        72,
         1
       ],
       "do": "chord",
@@ -574,6 +594,30 @@
       ],
       "do": "hit",
       "gain": -3
+    },
+    {
+      "at": [
+        38,
+        1
+      ],
+      "do": "hit",
+      "gain": -5
+    },
+    {
+      "at": [
+        39,
+        1
+      ],
+      "do": "hit",
+      "gain": -5
+    },
+    {
+      "at": [
+        40,
+        1
+      ],
+      "do": "hit",
+      "gain": -5
     }
   ],
   "clips": [
@@ -585,6 +629,36 @@
       ],
       "gain": 0,
       "_comment": "S24 'Add music': the chosen song"
+    },
+    {
+      "file": "audio/reels/trailer.wav",
+      "at": [
+        38,
+        1
+      ],
+      "bars": 1,
+      "optional": true,
+      "_comment": "S24b: the trailer (vertical cut)'s own sound for one bar (audio taken from the reel plan 05 makes)"
+    },
+    {
+      "file": "audio/reels/explainer.wav",
+      "at": [
+        39,
+        1
+      ],
+      "bars": 1,
+      "optional": true,
+      "_comment": "S24b: the 2D explainer's own sound for one bar (audio taken from the reel plan 05 makes)"
+    },
+    {
+      "file": "audio/reels/premise.wav",
+      "at": [
+        40,
+        1
+      ],
+      "bars": 1,
+      "optional": true,
+      "_comment": "S24b: the Roblox premise reel's own sound for one bar (audio taken from the reel plan 05 makes)"
     }
   ]
 }

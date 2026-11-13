@@ -7,18 +7,19 @@ what the next agent should know. Keep it short; replace stale lines instead of a
 
 - **Done:** repository created; film shot layout (`video/SHOTS.md`, `video/shots.json`, resolver script);
   plan files 00-10; text-card preview render; **film re-cut faster on one steady tempo**
-  (128 BPM, 72 bars, 2:15). 3:00 is a limit, not a target. **Score approved** by the author (2026-11-12):
+  (128 BPM, 75 bars, 2:21). 3:00 is a limit, not a target. **Score approved** by the author (2026-11-12):
   built from generated takes plus the chosen song (`video/tools/score.py`, `video/score/cues.json`).
 - **Next:** author reviews `video/SHOTS.md` and `plan/USER-TODO.md`, then plan 01.
 - **Not started:** all application code.
 
 ## Verified
 
-- `node video/tools/resolve.mjs`: 47 shots, 72 bars, 135.0 s; fastest voice line 2.9 words per second.
+- `node video/tools/resolve.mjs`: 48 shots, 75 bars, 140.6 s; fastest voice line 2.9 words per second.
 - `node video/tools/preview.mjs` renders `video/renders/shots-preview.mp4` with `score.wav` (duration checked
   with ffprobe against `timeline.json`).
 - `python video/tools/score.py`: every take measured at 128.0 BPM; each cue's span within 8 ms of the grid.
-  The author listened to the preview and approved it.
+  The author listened to the preview and approved it. Since then S24b (the three reels side by side, bars
+  38-40) was added and everything after it moved 3 bars; its reel sound waits for plan 05.
 
 ## Decisions by the author (2026-11-11)
 
