@@ -10,9 +10,10 @@ stop and ask you directly: see `AGENTS.md` rule 5 and "Waiting on the author" in
 | # | Item | Blocks |
 |---|---|---|
 | 1 | Unity Hub: add the **WebGL Build Support** module to the Unity 6 editor (6000.2.x). The install was approved in plan 03, but the Windows admin prompt was cancelled; click Yes on it next time. | 03 (browser build) |
-| 2 | Install `cloudflared` and put it on PATH. | 06 (public link), crossplay with Roblox |
+| 2 | ~~Install `cloudflared`~~: done in plan 06 (portable exe in `runs/.tools/`, set in `harness.local.json`). | |
 | 3 | Sign in to SurfaceCAD once and connect its MCP server (`https://surfacecad.com/mcp`) to the worker CLI that will run the CAD module. | 07 (CAD) |
-| 4 | Cloudflare account login for Pages + a named tunnel (quick tunnels work without it). | 06 (site online) |
+| 4 | ~~Cloudflare login for Pages~~: done; the site is at https://infinite-harness.pages.dev. A named tunnel (a fixed address) is optional; quick tunnels work without it. | |
+| 21 | Plan 06 checks on your own devices: a Host "Play in browser" link on your phone over mobile data (needs item 1), and the deployed site on another device paired with `pnpm bridge:public`. | 06 (sign-off) |
 | 5 | Confirm the model proxy is running and the subscriptions are signed in. | 02 (router), 04 (images) |
 | 6 | ~~Unity automation~~: done in plan 03 (the harness drives the open editor through a file queue). | |
 | 20 | Open the latest `runs/<id>/artifacts/game.roblox.build/place.rbxlx` in Roblox Studio and press Play (you chose "Unity only for now"). Turn on HttpService if you want crossplay. | 03 (Roblox play test) |

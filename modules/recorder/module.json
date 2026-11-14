@@ -1,0 +1,12 @@
+{
+  "id": "recorder",
+  "label": "Recorder",
+  "icon": "recorder",
+  "kind": "tool",
+  "summary": "Makes a 20-30 second video of how the run went: the graph of cells filling in, the camera on the busiest cells, then everything the run published, with the chosen song under it. Waits for every other cell (the Verifier too). Plan it whenever the request asks to show or record the process on video.",
+  "accepts": ["text"],
+  "produces": ["video"],
+  "runtime": "script",
+  "mock": true,
+  "allow": { "write": ["$NODE"], "network": ["127.0.0.1"] }
+}

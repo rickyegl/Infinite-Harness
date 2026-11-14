@@ -15,6 +15,10 @@
 //   POST /internal/tool            -> harness MCP calls from workers
 //   /relay/<room>                  -> crossplay relay (relay.ts); no token
 //   GET  /runs/:id/artifacts/webgl/... -> a game build; no token, so the plain build link opens in any browser
+//                                        (and through a tunnel: see tunnels.ts). Unity's compressed files
+//                                        (x.wasm.gz, x.data.br) go out with Content-Encoding and the inner type.
+//   GET  /tunnels                  -> the open tunnels
+// Cross-origin callers: loopback pages, plus the exact origins in config bridge.origins (the deployed site).
 
 import { timingSafeEqual } from "node:crypto";
 import { createReadStream, existsSync, statSync } from "node:fs";
@@ -23,6 +27,7 @@ import { extname, join, normalize, sep } from "node:path";
 import { WebSocketServer, type WebSocket } from "ws";
 import { isPlaceholder, type HarnessConfig } from "./config.ts";
 import { createRelay } from "./relay.ts";
+import { tunnels } from "./tunnels.ts";
 import type { LoadedModule } from "./modules.ts";
 import type { Runner } from "./runner.ts";
 import type { RunLog, RunStore } from "./store.ts";
@@ -38,14 +43,17 @@ const TYPES: Record<string, string> = {
 /** a game build is a web page: its own files are served as what they are (everywhere else html and js are text) */
 const BUILD = /^\/runs\/[A-Za-z0-9_-]+\/artifacts\/webgl(\/|$)/;
 const BUILD_TYPES: Record<string, string> = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8" };
+const ENCODINGS: Record<string, string> = { ".gz": "gzip", ".br": "br" };
 
 export type ServerDeps = { cfg: HarnessConfig; store: RunStore; runner: Runner; mods: Map<string, LoadedModule>; token: string };
 
 const sameToken = (a: string, b: string) => a.length === b.length && timingSafeEqual(Buffer.from(a), Buffer.from(b));
-const ORIGIN_OK = /^https?:\/\/(127\.0\.0\.1|localhost|\[::1\])(:\d+)?$/;
+const LOOPBACK = /^https?:\/\/(127\.0\.0\.1|localhost|\[::1\])(:\d+)?$/;
 
 export function startServer(d: ServerDeps): Promise<{ url: string; close: () => Promise<void> }> {
   const wss = new WebSocketServer({ noServer: true });
+  const allowed = new Set((d.cfg.bridge.origins ?? []).filter((o) => !isPlaceholder(o)).map((o) => o.replace(/\/+$/, "")));
+  const originOk = (o: string) => LOOPBACK.test(o) || allowed.has(o);
   const relay = createRelay();
 
   /** strips a /t/<token>/ prefix; returns the path and whether the request is authorized */
@@ -65,11 +73,13 @@ export function startServer(d: ServerDeps): Promise<{ url: string; close: () => 
 
   const cors = (req: IncomingMessage, res: ServerResponse) => {
     const o = req.headers.origin;
-    if (o && ORIGIN_OK.test(o)) {
+    if (o && originOk(o)) {
       res.setHeader("Access-Control-Allow-Origin", o);
       res.setHeader("Vary", "Origin");
       res.setHeader("Access-Control-Allow-Headers", "authorization, content-type");
       res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+      // a public page calling 127.0.0.1 (the deployed site on this computer) asks first
+      if (req.headers["access-control-request-private-network"]) res.setHeader("Access-Control-Allow-Private-Network", "true");
     }
   };
   const json = (res: ServerResponse, code: number, v: unknown) => {
@@ -126,6 +136,7 @@ export function startServer(d: ServerDeps): Promise<{ url: string; close: () => 
       if (req.method === "GET" && path === "/modules") {
         return json(res, 200, [...d.mods.values()].map((m) => ({ ...m.manifest, hasRun: m.hasRun, fixtures: m.fixtures.length })));
       }
+      if (req.method === "GET" && path === "/tunnels") return json(res, 200, tunnels.list().map(({ url, target, kind, owners }) => ({ url, target, kind, owners })));
       if (req.method === "GET" && path === "/proxy/status") return json(res, 200, await proxyStatus());
       if (req.method === "GET" && path === "/proxy/signin") {
         const u = d.cfg.proxy.signInUrl;
@@ -159,7 +170,11 @@ export function startServer(d: ServerDeps): Promise<{ url: string; close: () => 
           d.runner.say(id, text);
           return json(res, 200, { ok: true });
         }
-        if (parts[2] === "cancel" && req.method === "POST") return json(res, 200, { ok: d.runner.cancel(id) });
+        if (parts[2] === "cancel" && req.method === "POST") {
+          const ok = d.runner.cancel(id);
+          tunnels.release(id);
+          return json(res, 200, { ok });
+        }
         if (parts[2] === "events" && parts.length === 3 && req.method === "GET") {
           const since = Number(url.searchParams.get("seq") ?? 0);
           const evs = (d.runner.runs.get(id)?.log.events ?? d.store.events(id)).filter((e) => e.seq > since);
@@ -180,7 +195,13 @@ export function startServer(d: ServerDeps): Promise<{ url: string; close: () => 
             file = join(file, "index.html");
           }
           if (!existsSync(file) || !statSync(file).isFile()) return json(res, 404, { error: "not found" });
-          const ext = extname(file).toLowerCase();
+          let ext = extname(file).toLowerCase();
+          if (build && ENCODINGS[ext]) {
+            // a compressed Unity file: the browser unpacks it and sees the inner type (x.wasm.gz -> application/wasm)
+            res.setHeader("Content-Encoding", ENCODINGS[ext]);
+            res.setHeader("Vary", "Accept-Encoding");
+            ext = extname(file.slice(0, -ext.length)).toLowerCase();
+          }
           res.setHeader("Content-Type", (build && BUILD_TYPES[ext]) || TYPES[ext] || "application/octet-stream");
           res.setHeader("Cache-Control", "no-cache");
           return createReadStream(file).pipe(res);
@@ -197,7 +218,7 @@ export function startServer(d: ServerDeps): Promise<{ url: string; close: () => 
     if (relay.upgrade(req, socket, head, path)) return;
     const m = /^\/runs\/([A-Za-z0-9_-]+)\/events$/.exec(path);
     const o = req.headers.origin;
-    if (!ok || !m || (o && !ORIGIN_OK.test(o)) || !d.store.meta(m[1])) {
+    if (!ok || !m || (o && !originOk(o)) || !d.store.meta(m[1])) {
       socket.write("HTTP/1.1 401 Unauthorized\r\n\r\n");
       return socket.destroy();
     }

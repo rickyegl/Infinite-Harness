@@ -12,7 +12,8 @@
     "take": "tsx src/take.ts",
     "fixture": "tsx src/fixture.ts",
     "record:router": "tsx test/record-router.ts",
-    "pair": "tsx src/pair.ts"
+    "pair": "tsx src/pair.ts",
+    "cell": "tsx src/cell.ts"
   },
   "dependencies": {
     "@harness/protocol": "workspace:*",

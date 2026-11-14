@@ -20,6 +20,8 @@ export type GameState = {
   };
   /** models / banners: which generated models and pictures load as Roblox assets, and which still wait for an upload */
   roblox?: { project: string; node: string; place?: string; models?: { loaded: string[]; waiting: string[] }; banners?: { loaded: number; waiting: string[] } };
+  /** the public address (host cell): the tunnel origin, the play link, the relay room through it */
+  host?: { node: string; tunnel: string; play?: string; relay: string; at: number };
   /** live flags written so far (night, realistic, music, relay) */
   flags?: Record<string, unknown>;
 };

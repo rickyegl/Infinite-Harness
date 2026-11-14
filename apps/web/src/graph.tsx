@@ -37,7 +37,7 @@ export function GraphLayer(p: GraphProps) {
       <div style={{ position: "absolute", left: 0, top: 0, width: 0, height: 0, transformOrigin: "0 0", transform: worldTransform(p.cam) }}>
         <svg style={{ position: "absolute", overflow: "visible", left: 0, top: 0 }} width={1} height={1}>
           {nodes.map((n) => (n.parent ? <Edge key={n.id} a={at(state.nodes[n.parent])} b={at(n)} age={p.age(n.spawnedAt)} n={n} /> : null))}
-          {state.flights.map((f) => <FlightLight key={f.requestId} f={f} state={state} at={at} age={p.age} />)}
+          {state.flights.map((f, i) => <FlightLight key={`${i}:${f.requestId}`} f={f} state={state} at={at} age={p.age} />)}
         </svg>
         {nodes.map((n) => (
           <Cell key={n.id} n={n} pos={at(n)} age={p.age(n.spawnedAt)} stateAge={p.age(n.stateAt)} url={p.url} bare={p.bare}

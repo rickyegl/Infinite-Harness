@@ -9,6 +9,7 @@ import { spawn, spawnSync } from "node:child_process";
 import { copyFileSync, cpSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { addProc } from "../../../apps/bridge/src/procs.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 export const TEMPLATE = resolve(HERE, "..", "template");
@@ -101,6 +102,8 @@ export class Unity {
       this.log("Opening the Unity editor", this.project);
       const child = spawn(this.paths.editor, ["-projectPath", this.project], { detached: true, stdio: "ignore", windowsHide: false });
       child.unref();
+      // the harness opened this editor, so `pnpm stop` may close it (an editor the author opened is never recorded)
+      if (child.pid) addProc({ pid: child.pid, kind: "editor", what: `Unity editor on ${this.project}`, startedAt: Date.now() });
     } else {
       this.log("Waiting for the Unity editor", "it is open and still loading");
     }

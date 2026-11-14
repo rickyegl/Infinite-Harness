@@ -1,0 +1,9 @@
+{"t":1,"type":"node.state","node":".","state":"running"}
+{"t":16,"type":"node.step","node":".","title":"Directing","detail":"91 cells, 61 outputs: wide, the three busiest cells, then the wall; 24 s","icon":"film"}
+{"t":9718,"type":"node.step","node":".","title":"Capturing","detail":"72/288 frames","icon":"record"}
+{"t":17284,"type":"node.step","node":".","title":"Capturing","detail":"144/288 frames","icon":"record"}
+{"t":24850,"type":"node.step","node":".","title":"Capturing","detail":"216/288 frames","icon":"record"}
+{"t":32063,"type":"node.step","node":".","title":"Encoded","detail":"24.0 s, 1920x1080, 12 fps, 288 frames in 32 s, with the song","icon":"check"}
+{"t":32066,"type":"node.evidence","node":".","kind":"video","uri":"./default/process.mp4","caption":"How the run went","meta":{"duration":24,"width":1920,"height":1080,"fps":12}}
+{"t":32068,"type":"node.output","node":".","name":"Process video","uri":"./default/process.mp4","kind":"video"}
+{"t":32069,"type":"node.done","node":".","summary":"24 s process video, 1920x1080"}

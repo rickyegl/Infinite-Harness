@@ -24,6 +24,7 @@
   "include": [
     "src",
     "test",
-    "../../modules/*/run.ts"
+    "../../modules/*/run.ts",
+    "../../tools/stop.ts"
   ]
 }

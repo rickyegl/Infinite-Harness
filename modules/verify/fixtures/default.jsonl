@@ -1,0 +1,8 @@
+{"t":1,"type":"node.state","node":".","state":"running"}
+{"t":52,"type":"node.step","node":".","title":"Checking","detail":"1 cell: Test asset","icon":"verifier"}
+{"t":55,"type":"node.step","node":".","title":"Test asset: check failed","detail":"asset.svg is missing","icon":"alert"}
+{"t":57,"type":"node.request","node":".","to":"asset","what":"The Verifier found: asset.svg is missing. Make it again so these are right.","requestId":"q1"}
+{"t":58,"type":"node.state","node":".","state":"waiting"}
+{"t":69,"type":"node.state","node":".","state":"running"}
+{"t":1048,"type":"node.step","node":".","title":"Test asset: passes after the fix","detail":"1 file present; asset.svg 1024x1024, not blank","icon":"check"}
+{"t":1120,"type":"node.done","node":".","summary":"1 cell checked, all pass (1 after one fix)"}

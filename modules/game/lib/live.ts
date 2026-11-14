@@ -5,7 +5,7 @@
 // Flags.luau and the place is rebuilt (about a second; a running server picks them up on its next start).
 
 import type { ModuleContext } from "@harness/protocol";
-import { existsSync } from "node:fs";
+import { existsSync, writeFileSync } from "node:fs";
 import { Unity, unityPaths } from "../../game.unity/lib/unity.ts";
 import { Place } from "../../game.roblox/lib/roblox.ts";
 import { type GameState, patchState, readState, runDirOf } from "./state.ts";
@@ -26,7 +26,14 @@ const ROBLOX_FLAGS = new Set(["night", "realistic", "relay", "relayUrl", "musicI
 
 /** sets live flags in the project, the build and the Roblox place, and remembers them in game-state.json */
 export function setFlags(l: Live, patch: Record<string, unknown>, ctx?: ModuleContext): void {
-  if (l.u) l.u.patchFlags(patch, l.buildFlags);
+  if (l.u) {
+    const f = l.u.patchFlags(patch, l.buildFlags);
+    // a browser build is served by the bridge or by a tunnel to it: a room path without a host follows the page
+    // (ws:// on 127.0.0.1, wss:// through the tunnel), so the same build works from both addresses
+    if (l.state.unity?.build?.target === "webgl" && typeof f.relayUrl === "string" && /^wss?:\/\//.test(f.relayUrl) && existsSync(l.buildFlags)) {
+      writeFileSync(l.buildFlags, JSON.stringify({ ...f, relayUrl: new URL(f.relayUrl).pathname }));
+    }
+  }
   if (l.place) {
     const rb = Object.fromEntries(Object.entries(patch).filter(([k]) => ROBLOX_FLAGS.has(k)));
     if (Object.keys(rb).length) {

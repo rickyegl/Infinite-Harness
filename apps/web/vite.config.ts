@@ -1,6 +1,6 @@
 import { defineConfig, type Connect, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
-import { createReadStream, existsSync, statSync } from "node:fs";
+import { cpSync, createReadStream, existsSync, mkdirSync, statSync } from "node:fs";
 import { dirname, extname, join, normalize, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -42,7 +42,29 @@ const folders = (): Plugin => ({
   configurePreviewServer: (s) => { s.middlewares.use(serveFolders()); },
 });
 
+// The deployed site has no folders to serve: it carries the one take it replays when no bridge answers (the
+// main fixture and its art) and the timeline, nothing from runs/.
+const BUNDLED: [string, string][] = [
+  [join(here, "fixtures", "main.jsonl"), "fixtures/main.jsonl"],
+  [join(here, "fixtures", "art"), "fixtures/art"],
+  [join(repo, "video", "timeline.json"), "video/timeline.json"],
+];
+const bundleTake = (): Plugin => {
+  let out = "";
+  return {
+    name: "harness-bundled-take",
+    apply: "build",
+    configResolved: (c) => { out = resolve(c.root, c.build.outDir); },
+    closeBundle: () => {
+      for (const [from, to] of BUNDLED) {
+        mkdirSync(dirname(join(out, to)), { recursive: true });
+        cpSync(from, join(out, to), { recursive: true });
+      }
+    },
+  };
+};
+
 export default defineConfig({
-  plugins: [react(), folders()],
+  plugins: [react(), folders(), bundleTake()],
   server: { port: 5173, host: "127.0.0.1" },
 });

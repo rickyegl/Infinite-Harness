@@ -334,7 +334,7 @@ namespace HarnessEditor
             PlayerSettings.runInBackground = true;
             PlayerSettings.defaultScreenWidth = 1280; PlayerSettings.defaultScreenHeight = 720;
             PlayerSettings.fullScreenMode = FullScreenMode.Windowed;
-            PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Disabled;
+            PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Gzip;
             PlayerSettings.WebGL.decompressionFallback = false;
             PlayerSettings.WebGL.dataCaching = false;
             PlayerSettings.WebGL.exceptionSupport = WebGLExceptionSupport.ExplicitlyThrownExceptionsOnly;
@@ -741,8 +741,8 @@ namespace HarnessEditor
             var bt = web ? BuildTarget.WebGL : BuildTarget.StandaloneWindows64;
             if (web)
             {
-                // served by the bridge as plain files: no Content-Encoding headers, so no compression
-                PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Disabled;
+                // gzip: the bridge serves *.gz with Content-Encoding and the inner type (server.ts), through a tunnel too
+                PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Gzip;
                 PlayerSettings.WebGL.decompressionFallback = false;
             }
             Directory.CreateDirectory(outDir);

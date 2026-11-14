@@ -1,6 +1,7 @@
 {
   "_comment": "Template. Copy to harness.local.json (gitignored) and fill in real values; it is merged over this file key by key. Code reads config only through apps/bridge/src/config.ts.",
-  "bridge": { "port": 7411, "host": "127.0.0.1", "runsDir": "runs", "tokenFile": "runs/.bridge-token" },
+  "bridge": { "port": 7411, "host": "127.0.0.1", "runsDir": "runs", "tokenFile": "runs/.bridge-token", "origins": ["https://infinite-harness.pages.dev"] },
+  "site": { "project": "infinite-harness", "url": "https://infinite-harness.pages.dev" },
   "proxy": {
     "baseUrl": "http://127.0.0.1:8317/v1",
     "apiKeyEnv": "HARNESS_PROXY_KEY",
@@ -35,12 +36,14 @@
     "robloxProject": "runs/.game/roblox",
     "blender": "<blender executable>",
     "ffmpeg": "ffmpeg",
+    "cloudflared": "cloudflared",
     "canvasMcp": "<course MCP server folder>",
     "frcSim": "<FRC simulator project>",
     "unityToRoblox": "<Unity-to-Roblox porting project>",
     "imageToVideo": "<colab image-to-video launcher>",
     "forecast": "<forecast script, optional>"
   },
+  "roblox": { "studioPlace": "<name of the Roblox Studio place the harness may change; other open places are never touched>" },
   "colab": { "session": "forge", "gpu": "L4", "keepAlive": false },
   "voice": {
     "envFile": "<path to the .env that holds the voice key and voice id>",

@@ -27,7 +27,13 @@ export type WorkerConfig = {
 };
 
 export type HarnessConfig = {
-  bridge: { port: number; host: string; runsDir: string; tokenFile: string };
+  bridge: {
+    port: number; host: string; runsDir: string; tokenFile: string;
+    /** exact page origins (besides loopback) that may call the bridge with the token: the deployed site */
+    origins?: string[];
+  };
+  /** the deployed site (pnpm site:deploy) */
+  site?: { project: string; url: string };
   proxy: {
     baseUrl: string;
     apiKeyEnv: string;
@@ -51,6 +57,7 @@ export type HarnessConfig = {
   assetKinds: Record<string, string>;
   paths: Record<string, string>;
   colab: { session: string; gpu: string; keepAlive: boolean };
+  roblox?: { studioPlace: string };
   voice: { envFile: string; account?: { use: string; as: string } };
   brandDenyList: string[];
 };

@@ -1,0 +1,12 @@
+{
+  "id": "host",
+  "label": "Host",
+  "icon": "link",
+  "kind": "tool",
+  "summary": "Hosts a game or site this run built for the web browser at a public URL (a tunnel to this computer), checks it loads from outside, and points the crossplay relay at the same address. Comes after the build. For Roblox it prepares the place for publishing (publishing itself waits for approval).",
+  "accepts": ["code", "text"],
+  "produces": ["link", "doc", "frames"],
+  "runtime": "script",
+  "mock": true,
+  "allow": { "write": ["$RUN"], "network": ["*"] }
+}

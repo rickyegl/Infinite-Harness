@@ -10,7 +10,7 @@
 // only ever sent as the Authorization header. Nothing here prints or stores it.
 
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -136,6 +136,17 @@ function reopen(config: Record<string, any>, url: string, say: (t: string, d?: s
     }
   })();
   return reopening;
+}
+
+/**
+ * Is a forge runtime up (for `pnpm stop`'s reminder)? "up" when it answers on the forwarded port; "maybe" when
+ * the launcher's log shows a runtime that was started and never stopped, but the forward is gone.
+ */
+export async function forgeStatus(config: Record<string, any>): Promise<"up" | "maybe" | "no"> {
+  if (await healthy(`http://127.0.0.1:${port(config)}`, readToken())) return "up";
+  if (!existsSync(UP_LOG) || !/^REMOTE \d+/m.test(readFileSync(UP_LOG, "utf8"))) return "no";
+  const stopLog = join(STATE, "stop.log");
+  return existsSync(stopLog) && statSync(stopLog).mtimeMs > statSync(UP_LOG).mtimeMs ? "no" : "maybe";
 }
 
 /** stop a runtime this process started; the launcher's stop also ends the keep-alive and the forward */

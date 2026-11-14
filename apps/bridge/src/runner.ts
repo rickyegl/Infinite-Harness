@@ -8,12 +8,13 @@
 //   spawn_task: a child cell `<node>.<slug>` running a named module, or a sub-worker with the parent's allow block
 
 import type { EvidenceKind, ModuleContext, ModuleInput, ModuleManifest, ModuleOutput, NodeKind } from "@harness/protocol";
-import { copyFileSync, createWriteStream, existsSync, mkdirSync, readFileSync, statSync } from "node:fs";
+import { copyFileSync, createWriteStream, existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { basename, dirname, extname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { isPlaceholder, repoRoot, type HarnessConfig } from "./config.ts";
 import { loadRun, summaries, type LoadedModule } from "./modules.ts";
 import { route, type Existing, type PlanNode } from "./router.ts";
+import { tunnels } from "./tunnels.ts";
 import type { NewEvent, RunLog, RunStore } from "./store.ts";
 import { harnessToolList } from "./workers/allow.ts";
 import { resolveGrants, runWorker, type Grants } from "./workers/index.ts";
@@ -90,6 +91,8 @@ const inside = (file: string, dir: string) => {
   return !!r && !r.startsWith("..") && !isAbsolute(r);
 };
 
+type RunnableModule = LoadedModule | { manifest: ModuleManifest; dir: string; hasRun: false; fixtures: [] };
+
 export class Runner {
   readonly runs = new Map<string, Run>();
   constructor(readonly d: RunnerDeps) {}
@@ -110,6 +113,20 @@ export class Runner {
     }
     r.followUp(text);
     return r;
+  }
+
+  /** one module as a new cell of a run, without the router (pnpm cell, tests); a finished run reopens */
+  cell(id: string | null, moduleId: string, input: ModuleInput, label?: string): { run: Run; done: Promise<ModuleOutput | null> } {
+    const mod = this.d.mods.get(moduleId);
+    if (!mod) throw new Error(`no module ${moduleId}`);
+    let r = id ? this.runs.get(id) : undefined;
+    if (!r) {
+      if (id && !this.d.store.meta(id)) throw new Error(`no run ${id}`);
+      r = id ? new Run(this, this.d.store.reopen(id), true) : new Run(this, this.d.store.create(input.prompt), false);
+      this.runs.set(r.id, r);
+      if (!id) r.open(input.prompt);
+    }
+    return { run: r, done: r.direct(mod, input, label ?? mod.manifest.label) };
   }
 
   cancel(id: string): boolean {
@@ -160,6 +177,18 @@ export class Run {
     void this.plan(prompt);
   }
 
+  /** a new run without planning (Runner.cell) */
+  open(prompt: string): void {
+    this.emit({ type: "run.start", node: "root", prompt });
+    this.addCell("root", null, ROOT, "Infinite Harness", prompt, "root");
+  }
+
+  direct(mod: LoadedModule, input: ModuleInput, label: string): Promise<ModuleOutput | null> {
+    if (this.ended) throw new Error("run is closed");
+    this.emit({ type: "node.state", node: "root", state: "running" });
+    return this.runCell(this.freeId(slug(mod.manifest.id.split(".").pop()!)), "root", mod, label, input).catch(() => null);
+  }
+
   followUp(text: string): void {
     if (this.ended) throw new Error("run is closed");
     this.emit({ type: "node.state", node: "root", state: "running" });
@@ -170,6 +199,8 @@ export class Run {
   /** a reopened run: the cells it already has, so follow-ups can hang under them */
   private rebuild(): void {
     for (const e of this.log.events) {
+      // request ids go on from the highest one so far (a flight is keyed by its id)
+      if (e.type === "node.request") this.requests = Math.max(this.requests, Number(/^q(\d+)$/.exec(e.requestId)?.[1] ?? 0));
       if (e.type !== "node.spawn") continue;
       const m = e.node === "root" ? ROOT : e.node === "assets" ? HUB : this.runner.d.mods.get(e.module)?.manifest ?? { ...ROOT, id: e.module, label: e.label, kind: e.kind === "root" ? "orchestrator" : e.kind };
       this.cells.set(e.node, { id: e.node, parent: e.parent, module: e.module, manifest: m, dir: join(this.log.dir, "artifacts", e.node), open: false, failed: false, children: 0, evidence: [] });
@@ -201,6 +232,11 @@ export class Run {
     }
   }
   private planFailed = false;
+
+  private promptOf(id: string): string {
+    for (const e of this.log.events) if (e.type === "node.spawn" && e.node === id) return e.prompt ?? "";
+    return "";
+  }
 
   private labelOf(id: string): string {
     for (const e of this.log.events) if (e.type === "node.spawn" && e.node === id) return e.label;
@@ -275,6 +311,7 @@ export class Run {
     this.emit({ type: "node.error", node: "root", message: "cancelled" });
     this.emit({ type: "run.done", node: "root" });
     this.log.close("failed", "cancelled");
+    tunnels.release(this.id);
     this.ended = true;
     this.runner.runs.delete(this.id);
   }
@@ -305,32 +342,75 @@ export class Run {
   }
 
   /** Spawns a cell and runs its module to the end. Throws when it fails (after node.error). */
-  async runCell(id: string, parent: string, mod: LoadedModule | { manifest: ModuleManifest; dir: string; hasRun: false; fixtures: [] }, label: string, input: ModuleInput): Promise<ModuleOutput> {
+  async runCell(id: string, parent: string, mod: RunnableModule, label: string, input: ModuleInput): Promise<ModuleOutput> {
     this.inflight++;
     const cell = this.addCell(id, parent, mod.manifest, label, input.prompt);
     this.emit({ type: "node.state", node: id, state: "running" });
     mkdirSync(cell.dir, { recursive: true });
-    const ctx = this.context(cell);
-    cell.ctx = ctx;
+    // what the cell was asked, so a fix (ask) can run it again the same way, also after a restart
+    writeJson(join(this.log.dir, "inputs", `${id}.json`), input);
     try {
-      let out: ModuleOutput;
-      if (this.cfg.mock.enabled && mod.manifest.mock && mod.fixtures.length) out = await this.replay(cell, mod as LoadedModule);
-      else if (mod.hasRun) out = await (await loadRun(mod as LoadedModule))(ctx, input);
-      else if (mod.manifest.runtime === "cli-agent") {
-        // an agent module without run.ts: its prompt.md (if any) leads, the cell's task follows
-        const md = mod.dir ? join(mod.dir, "prompt.md") : "";
-        const lead = md && existsSync(md) ? readFileSync(md, "utf8").trim() + "\n\n## Task\n\n" : "";
-        const r = await ctx.agent(lead + input.prompt);
-        out = { summary: r.text };
-      } else throw new Error(`${mod.manifest.id} has no run.ts`);
-      if (this.abort.signal.aborted) throw new Error("cancelled");
-      out = { ...out, files: out.files ?? this.filesOf(id) };
+      const out = await this.execute(cell, mod, input);
       this.closeCell(id, null, out.summary);
       return out;
     } catch (e) {
       this.closeCell(id, e as Error);
       throw e;
     } finally {
+      this.inflight--;
+      this.maybeFinish();
+    }
+  }
+
+  /** runs a cell's module once: its fixture in mock mode, else run.ts, else its prompt as one worker */
+  private async execute(cell: Cell, mod: RunnableModule, input: ModuleInput): Promise<ModuleOutput> {
+    const ctx = this.context(cell);
+    cell.ctx = ctx;
+    let out: ModuleOutput;
+    if (this.cfg.mock.enabled && mod.manifest.mock && mod.fixtures.length) out = await this.replay(cell, mod as LoadedModule);
+    else if (mod.hasRun) out = await (await loadRun(mod as LoadedModule))(ctx, input);
+    else if (mod.manifest.runtime === "cli-agent") {
+      // an agent module without run.ts: its prompt.md (if any) leads, the cell's task follows
+      const md = mod.dir ? join(mod.dir, "prompt.md") : "";
+      const lead = md && existsSync(md) ? readFileSync(md, "utf8").trim() + "\n\n## Task\n\n" : "";
+      const fix = typeof input.params?.fix === "string" ? "\n\n## Fix\n\n" + input.params.fix : "";
+      const r = await ctx.agent(lead + input.prompt + fix);
+      out = { summary: r.text };
+    } else throw new Error(`${mod.manifest.id} has no run.ts`);
+    if (this.abort.signal.aborted) throw new Error("cancelled");
+    return { ...out, files: out.files ?? this.filesOf(cell.id) };
+  }
+
+  /**
+   * Work sent back to a finished cell (ctx.ask): node.request from `from` to it, the cell reopens and runs its
+   * own module again in place (same folder, same id) with `input`, then node.deliver back to `from`.
+   */
+  async ask(from: string, node: string, input: ModuleInput): Promise<ModuleOutput> {
+    const cell = this.cells.get(node);
+    if (!cell || node === "root" || node === "assets") throw new Error(`no cell ${node} to ask`);
+    if (cell.open) throw new Error(`${node} is still working`);
+    const mod = this.runner.d.mods.get(cell.module);
+    if (!mod) throw new Error(`${node} runs ${cell.module}, which is not installed`);
+    const file = join(this.log.dir, "inputs", `${node}.json`);
+    const first: ModuleInput = existsSync(file) ? JSON.parse(readFileSync(file, "utf8")) : { prompt: this.promptOf(node) };
+    const again: ModuleInput = { ...first, params: { ...first.params, ...input.params, fix: input.prompt } };
+    const requestId = `q${++this.requests}`;
+    this.inflight++;
+    this.emit({ type: "node.request", node: from, to: node, what: input.prompt, requestId });
+    this.emit({ type: "node.state", node: from, state: "waiting" });
+    cell.open = true;
+    cell.failed = false;
+    this.emit({ type: "node.state", node, state: "running" });
+    try {
+      const out = await this.execute(cell, mod, again);
+      this.closeCell(node, null, out.summary);
+      this.emit({ type: "node.deliver", node, to: from, requestId, uri: out.files?.[0]?.uri ?? `artifacts/${node}` });
+      return out;
+    } catch (e) {
+      this.closeCell(node, e as Error);
+      throw e;
+    } finally {
+      if (this.cells.get(from)?.open) this.emit({ type: "node.state", node: from, state: "running" });
       this.inflight--;
       this.maybeFinish();
     }
@@ -391,6 +471,11 @@ export class Run {
         return uri;
       },
       request: (moduleId, input) => run.request(id, moduleId, input),
+      ask: (node, input) => run.ask(id, node, input),
+      mark: (node, title, detail, icon) => {
+        if (!run.cells.has(node)) throw new Error(`no cell ${node} in this run`);
+        run.emit({ type: "node.step", node, title, ...(detail ? { detail } : {}), ...(icon ? { icon } : {}) });
+      },
       spawn: (moduleId, input, opts) => {
         const mod = run.runner.d.mods.get(moduleId);
         if (!mod) return Promise.reject(new Error(`no module ${moduleId}`));
@@ -575,7 +660,7 @@ export class Run {
 
 function writeJson(file: string, v: unknown): void {
   mkdirSync(dirname(file), { recursive: true });
-  createWriteStream(file).end(JSON.stringify(v, null, 2));
+  writeFileSync(file, JSON.stringify(v, null, 2));
 }
 
 export { repoRoot };

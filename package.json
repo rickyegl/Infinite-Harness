@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "pnpm --parallel --filter bridge --filter web dev",
     "bridge": "pnpm --filter bridge dev",
+    "bridge:public": "pnpm --filter bridge exec tsx src/main.ts --public",
     "site": "pnpm --filter web dev",
     "pair": "pnpm --filter bridge pair",
     "take": "pnpm --filter bridge take",
@@ -19,7 +20,11 @@
     "film:rough": "node video/tools/rough.mjs",
     "test:live": "node apps/web/test/live.mjs",
     "test:bridge": "pnpm --filter bridge exec tsx ../web/test/bridge.mjs",
-    "test:determinism": "node apps/web/test/determinism.mjs"
+    "test:determinism": "node apps/web/test/determinism.mjs",
+    "test:host": "pnpm --filter bridge exec tsx test/host.live.ts",
+    "cell": "pnpm --filter bridge cell",
+    "stop": "pnpm --filter bridge exec tsx ../../tools/stop.ts",
+    "record": "node video/tools/record-run.mjs"
   },
   "devDependencies": {
     "playwright": "1.58.2"

@@ -1,0 +1,23 @@
+{
+  "id": "verify",
+  "label": "Verifier",
+  "icon": "verifier",
+  "kind": "orchestrator",
+  "summary": "Checks everything the other cells of the run made (files present, pictures not blank and the right size, videos with the right length and sound, links that answer and draw, the browser build, a Roblox play test), marks each cell passed or failed, and sends one fix back to a cell whose work is broken. Plan it whenever the request asks for no mistakes, a check, or a test of the result.",
+  "accepts": [
+    "text"
+  ],
+  "produces": [
+    "doc"
+  ],
+  "runtime": "script",
+  "mock": true,
+  "allow": {
+    "write": [
+      "$NODE"
+    ],
+    "network": [
+      "*"
+    ]
+  }
+}

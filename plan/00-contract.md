@@ -123,6 +123,9 @@ export default async function run(ctx: ModuleContext, input: ModuleInput): Promi
 // ctx.step(title, detail?) ctx.evidence(kind, file, caption?) ctx.output(name, file, kind, href?)
 // ctx.state("waiting" | "running")                      <- the cell waits on the author (a script gate), then resumes
 // ctx.request(moduleId, input): Promise<ModuleOutput>   <- asset handoff: emits node.request / node.deliver
+// ctx.ask(node, {prompt}): Promise<ModuleOutput>        <- work back to a finished cell (the Verifier's fix): it
+//                                                          reruns in place with its first input + params.fix
+// ctx.mark(node, title, detail?, icon?)                 <- a step on another cell (the Verifier's check mark)
 // ctx.spawn(moduleId, input, {label})                  <- child cell under this node
 // ctx.sh(cmd, args, opts) ctx.agent(prompt, opts)      <- subprocess / headless CLI worker, events streamed
 // ctx.dir (artifact dir) ctx.config (merged config) ctx.signal (abort)
@@ -172,6 +175,21 @@ calls back into the bridge; it never sees the token in its arguments.
 
 A **take** is a finished run copied to `video/takes/<take>/` (events + only the artifacts the film shows). Takes
 may be trimmed and re-timed by `video/tools/` but never hand-written: a take always starts as a real run.
+
+### Running, hosting and stopping (plan 06)
+
+| Command | What it does |
+|---|---|
+| `pnpm cell <runId\|new> <module> [prompt]` | one module as a new cell of a run, without the router |
+| `pnpm bridge:public` | the bridge plus a quick tunnel to it; prints the public address (and, on a terminal, a link that pairs the deployed site) |
+| `pnpm record --run <id>` | the run's 20-30 s process video (the Recorder's cut); token from `HARNESS_TOKEN` |
+| `pnpm stop` | closes every tunnel and editor the harness started (by the pids in `runs/.procs.json`, never by program name) and reminds about a Colab runtime still up |
+| `pnpm test:host` | the Host cell over the real network on a throwaway run |
+
+Tunnels are Cloudflare quick tunnels (`paths.cloudflared`). Each belongs to a run (or to `bridge:public`) and
+closes with it, when the bridge stops, or on `pnpm stop`. The deployed site (`bridge.origins`) calls the bridge
+on 127.0.0.1 or through such a tunnel, always with the pairing token; with no bridge answering it replays the
+bundled take. The stage's `?director=1&run=<id>` is the Recorder's automatic cut.
 
 ## Config
 

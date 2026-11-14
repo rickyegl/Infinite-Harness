@@ -8,6 +8,8 @@ import { loadModules, type LoadedModule } from "./modules.ts";
 import { Runner } from "./runner.ts";
 import { startServer } from "./server.ts";
 import { RunStore } from "./store.ts";
+import { exePath, tunnels } from "./tunnels.ts";
+import { procsFile } from "./procs.ts";
 
 export type Bridge = {
   url: string; token: string; tokenFile: string; store: RunStore; runner: Runner;
@@ -32,6 +34,8 @@ export async function createBridge(cfg: HarnessConfig, opts: { modulesDir?: stri
   const tokenFile = abs(cfg.bridge.tokenFile);
   const token = pairingToken(tokenFile);
   const mods = loadModules(opts.modulesDir);
+  tunnels.file = procsFile(abs(cfg.bridge.runsDir));
+  tunnels.exe = exePath(cfg.paths.cloudflared ?? "cloudflared");
   // the runner needs the server's URL and the server needs the runner: fill the URL in after listen
   const deps = { store, cfg, mods, bridgeUrl: "", tokenFile };
   const runner = new Runner(deps);
@@ -41,6 +45,8 @@ export async function createBridge(cfg: HarnessConfig, opts: { modulesDir?: stri
     url: srv.url, token, tokenFile, store, runner, mods, recovered,
     close: async () => {
       for (const r of [...runner.runs.values()]) r.cancel();
+      // the session ends: every tunnel it opened goes with it
+      tunnels.closeAll();
       await srv.close();
     },
   };

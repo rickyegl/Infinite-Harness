@@ -86,6 +86,14 @@ export interface ModuleContext {
   output(name: string, file: string, kind: string, href?: string): Promise<string>;
   /** asset handoff: emits node.request / node.deliver around a run of `moduleId` */
   request(moduleId: string, input: ModuleInput): Promise<ModuleOutput>;
+  /**
+   * sends work back to another cell of this run that has finished (the verifier's fix): node.request to that
+   * cell (`input.prompt` is what is wrong), which runs its own module again in place with the input it first got
+   * plus `params.fix` = `input.prompt`, then node.deliver back; throws when it fails
+   */
+  ask(node: string, input: ModuleInput): Promise<ModuleOutput>;
+  /** a step on another cell of this run (the verifier's check mark on the cell it checked) */
+  mark(node: string, title: string, detail?: string, icon?: string): void;
   /** a child cell under this node running `moduleId` */
   spawn(moduleId: string, input: ModuleInput, opts?: { label?: string }): Promise<ModuleOutput>;
   sh(cmd: string, args: string[], opts?: { cwd?: string; env?: Record<string, string>; timeoutMs?: number }): Promise<ShResult>;

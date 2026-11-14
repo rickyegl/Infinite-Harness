@@ -1,5 +1,10 @@
 # Status
 
+> **packages/protocol changed (plan 06):** `ModuleContext` gained `ask(node, input)` (send work back to a finished
+> cell of the run: it reruns in place with its first input plus `params.fix`, between `node.request` and
+> `node.deliver`) and `mark(node, title, detail?, icon?)` (a step on another cell: the Verifier's check mark).
+> Additive only; no event type changed.
+>
 > **packages/protocol changed (plan 03):** `ModuleManifest` gained an optional `hidden?: boolean` (a part of
 > another module, spawned by its parent's `run.ts`, never offered to the router); `checkManifest` checks its type.
 > Additive only; no event type changed.
@@ -40,7 +45,12 @@ what the next agent should know. Keep it short; replace stale lines instead of a
   rendered), the Premise Reel, both Ad Images and the Publish dry run. The premise reel has its picture, recorded
   in Roblox Studio, and "Re-render the Roblox premise reel at night, same narration" re-recorded it at night through
   the cell, with a day/night before/after. Details under "The reels" below.
-- **Next:** plans 06-07, then plan 08 replaces fixtures with recorded takes and finalises the
+- **Done (plan 06), Unity browser build waiting on WebGL:** Host, Verifier, Recorder, the deployed site and
+  `pnpm stop`. The site is at https://infinite-harness.pages.dev: it replays a bundled take when no bridge
+  answers, and talks to the bridge on 127.0.0.1 or through `pnpm bridge:public`'s tunnel. Deleting a file makes
+  the Verifier fail that cell, fix it once and pass it. The Recorder made a 24 s video of run `20261113-224654`.
+  Details under "Hosting, checking, recording (plan 06)" below.
+- **Next:** plan 07, then plan 08 replaces fixtures with recorded takes and finalises the
   draft direction files (S37-S40, S42-S47).
 
 ## Waiting on the author
@@ -50,11 +60,18 @@ remove the line when it is answered. See `AGENTS.md` rule 5.
 
 - (plan 03) **WebGL Build Support** for the Unity 6 editor: the install was approved, but the Windows admin
   prompt was cancelled, so it is not installed (USER-TODO 1). Until then the Build cell makes a Windows player,
-  and there is no "Play in browser". Once it is installed, rerun the game prompt: Build switches to WebGL by
-  itself, and the bridge serves it at `/runs/<id>/artifacts/webgl/`.
-- (plan 03) **Roblox side of crossplay:** a Roblox server can reach the relay only through a public URL (a
-  tunnel, USER-TODO 2), and the place needs `HttpService` turned on. Today the relay is checked both ways
-  locally, and a stand-in Roblox rider proves the ghost in the Unity game.
+  and there is no "Play in browser". Checked again in plan 06: still not installed (the editor has only the
+  Android and Windows players). Once it is installed, rerun the game prompt: Build switches to WebGL (gzip) by
+  itself, and a Host cell puts it online. The hosting path itself is tested (`pnpm test:host`).
+- (plan 06) **Two checks only you can make:**
+  - open a Host cell's "Play in browser" link on your phone over mobile data (another network). This needs the
+    WebGL build above; until then `pnpm test:host` shows the same path with a small test page;
+  - open https://infinite-harness.pages.dev on another device: run `pnpm bridge:public` in a terminal and open the
+    "pair the deployed site" link it prints there. The live graph should appear. I checked the tunnel, CORS
+    and token from the shell, but I did not type the token into the public site myself.
+- (plan 03) **Roblox side of crossplay:** the Host cell now puts the relay on a public address and writes it into
+  the place's `Flags.luau` (and the open Studio place, HTTP on). A Studio play test showed no script errors on
+  run `20261113-224654`. The Roblox rider meeting a browser rider still waits for the WebGL build.
 - (plan 03) **Publishing the Roblox place:** not done, and not to be done without your approval.
 - (plan 04) **Video:** which image-to-video setup to use (USER-TODO 7). The forge's `launcher/h3` would work but
   downloads about 65 GB of weights, and `plan/LOCAL.md` names a different video model. Until you choose, Video
@@ -141,6 +158,47 @@ remove the line when it is answered. See `AGENTS.md` rule 5.
   - `pnpm typecheck` clean; `pnpm test` (protocol, web, bridge 36 including the router table) passes;
     `pnpm test:bridge`, `pnpm test:live`, `pnpm test:determinism` (96/96) pass; `pnpm film:rough` 140.625 s;
     `pnpm lint:brand` clean (523 files). Fixtures were checked for local paths and keys by grep.
+
+## Hosting, checking, recording (plan 06)
+
+- **Tunnels:** Cloudflare quick tunnels (no account, a random `*.trycloudflare.com` name each time), from the
+  portable `cloudflared` in `runs/.tools/` (`paths.cloudflared`). `apps/bridge/src/tunnels.ts` opens one per
+  target and shares it between owners (a run, or `bridge:public`). It closes when its last owner ends, when the
+  bridge stops, or on `pnpm stop`. Every pid the harness starts (tunnels, the Unity editor it opens) is in
+  `runs/.procs.json`; `pnpm stop` kills only those, never by program name, because the author runs
+  cloudflared for other things. A new name takes 10-60 s to resolve, and the local DNS can cache it as missing,
+  so "answers from outside" is checked over DNS-over-HTTPS with the connection pinned to that address.
+- **Host** (`modules/host`): the build at `/runs/<id>/<path>/` (no token, gzip/br with `Content-Encoding`). A
+  tunnel, then a wait for a 200 from outside, then a headless screenshot through the public address. The relay
+  goes to `<address>/relay/<run>` and into the Roblox place's Flags. For Roblox it writes a "ready to publish"
+  note and records a Studio play test; it never publishes. Run 20261113-224654 had no browser build, so its Host
+  cell put the relay online (Studio play test: no script errors). `pnpm test:host` (a throwaway run with a
+  canvas page) found and fixed a wrong build path in Host and in the Verifier.
+- **Site:** https://infinite-harness.pages.dev, the classic Pages project `infinite-harness` (production branch
+  `main`). Deploy with `pnpm --filter web build` then, from `apps/web`,
+  `npx wrangler@4 pages deploy dist --project-name infinite-harness --branch main`. The build carries one take
+  (fixture `main` and its art, plus `video/timeline.json`) and nothing from `runs/`. It was checked for the
+  token, local paths and the brand list. With no bridge answering, the site replays that take under a
+  "Connect a bridge" note. With a bridge answering, it is the prompt box and runs as before. For another
+  device: `pnpm bridge:public`, then `?pair=<token>&bridge=<tunnel>` (printed on the terminal only).
+  `bridge.origins` lists the site, so the bridge answers its CORS and private-network preflights. A newer
+  wrangler tries to turn a Pages project into a Workers one; the project was created with `--force` once, and
+  later deploys go straight to Pages.
+- **Verifier** (`modules/verify`): waits for the other cells, then checks every file they made (see its
+  README), marks each cell, sends one fix with `ctx.ask`, re-checks, and fails honestly.
+  - **Shallow checks:**
+    - the Roblox play test runs only when the harness place is open in Studio;
+    - the browser build is checked only when there is one;
+    - link pages pass on a non-blank picture within about 60 s;
+    - documents are checked for presence only.
+  - The verify test runs with mock off, because in mock mode the Verifier replays its fixture.
+- **Recorder** (`modules/recorder`): the stage's automatic cut (`apps/web/src/autocut.ts`, `?director=1&run=<id>`)
+  captured by `video/tools/capture.mjs` through `video/tools/record-run.mjs`, with the song. Capture runs at
+  **12 fps at 1920x1080**: a 24 s video takes 32-46 s on this machine. Run 20261113-224654 (91 cells, 61
+  outputs) gave 24.0 s, 288 frames, with sound (`artifacts/recorder-2/process.mp4`). The first cut,
+  `artifacts/recorder/`, came before the camera fixes.
+- **Fixtures:** `host` (relay + Roblox, from 20261113-224654), `verify` (one fix, from 20261114-122537),
+  `recorder` (the 24 s video, re-encoded small).
 
 ## The reels (plan 05)
 
@@ -570,7 +628,7 @@ before falling back to the fixture (checked: the full film has 20, one per take,
   Use one bridge at a time; a cell that is waiting must then be asked for again (the gate carry-over keeps the
   go).
 - Unity automation is the harness's own editor bridge (a file queue); the editor must be open (plan 03).
-- `cloudflared` is not installed (USER-TODO 2). Unity 6 has no WebGL module yet (USER-TODO 1).
+- Unity 6 has no WebGL module yet (USER-TODO 1). `cloudflared` is the portable exe in `runs/.tools/` (plan 06).
 
 ## Per-plan log
 
@@ -581,7 +639,7 @@ before falling back to the fixture (checked: the full film has 20, one per take,
 | 03 | done, two fallbacks | full run 20261113-014545, four follow-ups under 5 s, fixtures, typecheck, tests, test:bridge, test:live, determinism, film:rough, lint:brand | Windows build until WebGL is installed; Roblox place not opened in Studio. See "The games". |
 | 04 | done, video on mock | runs 20261113-222539 (house chain), 20261113-223714 (song), 20261113-223729 (voice), 20261113-224654 (full game with real assets), fixtures, mock replay, tests, test:bridge, typecheck, lint:brand, forge stopped (`colab ls`: no sessions) | Video waits for its runtime; `assets.image` with `transparent` not run live; image quota out at the end. See "The assets". |
 | 05 | done | trailer re-cut with the camera director (`trailer`, `trailer-2`, `trailer-3`: steady cameras, 9 angles, fights on screen, karts no longer twitch), test captures measured, contact sheets looked at, `reel.trailer` fixture re-recorded, typecheck, tests (protocol 13, web 7, bridge 63, reels 25 of them), lint:brand; premise picture day and night, the night re-render live through the cell (`premise-night`: Studio take, assembly, before/after), the recast (`premise-day`, `premise-night-2` recorded; `premise-night-3` reused the take), contact sheets looked at, `reel.premise` fixture re-recorded, typecheck, tests (protocol 13, web 7, bridge 59, reels 21 of them), lint:brand; earlier: tests (bridge 56, reels 18), campaign replayed from its fixture in mock mode, router re-record, test:bridge, test:live, determinism 96/96, film:rough (140.6 s, every cut on a beat), lint:brand, motion run + fixture, campaign live run end to end (trailer, explainer, premise narration, ads, publish dry run), fixtures for every reel module, HUD capture in Unity | Nothing published. See "The reels". |
-| 06 | not started | | |
+| 06 | done, Unity browser build waiting on WebGL | `pnpm test:host` (public address answers, the page draws through it, tunnel closed with the bridge); the Verifier on a real run through `pnpm cell` (file deleted, marked failed, one fix, passed) and its 3 tests; Recorder 24 s video on run 20261113-224654; site deployed, replay with no bridge seen on pages.dev, tunnel + CORS + token checked from the shell; `pnpm stop` closed a detached tunnel; typecheck, tests (protocol 13, web 10, bridge 66), test:bridge, test:live, determinism 96/96, film:rough, lint:brand (and the built site) | Phone and second-device checks are the author's. See "Hosting, checking, recording". |
 | 07 | not started | | |
 | 08 | not started | | |
 | 09 | not started | | |

@@ -24,13 +24,16 @@ export function saveSettings(s: BridgeSettings): void {
   }
 }
 
-/** `?pair=<token>` (printed by the bridge on the author's terminal) stores the token and leaves the URL. */
+/** `?pair=<token>[&bridge=<https address>]` (printed by the bridge on the author's terminal) stores the token (and the bridge's address) and leaves the URL. */
 export function takePairing(): void {
   const q = new URLSearchParams(location.search);
   const t = q.get("pair");
   if (!t) return;
-  saveSettings({ ...loadSettings(), token: t });
+  // &bridge=<address>: the bridge's tunnel, for the deployed site on another device
+  const address = q.get("bridge");
+  saveSettings({ ...loadSettings(), token: t, ...(address && /^https:\/\//.test(address) ? { address } : {}) });
   q.delete("pair");
+  q.delete("bridge");
   history.replaceState(null, "", `${location.pathname}${q.size ? `?${q}` : ""}`);
 }
 

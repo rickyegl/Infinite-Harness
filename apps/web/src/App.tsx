@@ -1,21 +1,23 @@
 // The stage. Two drivers share every view:
-//   director (?director=1&shot=S11 or &from=S09&to=S20, or &take=<id> for a whole take on the graph view):
+//   director (?director=1&shot=S11 or &from=S09&to=S20, or &take=<id> for a whole take on the graph view, or
+//            &run=<id>[&src=<bridge>&token=<t>&dur=24] for a run told in 20-30 s by the automatic cut, the recorder):
 //            t only moves through window.__harness.seek
 //   live     (?fixture=main&start=<ms> or ?take=<id>: a recorded take; otherwise the bridge, see live.tsx):
 //            t follows the wall clock; click a cell to focus, Escape returns
 // Every frame is f(events, t, view): the events are reduced at t and the views draw that state.
 
-import { emptyState, reduce } from "@harness/protocol";
+import { emptyState, parseJsonl, reduce } from "@harness/protocol";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { flushSync } from "react-dom";
 import { CameraRig } from "./camera.ts";
 import { Clock, useClock } from "./clock.ts";
 import type { Ctx } from "./ctx.ts";
-import { artifactUrl, loadRange, loadTake, loadTimeline, preloadTake, type Shot, type ShotData, type Take, type Timeline } from "./data.ts";
+import { autoShots } from "./autocut.ts";
+import { artifactUrl, loadRange, loadTake, loadTimeline, makeTake, preloadTake, type Shot, type ShotData, type Take, type Timeline } from "./data.ts";
 import { makeTimebase, type Direction, type ViewName } from "./direction.ts";
 import { Frame, Message } from "./frame.tsx";
 import { BridgeLive, FixtureLive } from "./live.tsx";
-import { takePairing } from "./bridge.ts";
+import { artifactBase, loadSettings, takePairing } from "./bridge.ts";
 import { color, size } from "./theme.ts";
 
 declare global {
@@ -74,10 +76,12 @@ function Director() {
 
   useEffect(() => {
     (async () => {
+      const runId = q.get("run");
       const takeOnly = q.get("take") && !q.get("shot") && !q.get("from");
-      const tl = takeOnly ? await loadTimeline().catch(() => NO_TIMELINE) : await loadTimeline();
+      const tl = takeOnly || runId ? await loadTimeline().catch(() => NO_TIMELINE) : await loadTimeline();
       let shots: ShotData[];
-      if (takeOnly) shots = [await wholeTake(q.get("take")!, 60000 / tl.grid.bpm)];
+      if (runId) shots = autoShots(await runTake(runId), 60000 / tl.grid.bpm, Number(q.get("dur") ?? 24));
+      else if (takeOnly) shots = [await wholeTake(q.get("take")!, 60000 / tl.grid.bpm)];
       else {
         const from = q.get("shot") ?? q.get("from") ?? tl.shots[0].id;
         const to = q.get("shot") ?? q.get("to") ?? from;
@@ -148,6 +152,16 @@ async function wholeTake(id: string, beatMs: number): Promise<ShotData> {
   };
   const dir: Direction = { shot: shot.id, draft: false, view: "graph", take: id, camera: [{ beat: 0, target: "all", dur: 0 }] };
   return { shot, dir, take, map: null, at: 0, durMs };
+}
+
+/** a run straight from the bridge (?src, else the saved address; ?token, else the saved token) */
+async function runTake(id: string): Promise<Take> {
+  const saved = loadSettings();
+  const s = { address: q.get("src") ?? saved.address, token: q.get("token") ?? saved.token };
+  const base = artifactBase(s, id);
+  const r = await fetch(base + "events.jsonl");
+  if (!r.ok) throw new Error(`the bridge answered ${r.status} for run ${id}`);
+  return makeTake(id, parseJsonl(await r.text()), base, false);
 }
 
 /** waits until what was just rendered is fully on screen: fonts, every image decoded, two paints */

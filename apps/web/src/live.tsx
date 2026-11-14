@@ -95,7 +95,11 @@ export function LiveStage({ take, t, tl, children }: { take: Take; t: number; tl
 
 export function FixtureLive() {
   const q = new URLSearchParams(location.search);
-  const start = Number(q.get("start") ?? 0);
+  return <Replay id={q.get("fixture") ?? q.get("take") ?? "main"} start={Number(q.get("start") ?? 0)} />;
+}
+
+/** a recorded take played on the wall clock; `children` sit over the stage */
+function Replay({ id, start = 0, children }: { id: string; start?: number; children?: ReactNode }) {
   const clock = useMemo(() => new Clock("live", start), [start]);
   const t = useClock(clock);
   const [take, setTake] = useState<Take | null>(null);
@@ -104,7 +108,6 @@ export function FixtureLive() {
 
   useEffect(() => {
     (async () => {
-      const id = q.get("fixture") ?? q.get("take") ?? "main";
       const [tk, timeline] = await Promise.all([loadTake(id), loadTimeline().catch(() => null)]);
       if (!tk) throw new Error(`no take or fixture named ${id}`);
       await preloadTake(tk);
@@ -116,20 +119,34 @@ export function FixtureLive() {
 
   if (err) return <Message text={err} />;
   if (!take) return null;
-  return <LiveStage take={take} t={t} tl={tl} />;
+  return <LiveStage take={take} t={t} tl={tl}>{children}</LiveStage>;
 }
 
 // ------------------------------------------------------------------ bridge
 
 const runParam = () => new URLSearchParams(location.search).get("run");
 
+/** the take the site replays when no bridge answers (bundled into the deployed site) */
+export const REPLAY_TAKE = "main";
+
 export function BridgeLive() {
   const [s, setS] = useState<BridgeSettings>(loadSettings);
   const [run, setRun] = useState<string | null>(runParam);
-  const [sheet, setSheet] = useState(() => !loadSettings().token);
+  const [sheet, setSheet] = useState(false);
   const [tl, setTl] = useState<Timeline | null>(null);
+  // whether a bridge answers at the address: "down" plays the bundled take instead
+  const [reach, setReach] = useState<"checking" | "up" | "down">("checking");
 
+  const probe = (c: BridgeSettings) =>
+    api(c, "/health").then(
+      () => "up" as const,
+      (x) => (/failed to fetch|networkerror|load failed/i.test(String((x as Error)?.message ?? x)) ? ("down" as const) : ("up" as const)),
+    );
   useEffect(() => {
+    void probe(s).then((r) => {
+      setReach(r);
+      if (r === "up" && !s.token) setSheet(true);
+    });
     loadTimeline().then(setTl, () => {});
     const on = () => setRun(runParam());
     addEventListener("popstate", on);
@@ -142,13 +159,31 @@ export function BridgeLive() {
   const save = (n: BridgeSettings) => {
     saveSettings(n);
     setS(n);
+    void probe(n).then(setReach);
   };
+
+  if (reach === "checking") return null;
+  const sheetEl = sheet ? <SettingsSheet s={s} onSave={save} onClose={() => setSheet(false)} /> : null;
+  if (reach === "down")
+    return (
+      <div style={{ position: "absolute", inset: 0 }}>
+        <Replay id={REPLAY_TAKE}>
+          <div data-ui style={{ position: "absolute", right: 40, top: 36, display: "flex", alignItems: "center", gap: 18 }}>
+            <div style={{ color: color.dim, font: `500 22px ${font.ui}`, background: color.panel, border: `1px solid ${color.line}`, borderRadius: size.radius, padding: "10px 16px" }}>
+              A replay. Connect a bridge in Settings to start your own run.
+            </div>
+            <RoundButton title="Settings" onClick={() => setSheet(true)}><Icon name="cog" size={26} /></RoundButton>
+          </div>
+        </Replay>
+        {sheetEl}
+      </div>
+    );
 
   return (
     <div style={{ position: "absolute", inset: 0 }}>
       {run ? <RunView key={`${run}|${s.address}|${s.token}`} s={s} run={run} tl={tl} onNew={() => open(null)} onSettings={() => setSheet(true)} />
         : <PromptScreen s={s} onRun={open} onSettings={() => setSheet(true)} />}
-      {sheet ? <SettingsSheet s={s} onSave={save} onClose={() => setSheet(false)} /> : null}
+      {sheetEl}
     </div>
   );
 }
