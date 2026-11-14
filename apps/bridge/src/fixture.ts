@@ -26,8 +26,17 @@ export function extractFixture(events: HarnessEvent[], node: string, name: strin
     if (typeof l.to === "string" && sub.has(l.to)) l.to = rel(l.to);
     const local = (u: unknown): u is string => typeof u === "string" && !u.includes("://") && !u.startsWith("/") && !u.startsWith("./");
     const keep = (u: string) => {
-      const file = files.get(u) ?? `${rel(e.node) === "." ? "" : rel(e.node) + "-"}${basename(u)}`;
-      files.set(u, file);
+      let file = files.get(u);
+      if (!file) {
+        // two run files can share a base name (stills/still-01.jpg, day/still-01.jpg): the later one gets a suffix
+        const want = `${rel(e.node) === "." ? "" : rel(e.node) + "-"}${basename(u)}`;
+        const taken = new Set(files.values());
+        const dot = want.lastIndexOf(".");
+        const [stem, ext] = dot > 0 ? [want.slice(0, dot), want.slice(dot)] : [want, ""];
+        file = want;
+        for (let i = 2; taken.has(file); i++) file = `${stem}-${i}${ext}`;
+        files.set(u, file);
+      }
       return `./${name}/${file}`;
     };
     for (const k of ["uri", "thumb"]) if (local(l[k])) l[k] = keep(l[k] as string);

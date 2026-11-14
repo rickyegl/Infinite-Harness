@@ -34,12 +34,13 @@ what the next agent should know. Keep it short; replace stale lines instead of a
 - **Done (plan 04), video on mock:** the asset modules. Image, Image Edit, Cutout, Music and Voice run for real;
   "show me a house", "make the walls red", "transparent background" chain without paths. Video stays on the mock
   until the author picks its runtime (USER-TODO 7). Details under "The assets" below.
-- **Built (plan 05), waiting on the author:** the reel modules: Trailer, Explainer, Premise Reel, Motion,
-  Ad Image, Campaign, Publish (dry run) and Approve, plus the script gate. "Make an ad campaign for Unity and
-  Roblox players" ran live end to end on run `20261113-224654`: the Trailer (both cuts, on the author's track),
-  the Explainer (narrated and rendered), the Premise narration, both Ad Images and the Publish dry run. Left: the
-  premise picture (waits for the author's green flag) and "make it night" on it. Details under "The reels" below.
-- **Next:** finish plan 05 once the author answers (below), then plans 06-07, then plan 08 replaces fixtures with recorded takes and finalises the
+- **Done (plan 05):** the reel modules: Trailer, Explainer, Premise Reel, Motion, Ad Image, Campaign, Publish
+  (dry run) and Approve, plus the script gate. "Make an ad campaign for Unity and Roblox players" ran live end to
+  end on run `20261113-224654`: the Trailer (both cuts, on the author's track), the Explainer (narrated and
+  rendered), the Premise Reel, both Ad Images and the Publish dry run. The premise reel has its picture, recorded
+  in Roblox Studio, and "Re-render the Roblox premise reel at night, same narration" re-recorded it at night through
+  the cell, with a day/night before/after. Details under "The reels" below.
+- **Next:** plans 06-07, then plan 08 replaces fixtures with recorded takes and finalises the
   draft direction files (S37-S40, S42-S47).
 
 ## Waiting on the author
@@ -61,9 +62,6 @@ remove the line when it is answered. See `AGENTS.md` rule 5.
 - (plan 04) **One more short voice reading?** The recorded Voice fixture also says the lead-in ("Read this in my
   voice: ..."), because the planner passed the whole sentence. That is fixed (the planner now passes only the
   script, checked on the mock bridge), but a clean recording costs one more short script of credits.
-- (plan 05) **Premise picture:** sets, cast, shots and the Studio capture start on your green flag for the
-  combined recording set and racing place. Until then the cell ends after the narration. "Make it night" on
-  the premise (a Done-when item) needs that picture, so it is not built yet.
 - (plan 05) **An Approve button on the site** next to a waiting script: today the go is a typed follow-up.
   Do you want a button (plan 06 or later)?
 - (plan 04) **The chosen song is 2.06 s long** (`video/makeasong.mp3`, 45 KB). Music cells hand it over as it
@@ -156,7 +154,14 @@ remove the line when it is answered. See `AGENTS.md` rule 5.
     Script, gate, the `explainer` voice, a HyperFrames picture in the game's colours, then the studio's sound,
     captions and assembly. About 24 s. The Campaign hands it the Unity brief.
   - `reel.premise`: a Template A script that opens with "In this world,", the gate, the `premise` voice
-    (fx A, 1.15x), then a stop before the picture. About 30 s.
+    (fx A, 1.15x), then the picture once the studio project has `gen_shots.py` and `project.json` (authored in
+    the recording place after the author's green flag; without them the cell stops after the narration, as
+    before). Lighting comes from the `lighting` param, else "night" in the prompt, else day. The cell generates
+    `Shots.lua` for the lighting, records a take in Studio with `capture.py` (sync, Play, the studio recorder on
+    the portrait monitor, stop on "[cutscene] done", cut the set-change holds, measure the white slates), or
+    reuses the last take when its `Shots.lua` hash is the same (`retake: true` forces a new one). It then
+    assembles with the cached narration, captions, sounds and bed, and adds a wipe before/after against the other
+    lighting when that reel exists. About 25.6 s.
   - `motion`: HyperFrames clips.
   - `ad.image`: an image-model picture, with the type set in code.
   - `campaign`: one brief per audience, then the pieces side by side, then a Publish dry run.
@@ -185,12 +190,21 @@ remove the line when it is answered. See `AGENTS.md` rule 5.
   - Explainer: `artifacts/campaign-4.explainer/explainer.mp4`, "What If Your Kart Race Had Punching?", 59
     words, 1080x1920, 20.1 s (19.3 s of narration). About the game only: the loops, the 24 m drop, the punch,
     the four classes, the trophy, "Play it on PC" (frames looked at).
-  - Premise: 110 words read in 24.9 s (fx A, 1.15x), opening "In this world,"; the cell stops before the picture.
+  - Premise: 110 words read in 24.9 s (fx A, 1.15x), opening "In this world,". Picture (after the green flag
+    and the author copying the race into "Global Set - Inf"): the race set at +47500 Z, a cast of karts and
+    riders (`build_cast.lua`), 34 shots, recorded in Studio and assembled at -14.7 LUFS, 25.6 s, 9:16. Day by
+    hand first, then night (lifted ambient, exposure 0.75). Then the follow-up "Re-render the Roblox premise reel
+    at night, same narration" (`premise-night`) ran the cell end to end: it recorded a new night take in Studio
+    by itself (1533 frames, 0 set holds), assembled it, and attached the day/night wipe at 13.6 s. Contact sheets
+    looked at for both: no pink, no black or white frames, no freezes, captions in sync. Same narration files
+    (hash checked), no new voice credits. The take-reuse path (unchanged shots) is written and typechecked but
+    not run live. Studio-side notes: the project's `STATE.md` in the studio.
   - Both scripts passed the gate as "Script approved earlier" (the go's from 2026-11-14, kept in the ledger).
   - Publish dry run: 3 posts planned for the explainer (TikTok dev_en, Instagram dev_en, YouTube explainers),
-    nothing posted. No studio account posts trailers; the premise reel is routed once it has a picture.
-  - `video/audio/reels/trailer.wav` and `explainer.wav` copied from the mp4s (sound from the first frame);
-    `premise.wav` waits for the premise reel's night version.
+    nothing posted. No studio account posts trailers; the premise reel was not routed in that dry run (it had
+    no picture yet), and nothing has been published.
+  - `video/audio/reels/trailer.wav`, `explainer.wav` and `premise.wav` (the night reel) copied from the mp4s
+    (sound from the first frame).
 - **HUD switch verified in the open editor:** the template is synced and compiles with 0 errors. `play_capture`
   with `hud: false` has no HUD, and the HUD is back on the next capture. The trailer cell now syncs the
   template and runs `setup` (which compiles) before it records.
@@ -211,6 +225,9 @@ remove the line when it is answered. See `AGENTS.md` rule 5.
 - **Fixtures:** recorded from run `20261113-224654` for `reel.trailer`, `reel.explainer`, `reel.premise`,
   `ad.image`, `approve` and `campaign` (the campaign fixture carries its whole subtree). Media shrunk for the
   repo (videos 360 px, narration 16 kHz mono, ad pictures at half size); local paths replaced by `<studio>`.
+  `reel.premise` re-recorded from `premise-night` (the night reel, its stills and the before/after). The fixture
+  recorder now gives run files that share a base name (`stills/still-01.jpg`, `day/still-01.jpg`) their own
+  fixture files; before, the before/after pointed both sides at one picture (tested).
   `HARNESS_MOCK=1` replays the whole campaign from them (16 s at speed 20). Worker steps for the CLI's own
   tool listing are titled "Looked up its tools" (they carried the CLI's name; caught by lint:brand).
 
@@ -546,7 +563,7 @@ before falling back to the fixture (checked: the full film has 20, one per take,
 | 02 | done | typecheck, unit tests (none skipped), `pnpm dev`, real runs on both workers, no-network probes, proxy routing with both models, prompt.md module run, test:bridge, test:live, determinism, film:rough, lint:brand | See "The bridge". |
 | 03 | done, two fallbacks | full run 20261113-014545, four follow-ups under 5 s, fixtures, typecheck, tests, test:bridge, test:live, determinism, film:rough, lint:brand | Windows build until WebGL is installed; Roblox place not opened in Studio. See "The games". |
 | 04 | done, video on mock | runs 20261113-222539 (house chain), 20261113-223714 (song), 20261113-223729 (voice), 20261113-224654 (full game with real assets), fixtures, mock replay, tests, test:bridge, typecheck, lint:brand, forge stopped (`colab ls`: no sessions) | Video waits for its runtime; `assets.image` with `transparent` not run live; image quota out at the end. See "The assets". |
-| 05 | built, waiting on the author | typecheck (all packages), tests (protocol 13, web 7, bridge 56, reels 18 of them), campaign replayed from its fixture in mock mode, router re-record, test:bridge, test:live, determinism 96/96, film:rough (140.6 s, every cut on a beat), lint:brand, motion run + fixture, campaign live run end to end (trailer, explainer, premise narration, ads, publish dry run), fixtures for every reel module, HUD capture in Unity | Premise green flag; "make it night" on the premise needs the picture. See "The reels". |
+| 05 | done | premise picture day and night, the night re-render live through the cell (`premise-night`: Studio take, assembly, before/after), contact sheets looked at, `reel.premise` fixture re-recorded, typecheck, tests (protocol 13, web 7, bridge 58, reels 20 of them), lint:brand; earlier: tests (bridge 56, reels 18), campaign replayed from its fixture in mock mode, router re-record, test:bridge, test:live, determinism 96/96, film:rough (140.6 s, every cut on a beat), lint:brand, motion run + fixture, campaign live run end to end (trailer, explainer, premise narration, ads, publish dry run), fixtures for every reel module, HUD capture in Unity | The premise take-reuse path is not run live; nothing published. See "The reels". |
 | 06 | not started | | |
 | 07 | not started | | |
 | 08 | not started | | |

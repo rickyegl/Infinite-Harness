@@ -16,7 +16,7 @@ import { resolutionOf, secondsOf } from "../../../modules/motion/run.ts";
 import { MARKER, tableLines, type Entry } from "../../../modules/publish/run.ts";
 import { accountOf, cacheKey, presetOf } from "../../../modules/voice/run.ts";
 import { briefsOf } from "../../../modules/campaign/run.ts";
-import { opensRight } from "../../../modules/reel.premise/run.ts";
+import { lightingOf, opensRight } from "../../../modules/reel.premise/run.ts";
 import { gameFacts, gameLook } from "../../../modules/reel.explainer/run.ts";
 import { gameLook as adLook, headlineOf } from "../../../modules/ad.image/run.ts";
 import { DEFAULT } from "../../../modules/game/lib/design.ts";
@@ -216,6 +216,14 @@ describe("premise and campaign", () => {
     expect(opensRight("# Title: x\nWhenever you brake, you win.")).toBe(false);
   });
 
+  it("picks the premise lighting: param, then the prompt, then day", () => {
+    expect(lightingOf("night", "make it day")).toBe("night");
+    expect(lightingOf(undefined, "Make it night")).toBe("night");
+    expect(lightingOf(undefined, "re-render the premise reel at nighttime")).toBe("night");
+    expect(lightingOf(undefined, "nightly build of the premise reel")).toBe("day");
+    expect(lightingOf("dusk", undefined)).toBe("day");
+  });
+
   it("fills briefs the worker missed and keeps the ones it wrote", () => {
     const b = briefsOf([{ audience: "Roblox players", angle: "Race your friends.", headline: "RACE. FIGHT.", cta: "Play free" }], ["unity", "roblox"], "Zapwick Rush");
     expect(b.map((x) => x.audience)).toEqual(["unity", "roblox"]);
@@ -245,5 +253,23 @@ describe("premise and campaign", () => {
     expect(look).not.toMatch(/sitting with both arms/);
     expect(adLook(undefined)).toBe("");
     expect(headlineOf("make an ad")).toBe("Race. Fight. Win.");
+  });
+});
+
+describe("fixture recording", () => {
+  it("gives run files that share a base name their own fixture files", async () => {
+    const { extractFixture } = await import("../src/fixture.ts");
+    const ev = (seq: number, x: Record<string, unknown>) => ({ seq, run: "r", t: seq, ...x }) as unknown as HarnessEvent;
+    const events = [
+      ev(1, { type: "node.spawn", node: "p", parent: "root", title: "P" }),
+      ev(2, { type: "node.evidence", node: "p", kind: "video", uri: "artifacts/p/a.mp4", caption: "", meta: { frames: ["artifacts/p/stills/still-01.jpg"] } }),
+      ev(3, { type: "node.evidence", node: "p", kind: "image", uri: "artifacts/p/night/still-01.jpg", caption: "", meta: { before: "artifacts/p/day/still-01.jpg" } }),
+      ev(4, { type: "node.done", node: "p", summary: "ok" }),
+    ];
+    const { lines, files } = extractFixture(events, "p", "default");
+    expect(new Set(files.values()).size).toBe(files.size);
+    const img = lines.find((l) => l.kind === "image") as { uri: string; meta: { before: string } };
+    expect(img.uri).toBe("./default/still-01-2.jpg");
+    expect(img.meta.before).toBe("./default/still-01-3.jpg");
   });
 });

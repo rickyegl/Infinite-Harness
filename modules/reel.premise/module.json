@@ -3,13 +3,16 @@
   "label": "Premise Reel",
   "icon": "film",
   "kind": "agent",
-  "summary": "A Roblox premise Short in the studio's recipe set in the run's own racing game (about 30 s, 9:16): an \"In this world,\" script, a stop for the author's go, then narration in the premise voice. The Studio picture (sets, shots, capture) starts after the author's green flag.",
+  "summary": "A Roblox premise Short in the studio's recipe set in the run's own racing game (about 25-30 s, 9:16): an \"In this world,\" script, a stop for the author's go, narration in the premise voice, then the picture recorded in Roblox Studio from the project's shot list, by day or by night (\"make it night\" re-renders with the same narration and attaches before/after).",
   "accepts": [
     "text"
   ],
   "produces": [
     "doc",
-    "audio"
+    "audio",
+    "frames",
+    "video",
+    "image"
   ],
   "runtime": "cli-agent",
   "mock": true,
