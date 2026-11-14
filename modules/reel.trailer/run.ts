@@ -69,6 +69,14 @@ export default async function run(ctx: ModuleContext, input: ModuleInput): Promi
     }
   } else {
     const u = unityFor(ctx);
+    // the editor compiles template changes (such as the capture's HUD switch) only on setup's asset refresh
+    const changed = u.prepare();
+    if (changed.some((f) => f.endsWith(".cs"))) {
+      ctx.step("Updating the Unity project", changed.join(", "), "cube");
+      await u.op("setup", {}, 10 * 60_000);
+      await u.settle();
+      await u.op("setup", {}, 10 * 60_000);
+    }
     const plan: { key: string; role: Role; from: string; what: string }[] = [
       { key: "A", role: "start", from: "", what: "the start" },
       ...(design.track.loops ? [{ key: "B", role: "loop" as Role, from: "loop", what: "the loop" }] : []),

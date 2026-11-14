@@ -6,7 +6,7 @@ game: about 30 s (the recipe runs 35-45 s), 9:16, in the premise narrator's voic
 - **Script:** Template A. The first spoken words are always "In this world," then the rule ("whenever you X, Y"),
   examples, the exception kid aged 12-16, the turn, the escalation, "<Name> froze." and a reframe that ends on the
   punchline. A worker writes it from `script.md` with the game's design (title, track, the four rider classes);
-  113-125 spoken words at the narrator's 4.1 words a second. A draft that is out of range or opens any other way
+  113-125 spoken words at the narrator's 4.1 words a second (a draft within 6 words of that range is kept). A draft that is out of range or opens any other way
   is rewritten up to twice, and the cell refuses a script that does not open with "In this world,".
 - **Gate:** the cell stops at "Waiting for your go" before any voice credit is spent (`_shared/gate.ts`).
 - **Narration:** the Voice cell's `premise` preset (the recipe's narrator, fx A, speed 1.15; the voice id lives

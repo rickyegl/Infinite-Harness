@@ -40,7 +40,7 @@ export function waiting(runDir: string): Wait[] {
 /** the approve side: records a go for exactly the script text as it is now */
 export function approve(runDir: string, w: Wait): string {
   const text = readFileSync(w.script, "utf8");
-  writeFileSync(fileOf(runDir, w.node, "go"), JSON.stringify({ hash: hashOf(text), at: new Date().toISOString() }));
+  writeFileSync(fileOf(runDir, w.node, "go"), JSON.stringify({ hash: hashOf(text), script: w.script, at: new Date().toISOString() }));
   return text;
 }
 
@@ -64,6 +64,26 @@ export async function gate(ctx: ModuleContext, label: string, script: string): P
     return readFileSync(script, "utf8");
   }
   mkdirSync(approvalsDir(runDir), { recursive: true });
+  // a go given to an earlier cell for this same script and text (the bridge stopped while it waited, and the
+  // author asked for the reel again) still counts; that cell's stale wait goes
+  const now = hashOf(readFileSync(script, "utf8"));
+  let earlier = false;
+  for (const f of readdirSync(approvalsDir(runDir))) {
+    const at = join(approvalsDir(runDir), f);
+    let rec: { script?: string; hash?: string } = {};
+    try {
+      rec = JSON.parse(readFileSync(at, "utf8"));
+    } catch {
+      continue;
+    }
+    if (rec.script !== script || f === `${ctx.node}.wait` || !/\.(wait|go)$/.test(f)) continue;
+    if (f.endsWith(".go") && rec.hash === now) earlier = true;
+    rmSync(at, { force: true });
+  }
+  if (earlier) {
+    ctx.step("Script approved earlier", "the go was given while an earlier cell waited on this script", "check");
+    return readFileSync(script, "utf8");
+  }
   rmSync(fileOf(runDir, ctx.node, "go"), { force: true });
   const wait: Wait = { node: ctx.node, label, script, hash: hashOf(readFileSync(script, "utf8")), at: new Date().toISOString() };
   writeFileSync(fileOf(runDir, ctx.node, "wait"), JSON.stringify(wait, null, 2));

@@ -3,14 +3,14 @@
 // and leave the studio's catalog and post lists untouched (its sockets are blocked inside plan.py, so a planner
 // that tried the network would fail the run instead of posting).
 
-import type { HarnessEvent } from "@harness/protocol";
+import type { HarnessEvent, ModuleContext } from "@harness/protocol";
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
 import { config } from "../src/config.ts";
-import { approve, hashOf, waiting, type Wait } from "../../../modules/_shared/gate.ts";
+import { approve, gate, hashOf, waiting, type Wait } from "../../../modules/_shared/gate.ts";
 import { inSubtree, pick } from "../../../modules/approve/run.ts";
 import { resolutionOf, secondsOf } from "../../../modules/motion/run.ts";
 import { MARKER, tableLines, type Entry } from "../../../modules/publish/run.ts";
@@ -54,6 +54,31 @@ describe("script gate", () => {
     approve(run, w);
     const go = JSON.parse(readFileSync(join(run, "approvals", "n1.go"), "utf8"));
     expect(go.hash).toBe(hashOf("In this world, karts race."));
+  });
+  it("lets a go given to a stopped cell count for the next cell on the same script", async () => {
+    const run = join(tmp, "run2");
+    const script = join(tmp, "script2.txt");
+    writeFileSync(script, "In this world, karts race.");
+    mkdirSync(join(run, "approvals"), { recursive: true });
+    const old: Wait = { node: "premise", label: "Premise", script, hash: hashOf("In this world, karts race."), at: "" };
+    writeFileSync(join(run, "approvals", "premise.wait"), JSON.stringify(old));
+    approve(run, old); // the author said go, but the cell that waited is gone
+    const dir = join(run, "artifacts", "premise-2");
+    mkdirSync(dir, { recursive: true });
+    const steps: string[] = [];
+    const ctx = {
+      dir,
+      node: "premise-2",
+      config: {},
+      signal: new AbortController().signal,
+      step: (t: string) => steps.push(t),
+      state: () => {},
+      evidence: async () => "",
+      sh: async (_c: string, a: string[]) => (writeFileSync(a[2], "png"), { code: 0, stdout: "", stderr: "" }),
+    } as unknown as ModuleContext;
+    await expect(gate(ctx, "Premise", script)).resolves.toBe("In this world, karts race.");
+    expect(steps).toContain("Script approved earlier");
+    expect(waiting(run)).toEqual([]);
   });
 });
 
