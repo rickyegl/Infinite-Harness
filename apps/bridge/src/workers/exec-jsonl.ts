@@ -20,6 +20,13 @@ import { anyNetwork, harnessToolList } from "./allow.ts";
 import { runLines, runText, short } from "./proc.ts";
 import type { WorkerCall, WorkerOutcome } from "./types.ts";
 
+/**
+ * The step title for a tool call. The CLI's own resource-listing tools come under the CLI's own name as the
+ * server, which must never be shown, so they get a plain title.
+ */
+export const toolStep = (server: string, tool: string): string =>
+  /^(list_mcp_resources|list_mcp_resource_templates|read_mcp_resource)$/.test(tool) ? "Looked up its tools" : `${server}: ${tool}`;
+
 const ALWAYS_OFF = ["browser_use", "browser_use_external", "in_app_browser", "computer_use", "apps", "plugins", "image_generation", "multi_agent"];
 
 const toml = (v: unknown): string => {
@@ -109,7 +116,7 @@ export async function runExecJsonl(call: WorkerCall): Promise<WorkerOutcome> {
       }
       const it = e.item;
       if (e.type === "item.started" && it?.type === "command_execution") call.onStep("Ran a command", short(String(it.command ?? "")), "code");
-      else if (e.type === "item.started" && it?.type === "mcp_tool_call" && it.server !== "harness") call.onStep(`${it.server}: ${it.tool}`, short(JSON.stringify(it.arguments ?? {})), "cog");
+      else if (e.type === "item.started" && it?.type === "mcp_tool_call" && it.server !== "harness") call.onStep(toolStep(it.server, it.tool), short(JSON.stringify(it.arguments ?? {})), "cog");
       else if (e.type === "item.started" && it?.type === "web_search") call.onStep("Searched the web", short(String(it.query ?? "")), "globe");
       else if (e.type === "item.completed" && it?.type === "file_change") {
         for (const ch of it.changes ?? []) {
@@ -119,7 +126,7 @@ export async function runExecJsonl(call: WorkerCall): Promise<WorkerOutcome> {
           call.onStep(ch.kind === "add" ? `Wrote ${basename(ch.path)}` : `Edited ${basename(ch.path)}`, undefined, "pencil");
         }
       } else if (e.type === "item.completed" && it?.type === "agent_message") text = String(it.text ?? "");
-      else if (e.type === "item.completed" && it?.type === "mcp_tool_call" && it.error) call.onStep(`${it.server}: ${it.tool} failed`, short(String(it.error?.message ?? it.error)), "alert");
+      else if (e.type === "item.completed" && it?.type === "mcp_tool_call" && it.error) call.onStep(`${toolStep(it.server, it.tool)} failed`, short(String(it.error?.message ?? it.error)), "alert");
       else if (e.type === "turn.failed") error = String(e.error?.message ?? "turn failed");
       else if (e.type === "error" && !error) error = String(e.message ?? "error");
     },

@@ -12,7 +12,7 @@ import { describe, expect, it } from "vitest";
 import { config, isPlaceholder, type WorkerConfig } from "../src/config.ts";
 import { checkAllow } from "../src/modules.ts";
 import { resolveGrants, runWorker, type Grants, type WorkerCall } from "../src/workers/index.ts";
-import { buildArgs as execArgs } from "../src/workers/exec-jsonl.ts";
+import { buildArgs as execArgs, toolStep } from "../src/workers/exec-jsonl.ts";
 import { buildArgs as streamArgs } from "../src/workers/stream-json.ts";
 
 const manifest = (allow: ModuleManifest["allow"]): ModuleManifest => ({
@@ -51,6 +51,14 @@ describe("allow vocabulary", () => {
     expect(g.writeDirs).toEqual(["/r/work/n"]);
     expect(resolveGrants({ tools: ["harness.*"] }, where, cfg).harness).toBe("*");
     expect(() => resolveGrants({ write: ["$paths.nope"] }, where, cfg)).toThrow(/not set/);
+  });
+});
+
+describe("exec-jsonl step titles", () => {
+  it("never shows the CLI's own name for its built-in tool listing", () => {
+    expect(toolStep("cli", "list_mcp_resources")).toBe("Looked up its tools");
+    expect(toolStep("cli", "list_mcp_resource_templates")).toBe("Looked up its tools");
+    expect(toolStep("studio", "render")).toBe("studio: render");
   });
 });
 

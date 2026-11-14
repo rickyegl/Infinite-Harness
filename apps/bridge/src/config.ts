@@ -51,7 +51,7 @@ export type HarnessConfig = {
   assetKinds: Record<string, string>;
   paths: Record<string, string>;
   colab: { session: string; gpu: string; keepAlive: boolean };
-  voice: { envFile: string };
+  voice: { envFile: string; account?: { use: string; as: string } };
   brandDenyList: string[];
 };
 

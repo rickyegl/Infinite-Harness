@@ -9,6 +9,9 @@
 // only; ids never go in committed files): "premise" is the premise narrator sped up, "explainer" the explainer
 // narrator at normal speed. params.verbatim keeps the prompt as is (a reel's script, one beat per line).
 //
+// Account: config voice.account picks which key line of voice.envFile pays (see accountOf); unset, the tool
+// uses its own default line.
+//
 // Voice credits: one request reads one script (at most MAX_CHARS, or the preset's maxChars). Results are cached by
 // script text and voice under runs/.cache/voice, so the same script never costs credits twice.
 //
@@ -47,6 +50,23 @@ export function presetOf(config: Record<string, any>, name: unknown): Preset | n
   if (!p || !set(p.voice)) throw new Error(`config voice.presets.${String(name)} is not set (harness.local.json)`);
   if (!["none", "A", "B", "C"].includes(p.fx ?? "none")) throw new Error(`voice.presets.${String(name)}.fx must be none, A, B or C`);
   return { name: String(name), voice: p.voice, model: set(p.model) ? p.model : undefined, fx: p.fx ?? "none", speed: Number(p.speed) || undefined, maxChars: Number(p.maxChars) || undefined };
+}
+
+/**
+ * config voice.account = { use, as } (harness.local.json): which voice account pays. `use` names the line in
+ * voice.envFile that holds that account's key, `as` the name the narration tool reads; the key goes to the tool
+ * as that variable only, and is never logged. Unset: the tool's own default line.
+ */
+export function accountOf(config: Record<string, any>, text?: string): { as: string; key: string } | null {
+  const a = config.voice?.account;
+  const name = (v: unknown) => typeof v === "string" && /^[A-Za-z_][A-Za-z0-9_]*$/.test(v);
+  if (!a || !name(a.use) || !name(a.as)) return null;
+  const file = config.voice?.envFile;
+  const body = text ?? (typeof file === "string" && existsSync(file) ? readFileSync(file, "utf8") : "");
+  const line = body.split(/\r?\n/).find((l) => l.startsWith(`${a.use}=`));
+  const key = line?.slice(a.use.length + 1).trim();
+  if (!key) throw new Error("config voice.account names a key line that is not in voice.envFile");
+  return { as: a.as, key };
 }
 
 /** the cache key: the default voice keeps its old key, so earlier readings stay reusable */
@@ -96,6 +116,8 @@ async function read(ctx: ModuleContext, script: string, cache: string, preset: P
   // (Windows names it Path; set the same key so the child does not get two)
   const pk = Object.keys(process.env).find((k) => k.toUpperCase() === "PATH") ?? "PATH";
   const env: Record<string, string> = ff && !/^<.*>$/.test(ff) ? { [pk]: `${dirname(ff)}${delimiter}${process.env[pk] ?? ""}` } : {};
+  const acct = accountOf(ctx.config);
+  if (acct) env[acct.as] = acct.key;
   ctx.step(preset ? `Reading the script in the ${preset.name} voice` : "Reading the script in the cloned voice", script.slice(0, 160), "wave");
   const python = ctx.config.paths?.python && !/^<.*>$/.test(ctx.config.paths.python) ? ctx.config.paths.python : "python";
   const args = [tool, join(tmp, "script.txt"), tmp, "--fx", preset?.fx ?? "none"];

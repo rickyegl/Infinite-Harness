@@ -14,7 +14,7 @@ import { approve, gate, hashOf, waiting, type Wait } from "../../../modules/_sha
 import { inSubtree, pick } from "../../../modules/approve/run.ts";
 import { resolutionOf, secondsOf } from "../../../modules/motion/run.ts";
 import { MARKER, tableLines, type Entry } from "../../../modules/publish/run.ts";
-import { cacheKey, presetOf } from "../../../modules/voice/run.ts";
+import { accountOf, cacheKey, presetOf } from "../../../modules/voice/run.ts";
 import { briefsOf } from "../../../modules/campaign/run.ts";
 import { opensRight } from "../../../modules/reel.premise/run.ts";
 import { gameFacts, gameLook } from "../../../modules/reel.explainer/run.ts";
@@ -38,6 +38,12 @@ describe("voice presets", () => {
     expect(cacheKey("hi", p)).not.toBe(cacheKey("hi", null));
     expect(cacheKey("hi", p)).not.toBe(cacheKey("hi there", p));
     expect(cacheKey("hi", null)).toBe(cacheKey("hi", null));
+  });
+  it("hands the chosen account's key to the tool under the name it reads", () => {
+    const env = "# keys\nTOOL_KEY=second\nTOOL_KEY_FIRST=first\n";
+    expect(accountOf({ voice: { account: { use: "TOOL_KEY_FIRST", as: "TOOL_KEY" } } }, env)).toEqual({ as: "TOOL_KEY", key: "first" });
+    expect(accountOf({ voice: {} }, env)).toBeNull();
+    expect(() => accountOf({ voice: { account: { use: "NOPE", as: "TOOL_KEY" } } }, env)).toThrow(/not in voice.envFile/);
   });
 });
 

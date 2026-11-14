@@ -36,9 +36,9 @@ what the next agent should know. Keep it short; replace stale lines instead of a
   until the author picks its runtime (USER-TODO 7). Details under "The assets" below.
 - **Built (plan 05), waiting on the author:** the reel modules: Trailer, Explainer, Premise Reel, Motion,
   Ad Image, Campaign, Publish (dry run) and Approve, plus the script gate. "Make an ad campaign for Unity and
-  Roblox players" ran live on run `20261113-224654`: the Trailer (both cuts, on the author's track) and both
-  Ad Images are done; both scripts are approved, but their narration is blocked by the voice account (below).
-  Details under "The reels" below.
+  Roblox players" ran live end to end on run `20261113-224654`: the Trailer (both cuts, on the author's track),
+  the Explainer (narrated and rendered), the Premise narration, both Ad Images and the Publish dry run. Left: the
+  premise picture (waits for the author's green flag) and "make it night" on it. Details under "The reels" below.
 - **Next:** finish plan 05 once the author answers (below), then plans 06-07, then plan 08 replaces fixtures with recorded takes and finalises the
   draft direction files (S37-S40, S42-S47).
 
@@ -61,13 +61,6 @@ remove the line when it is answered. See `AGENTS.md` rule 5.
 - (plan 04) **One more short voice reading?** The recorded Voice fixture also says the lead-in ("Read this in my
   voice: ..."), because the planner passed the whole sentence. That is fixed (the planner now passes only the
   script, checked on the mock bridge), but a clean recording costs one more short script of credits.
-- (plan 05) **Voice account (blocks both narrations):** both scripts are approved (2026-11-14), but the
-  voice service refused both reads. The account is on the free plan with 299 of 10,000 characters left until
-  2026-12-03; the two scripts need 1,058 (explainer 394, premise 664). The explainer voice is a library
-  (professional) voice, which the free plan cannot use through the API (402); the premise voice got 401. Needed:
-  a paid plan on that account, or another key in the studio's `.env`. Then ask again "Make an ad campaign for
-  Unity and Roblox players" on run `20261113-224654`: both go's still hold (they follow the script files), so it
-  narrates and renders without a new go.
 - (plan 05) **Premise picture:** sets, cast, shots and the Studio capture start on your green flag for the
   combined recording set and racing place. Until then the cell ends after the narration. "Make it night" on
   the premise (a Done-when item) needs that picture, so it is not built yet.
@@ -180,18 +173,24 @@ remove the line when it is answered. See `AGENTS.md` rule 5.
     Approve.
 - **Campaign live** (run `20261113-224654`): briefs "ZAP PAST THE PACK" (Unity) and "SEND THE PACK
   SPINNING" (Roblox). Explainer, Premise Reel, two Ad Images and the Trailer run side by side as the Campaign
-  subtree. Third pass (`campaign-3`, after the track, the quota and both go's):
+  subtree. Fourth pass (`campaign-4`, on voice account 1; the trailer and ad notes below are from the third pass,
+  `campaign-4` made the same again with new ad lines "ZAPWICK RUSH: MASTER THE CHAOS" and "ZAPWICK RUSH:
+  SCRAMBLE THE PACK"):
   - Trailer: `artifacts/campaign-3.trailer/trailer-9x16.mp4` and `trailer-16x9.mp4`, 30 s each, 25 cuts on the
     beat, the drop at 12.8 s, -14.0 LUFS, no HUD. The captions are about the game only: "8 RIDERS", "FIGHT FOR
     THE LEAD", the loops and twists, then "ZAPWICK RUSH / PLAY NOW ON PC".
   - Ad Images: Unity "MASTER THE LOOP. STEAL FIRST." / "Race Now", Roblox "EIGHT RIDERS. TOTAL CHAOS." /
     "Play On Roblox", feed and story each. The picture brief now describes the game (kart, rider, track,
     colours), so the ads show karts on the track (looked at).
-  - Explainer ("What If Your Kart Race Had Punching?", 59 words, about the game) and Premise ("Your Kart Gets
-    FASTER When You Brake for Someone...", 112 words, opening "In this world,"): both approved, both shown as
-    "Script approved earlier" on the re-ask; the voice step failed on the account (see "Waiting on the author").
-  - Publish dry run: 0 posts. The studio reports that no channel or account posts trailers; the explainer and
-    premise reels are routed once they exist.
+  - Explainer: `artifacts/campaign-4.explainer/explainer.mp4`, "What If Your Kart Race Had Punching?", 59
+    words, 1080x1920, 20.1 s (19.3 s of narration). About the game only: the loops, the 24 m drop, the punch,
+    the four classes, the trophy, "Play it on PC" (frames looked at).
+  - Premise: 110 words read in 24.9 s (fx A, 1.15x), opening "In this world,"; the cell stops before the picture.
+  - Both scripts passed the gate as "Script approved earlier" (the go's from 2026-11-14, kept in the ledger).
+  - Publish dry run: 3 posts planned for the explainer (TikTok dev_en, Instagram dev_en, YouTube explainers),
+    nothing posted. No studio account posts trailers; the premise reel is routed once it has a picture.
+  - `video/audio/reels/trailer.wav` and `explainer.wav` copied from the mp4s (sound from the first frame);
+    `premise.wav` waits for the premise reel's night version.
 - **HUD switch verified in the open editor:** the template is synced and compiles with 0 errors. `play_capture`
   with `hud: false` has no HUD, and the HUD is back on the next capture. The trailer cell now syncs the
   template and runs `setup` (which compiles) before it records.
@@ -204,12 +203,16 @@ remove the line when it is answered. See `AGENTS.md` rule 5.
   > synth bass, bright arcade lead, revving-engine risers. Short intro, an 8-bar build with a snare roll and a
   > rising sweep, one beat of silence, then a huge drop with sidechained bass and stabbing synth chords. Video
   > game trailer energy, no vocals.
-- **Credits used in plan 05:** no voice characters (both reads were refused before any audio). Image calls:
-  8 ad pictures (two ads with two sizes each, on the second and third campaign passes).
-- **Fixtures:** recorded from run `20261113-224654` for `reel.trailer` (the videos shrunk to 360 px for the
-  fixture), `ad.image` and `approve`. Still none for `reel.explainer`, `reel.premise` and `campaign`: they are
-  recorded once the narration runs. Until then a mock-mode run that routes to them runs them for real (worker
-  calls, image requests and the gates); no voice is used without a go.
+- **Credits used in plan 05:** voice account 1 (the original paid account): 225 credits for both reads, 9,758
+  left. Image calls: 12 ad pictures (two ads with two sizes each, on the second, third and fourth passes).
+- **Voice account:** `voice.account` in `harness.local.json` = { use, as } names which key line of the studio's
+  `.env` pays (account 1, per the author on 2026-11-14) and the name the narration tool reads it under. The key
+  is handed to the tool as that variable only, never logged; the studio's `.env` is unchanged (tested).
+- **Fixtures:** recorded from run `20261113-224654` for `reel.trailer`, `reel.explainer`, `reel.premise`,
+  `ad.image`, `approve` and `campaign` (the campaign fixture carries its whole subtree). Media shrunk for the
+  repo (videos 360 px, narration 16 kHz mono, ad pictures at half size); local paths replaced by `<studio>`.
+  `HARNESS_MOCK=1` replays the whole campaign from them (16 s at speed 20). Worker steps for the CLI's own
+  tool listing are titled "Looked up its tools" (they carried the CLI's name; caught by lint:brand).
 
 ## The assets (plan 04)
 
@@ -543,7 +546,7 @@ before falling back to the fixture (checked: the full film has 20, one per take,
 | 02 | done | typecheck, unit tests (none skipped), `pnpm dev`, real runs on both workers, no-network probes, proxy routing with both models, prompt.md module run, test:bridge, test:live, determinism, film:rough, lint:brand | See "The bridge". |
 | 03 | done, two fallbacks | full run 20261113-014545, four follow-ups under 5 s, fixtures, typecheck, tests, test:bridge, test:live, determinism, film:rough, lint:brand | Windows build until WebGL is installed; Roblox place not opened in Studio. See "The games". |
 | 04 | done, video on mock | runs 20261113-222539 (house chain), 20261113-223714 (song), 20261113-223729 (voice), 20261113-224654 (full game with real assets), fixtures, mock replay, tests, test:bridge, typecheck, lint:brand, forge stopped (`colab ls`: no sessions) | Video waits for its runtime; `assets.image` with `transparent` not run live; image quota out at the end. See "The assets". |
-| 05 | built, waiting on the author | typecheck (all packages), tests (protocol 13, web 7, bridge 54, reels 17 of them), router re-record, test:bridge, test:live, determinism 96/96, film:rough (140.6 s, every cut on a beat), lint:brand, motion run + fixture, campaign live run (trailer and ad images done), HUD capture in Unity | Voice account (plan or key), premise green flag; "make it night" on the premise needs the picture. See "The reels". |
+| 05 | built, waiting on the author | typecheck (all packages), tests (protocol 13, web 7, bridge 56, reels 18 of them), campaign replayed from its fixture in mock mode, router re-record, test:bridge, test:live, determinism 96/96, film:rough (140.6 s, every cut on a beat), lint:brand, motion run + fixture, campaign live run end to end (trailer, explainer, premise narration, ads, publish dry run), fixtures for every reel module, HUD capture in Unity | Premise green flag; "make it night" on the premise needs the picture. See "The reels". |
 | 06 | not started | | |
 | 07 | not started | | |
 | 08 | not started | | |

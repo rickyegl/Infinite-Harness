@@ -44,6 +44,7 @@
   "colab": { "session": "forge", "gpu": "L4", "keepAlive": false },
   "voice": {
     "envFile": "<path to the .env that holds the voice key and voice id>",
+    "account": { "use": "<the line in envFile with the key of the account that pays, optional>", "as": "<the key name the narration tool reads>" },
     "presets": {
       "premise": { "voice": "<voice id of the premise narrator>", "fx": "A", "speed": 1.15, "maxChars": 900 },
       "explainer": { "voice": "<voice id of the explainer narrator>", "model": "<its model id>", "fx": "none", "maxChars": 700 }

@@ -1,0 +1,53 @@
+{
+ "mode": "DRY RUN",
+ "entries": [
+  {
+   "platform": "TikTok",
+   "generator": "explainers",
+   "stem": "ZapwickRush_Explainer_20261113224654_Short_final",
+   "account": "dev_en",
+   "lang": "en",
+   "file": "<studio>\\explainers\\projects\\ZapwickRush_Explainer_20261113224654\\out\\ZapwickRush_Explainer_20261113224654_Short_final.mp4",
+   "caption": "What If Your Kart Race Had Punching? 😱 #fyp #programming #python #programmer #developer #learnprogramming #learnpython #backend #javascript #java #backenddeveloper #sql",
+   "post_at": "2026-11-14T07:00-06:00",
+   "status": "ready",
+   "note": ""
+  },
+  {
+   "platform": "Instagram",
+   "generator": "explainers",
+   "stem": "ZapwickRush_Explainer_20261113224654_Short_final",
+   "account": "dev_en",
+   "lang": "en",
+   "file": "<studio>\\explainers\\projects\\ZapwickRush_Explainer_20261113224654\\out\\ZapwickRush_Explainer_20261113224654_Short_final.mp4",
+   "caption": "What If Your Kart Race Had Punching? 😱",
+   "post_at": "2026-11-14T07:00-06:00",
+   "status": "ready",
+   "note": ""
+  },
+  {
+   "platform": "YouTube",
+   "generator": "explainers",
+   "stem": "ZapwickRush_Explainer_20261113224654_Short_final",
+   "account": "explainers",
+   "lang": "en",
+   "file": "<studio>\\explainers\\projects\\ZapwickRush_Explainer_20261113224654\\out\\ZapwickRush_Explainer_20261113224654_Short_final.mp4",
+   "caption": "What If Your Kart Race Had Punching? 😱",
+   "post_at": "2026-11-14T07:00-06:00",
+   "status": "ready",
+   "note": "next free day by the catalog (YouTube itself not read)"
+  },
+  {
+   "platform": "-",
+   "generator": "trailers",
+   "stem": "ZapwickRush_Trailer_20261113224654_9x16",
+   "account": "-",
+   "lang": "en",
+   "file": "<studio>\\trailers\\projects\\ZapwickRush_Trailer_20261113224654\\out\\ZapwickRush_Trailer_20261113224654_9x16.mp4",
+   "caption": "Zapwick Rush: launch trailer",
+   "post_at": "",
+   "status": "no account",
+   "note": "no channel or account posts trailers"
+  }
+ ]
+}
