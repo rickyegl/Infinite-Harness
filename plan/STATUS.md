@@ -614,6 +614,8 @@ before falling back to the fixture (checked: the full film has 20, one per take,
   The trailer belongs to the Unity audience (Unity gameplay) and the premise reel to the Roblox audience.
 - ASSUMED (plan 04): Video is not built until the author chooses its runtime; the plan allows shipping it on
   the mock.
+- ASSUMED (plan 06): the deployed site carries one take, the `main` fixture with its art, and replays it when no
+  bridge answers. The Verifier fixes a cell at most once per run, then reports what is still wrong.
 
 ## Open problems
 
