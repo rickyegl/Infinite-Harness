@@ -9,8 +9,10 @@
 import type { ModuleContext, ModuleInput, ModuleOutput } from "@harness/protocol";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
+import { readState } from "../game/lib/state.ts";
 import { refPath } from "../_shared/image.ts";
-import { python, why } from "../_shared/studio.ts";
+import { python, runDirOf, why } from "../_shared/studio.ts";
+import type { Design } from "../game/lib/design.ts";
 
 export const FORMATS = {
   feed: { w: 1080, h: 1080, aspect: "1:1", label: "Feed 1:1" },
@@ -29,13 +31,27 @@ export function formatsOf(params?: Record<string, unknown>): Format[] {
 export function headlineOf(prompt: string, params?: Record<string, unknown>): string {
   if (typeof params?.headline === "string" && params.headline.trim()) return params.headline.trim();
   const q = /["“]([^"”]{4,60})["”]/.exec(prompt);
-  return q ? q[1].trim() : "One prompt. A whole game.";
+  return q ? q[1].trim() : "Race. Fight. Win.";
+}
+
+/** what the picture must show when the run has a game: its karts, riders and track, so the ad looks like the game */
+export function gameLook(d: Design | undefined): string {
+  if (!d) return "";
+  const t = d.track;
+  const track = [t.loops ? "loops" : "", t.twists ? "twists" : "", t.hover ? "glowing hover sections" : ""].filter(Boolean).join(", ");
+  return [
+    `The game is a kart racing game: show karts racing on a track${track ? ` with ${track}` : ""}, never people on foot, motorbikes or cars.`,
+    `The kart: ${d.models.kart}, in colours like ${d.karts.colors.slice(0, 3).join(", ")}.`,
+    `The rider sitting in it: ${d.models.riders.volt.replace(/,?\s*sitting[^,]*$/i, "")}${d.riders.notes ? `. ${d.riders.notes}` : ""}.`,
+    `Sky ${d.look.sky}, ground ${d.look.ground}; a bright, chunky, toy-like 3D game look.`,
+  ].join(" ");
 }
 
 export default async function run(ctx: ModuleContext, input: ModuleInput): Promise<ModuleOutput> {
   const p = input.params ?? {};
   const headline = headlineOf(input.prompt, p);
-  const cta = typeof p.cta === "string" && p.cta.trim() ? p.cta.trim() : "Watch it build";
+  const cta = typeof p.cta === "string" && p.cta.trim() ? p.cta.trim() : "Play now";
+  const game = gameLook(readState(runDirOf(ctx)).design);
   const formats = formatsOf(p);
   const audience = typeof p.audience === "string" ? p.audience : "";
   ctx.step("Ad copy", `${headline} / ${cta}`, "pencil");
@@ -44,7 +60,7 @@ export default async function run(ctx: ModuleContext, input: ModuleInput): Promi
   const aspects = [...new Set(formats.map((f) => FORMATS[f].aspect))];
   const pictures = new Map<string, string>();
   for (const aspect of aspects) {
-    const brief = `${input.prompt.trim().replace(/[.\s]+$/, "")}. An advertising key visual${audience ? ` for ${audience}` : ""}: bold, bright, one clear subject, room at the top for a headline. No text, no letters, no logos, no watermark. No pink or magenta.`;
+    const brief = `${input.prompt.trim().replace(/[.\s]+$/, "")}.${game ? ` ${game}` : ""} An advertising key visual${audience ? ` for ${audience}` : ""}: bold, bright, one clear subject, room at the top for a headline. No text, no letters, no logos, no watermark. No pink or magenta.`;
     const got = await ctx.request("assets.image", { prompt: brief, params: { size: aspect, name: `ad ${aspect}`, count: 1 } });
     const uri = got.files?.[0]?.uri;
     if (!uri) throw new Error("the image module gave no picture");

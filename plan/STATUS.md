@@ -35,10 +35,10 @@ what the next agent should know. Keep it short; replace stale lines instead of a
   "show me a house", "make the walls red", "transparent background" chain without paths. Video stays on the mock
   until the author picks its runtime (USER-TODO 7). Details under "The assets" below.
 - **Built (plan 05), waiting on the author:** the reel modules: Trailer, Explainer, Premise Reel, Motion,
-  Ad Image, Campaign, Publish (dry run) and Approve, plus the script gate. Motion and Publish are done and
-  verified. "Make an ad campaign for Unity and Roblox players" ran live: briefs, then five pieces side by side,
-  then it parks with both scripts at their gates (no voice credits spent). The trailer stops for the missing
-  track and the ad images for the image quota. Details under "The reels" below.
+  Ad Image, Campaign, Publish (dry run) and Approve, plus the script gate. "Make an ad campaign for Unity and
+  Roblox players" ran live on run `20261113-224654`: the Trailer (both cuts, on the author's track) and both
+  Ad Images are done; both scripts are approved, but their narration is blocked by the voice account (below).
+  Details under "The reels" below.
 - **Next:** finish plan 05 once the author answers (below), then plans 06-07, then plan 08 replaces fixtures with recorded takes and finalises the
   draft direction files (S37-S40, S42-S47).
 
@@ -61,21 +61,16 @@ remove the line when it is answered. See `AGENTS.md` rule 5.
 - (plan 04) **One more short voice reading?** The recorded Voice fixture also says the lead-in ("Read this in my
   voice: ..."), because the planner passed the whole sentence. That is fixed (the planner now passes only the
   script, checked on the mock bridge), but a clean recording costs one more short script of credits.
-- (plan 05) **Trailer track:** generate it from the song prompt under "The reels" (also sent in chat on
-  2026-11-14). Save it as `assets/music/trailer.wav` (or .mp3), then say "make a trailer" on a game run. Unity
-  must be open: the cell records HUD-free clips.
-- (plan 05) **Two scripts wait for your go**, and voice credits are spent only after it. Both are in run
-  `20261113-224654`: the explainer (now about the Unity game, not the harness) in
-  `explainers/projects/ZapwickRush_Explainer_20261113224654/script.txt`, the premise in
-  `premise/projects/HarnessPremise_20261113224654/script.txt` (edit them there first if you like). The bridge
-  that held the cells was stopped, so: open that run in the app, ask again "Make an ad campaign for Unity and
-  Roblox players" (it reuses both scripts and stops at the gates), then say "go on both". A go given before the
-  re-ask also counts. Ignore the older harness explainer drafts (`HarnessExplainer_*`, run `20261114-003506`).
+- (plan 05) **Voice account (blocks both narrations):** both scripts are approved (2026-11-14), but the
+  voice service refused both reads. The account is on the free plan with 299 of 10,000 characters left until
+  2026-12-03; the two scripts need 1,058 (explainer 394, premise 664). The explainer voice is a library
+  (professional) voice, which the free plan cannot use through the API (402); the premise voice got 401. Needed:
+  a paid plan on that account, or another key in the studio's `.env`. Then ask again "Make an ad campaign for
+  Unity and Roblox players" on run `20261113-224654`: both go's still hold (they follow the script files), so it
+  narrates and renders without a new go.
 - (plan 05) **Premise picture:** sets, cast, shots and the Studio capture start on your green flag for the
   combined recording set and racing place. Until then the cell ends after the narration. "Make it night" on
   the premise (a Done-when item) needs that picture, so it is not built yet.
-- (plan 05) **Ad Image live run:** waits for the image quota, which was used up at the end of plan 04. The
-  quota is reported as free again about 2 h after 01:00 on 2026-11-14.
 - (plan 05) **An Approve button on the site** next to a waiting script: today the go is a typed follow-up.
   Do you want a button (plan 06 or later)?
 - (plan 04) **The chosen song is 2.06 s long** (`video/makeasong.mp3`, 45 KB). Music cells hand it over as it
@@ -184,24 +179,37 @@ remove the line when it is answered. See `AGENTS.md` rule 5.
   - Router re-recorded: Act 1 routes to Game, Trailer, Campaign, Host, Recorder and Verify. "go" routes to
     Approve.
 - **Campaign live** (run `20261113-224654`): briefs "ZAP PAST THE PACK" (Unity) and "SEND THE PACK
-  SPINNING" (Roblox). Explainer, Premise Reel, two Ad Images and the Trailer ran side by side as the Campaign
-  subtree. The trailer stopped for the missing track and the ad images for the quota, each with its reason. The
-  explainer draft (rewritten about the game: "What If Your Kart Race Had Punching?", 59 words) and the premise draft ("Your Kart
-  Gets FASTER When You Brake for Someone...", 112 words, opening "In this world,") wait at their gates.
+  SPINNING" (Roblox). Explainer, Premise Reel, two Ad Images and the Trailer run side by side as the Campaign
+  subtree. Third pass (`campaign-3`, after the track, the quota and both go's):
+  - Trailer: `artifacts/campaign-3.trailer/trailer-9x16.mp4` and `trailer-16x9.mp4`, 30 s each, 25 cuts on the
+    beat, the drop at 12.8 s, -14.0 LUFS, no HUD. The captions are about the game only: "8 RIDERS", "FIGHT FOR
+    THE LEAD", the loops and twists, then "ZAPWICK RUSH / PLAY NOW ON PC".
+  - Ad Images: Unity "MASTER THE LOOP. STEAL FIRST." / "Race Now", Roblox "EIGHT RIDERS. TOTAL CHAOS." /
+    "Play On Roblox", feed and story each. The picture brief now describes the game (kart, rider, track,
+    colours), so the ads show karts on the track (looked at).
+  - Explainer ("What If Your Kart Race Had Punching?", 59 words, about the game) and Premise ("Your Kart Gets
+    FASTER When You Brake for Someone...", 112 words, opening "In this world,"): both approved, both shown as
+    "Script approved earlier" on the re-ask; the voice step failed on the account (see "Waiting on the author").
+  - Publish dry run: 0 posts. The studio reports that no channel or account posts trailers; the explainer and
+    premise reels are routed once they exist.
 - **HUD switch verified in the open editor:** the template is synced and compiles with 0 errors. `play_capture`
   with `hud: false` has no HUD, and the HUD is back on the next capture. The trailer cell now syncs the
   template and runs `setup` (which compiles) before it records.
 - **Gate carry-over:** a go is tied to the script file. If the bridge stops while a cell waits, asking for the
-  reel again reuses the script, and an earlier go still counts (tested).
+  reel again reuses the script, and an earlier go still counts (tested). Each go a cell takes is also written to
+  `runs/<run>/approvals/approved.json` (script path and hash), so the approval survives a later step failing
+  (the voice): a re-ask on the same text passes the gate without a new go, and an edited text waits (tested).
 - **Song prompt for the trailer track** (instrumental):
   > Instrumental high-energy electronic kart-racing anthem, 140 BPM, punchy four-on-the-floor kick, distorted
   > synth bass, bright arcade lead, revving-engine risers. Short intro, an 8-bar build with a snare roll and a
   > rising sweep, one beat of silence, then a huge drop with sidechained bass and stabbing synth chords. Video
   > game trailer energy, no vocals.
-- **Credits used in plan 05:** none (no narration yet, no image calls).
-- **No fixtures yet** for the reels, Campaign or Approve. They are recorded from real runs once the scripts are
-  approved. Each has `mock: true` and a README. Until then a mock-mode run that routes to them (Act 1) runs them
-  for real: worker calls, image requests and the gates. No voice is used without a go.
+- **Credits used in plan 05:** no voice characters (both reads were refused before any audio). Image calls:
+  8 ad pictures (two ads with two sizes each, on the second and third campaign passes).
+- **Fixtures:** recorded from run `20261113-224654` for `reel.trailer` (the videos shrunk to 360 px for the
+  fixture), `ad.image` and `approve`. Still none for `reel.explainer`, `reel.premise` and `campaign`: they are
+  recorded once the narration runs. Until then a mock-mode run that routes to them runs them for real (worker
+  calls, image requests and the gates); no voice is used without a go.
 
 ## The assets (plan 04)
 
@@ -535,7 +543,7 @@ before falling back to the fixture (checked: the full film has 20, one per take,
 | 02 | done | typecheck, unit tests (none skipped), `pnpm dev`, real runs on both workers, no-network probes, proxy routing with both models, prompt.md module run, test:bridge, test:live, determinism, film:rough, lint:brand | See "The bridge". |
 | 03 | done, two fallbacks | full run 20261113-014545, four follow-ups under 5 s, fixtures, typecheck, tests, test:bridge, test:live, determinism, film:rough, lint:brand | Windows build until WebGL is installed; Roblox place not opened in Studio. See "The games". |
 | 04 | done, video on mock | runs 20261113-222539 (house chain), 20261113-223714 (song), 20261113-223729 (voice), 20261113-224654 (full game with real assets), fixtures, mock replay, tests, test:bridge, typecheck, lint:brand, forge stopped (`colab ls`: no sessions) | Video waits for its runtime; `assets.image` with `transparent` not run live; image quota out at the end. See "The assets". |
-| 05 | built, waiting on the author | typecheck (all packages), tests (protocol 13, web 7, bridge 52, reels 15 of them), router re-record, test:bridge, test:live, determinism 96/96, film:rough (140.6 s, every cut on a beat), lint:brand, motion run + fixture, campaign live run, HUD capture in Unity | Trailer track, script approvals, premise green flag, image quota; "make it night" on the premise needs the picture. See "The reels". |
+| 05 | built, waiting on the author | typecheck (all packages), tests (protocol 13, web 7, bridge 54, reels 17 of them), router re-record, test:bridge, test:live, determinism 96/96, film:rough (140.6 s, every cut on a beat), lint:brand, motion run + fixture, campaign live run (trailer and ad images done), HUD capture in Unity | Voice account (plan or key), premise green flag; "make it night" on the premise needs the picture. See "The reels". |
 | 06 | not started | | |
 | 07 | not started | | |
 | 08 | not started | | |

@@ -1,0 +1,4 @@
+{"t":1,"type":"node.state","node":".","state":"running"}
+{"t":66,"type":"node.step","node":".","title":"Approved the explainer script","detail":"[curious] What if your kart race had *punching*?\nThree laps take you through two *towering loops*.\nThen comes a twenty-four metre *drop*.\nEi","icon":"check"}
+{"t":371,"type":"node.evidence","node":".","kind":"doc","uri":"./default/explainer-approved.png","caption":"Explainer script approved"}
+{"t":373,"type":"node.done","node":".","summary":"Approved explainer script"}

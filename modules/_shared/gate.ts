@@ -44,6 +44,28 @@ export function approve(runDir: string, w: Wait): string {
   return text;
 }
 
+/**
+ * runs/<run>/approvals/approved.json: every go a cell took, as { script, hash, at }. A go is used up when a cell
+ * reads it, so this list is what keeps an approval good for the same script text when a later step (the voice)
+ * fails and the reel is asked for again. An edit changes the hash and needs a new go.
+ */
+const ledgerOf = (runDir: string) => join(approvalsDir(runDir), "approved.json");
+type Approved = { script: string; hash: string; at: string };
+function ledger(runDir: string): Approved[] {
+  try {
+    const l = JSON.parse(readFileSync(ledgerOf(runDir), "utf8"));
+    return Array.isArray(l) ? l : [];
+  } catch {
+    return [];
+  }
+}
+export const approvedBefore = (runDir: string, script: string, hash: string): boolean => ledger(runDir).some((a) => a.script === script && a.hash === hash);
+export function remember(runDir: string, script: string, hash: string): void {
+  if (approvedBefore(runDir, script, hash)) return;
+  mkdirSync(approvalsDir(runDir), { recursive: true });
+  writeFileSync(ledgerOf(runDir), JSON.stringify([...ledger(runDir), { script, hash, at: new Date().toISOString() }], null, 1));
+}
+
 const sleep = (ms: number, signal: AbortSignal) =>
   new Promise<void>((res, rej) => {
     const stop = () => (clearTimeout(t), rej(new Error("stopped")));
@@ -64,10 +86,10 @@ export async function gate(ctx: ModuleContext, label: string, script: string): P
     return readFileSync(script, "utf8");
   }
   mkdirSync(approvalsDir(runDir), { recursive: true });
-  // a go given to an earlier cell for this same script and text (the bridge stopped while it waited, and the
-  // author asked for the reel again) still counts; that cell's stale wait goes
+  // a go given to an earlier cell for this same script and text (the bridge stopped while it waited, the author
+  // asked for the reel again, or a later step such as the voice failed) still counts; that cell's stale wait goes
   const now = hashOf(readFileSync(script, "utf8"));
-  let earlier = false;
+  let earlier = approvedBefore(runDir, script, now);
   for (const f of readdirSync(approvalsDir(runDir))) {
     const at = join(approvalsDir(runDir), f);
     let rec: { script?: string; hash?: string } = {};
@@ -81,7 +103,8 @@ export async function gate(ctx: ModuleContext, label: string, script: string): P
     rmSync(at, { force: true });
   }
   if (earlier) {
-    ctx.step("Script approved earlier", "the go was given while an earlier cell waited on this script", "check");
+    remember(runDir, script, now);
+    ctx.step("Script approved earlier", "the author already said go on this exact text", "check");
     return readFileSync(script, "utf8");
   }
   rmSync(fileOf(runDir, ctx.node, "go"), { force: true });
@@ -104,6 +127,7 @@ export async function gate(ctx: ModuleContext, label: string, script: string): P
       rmSync(go, { force: true });
       const text = readFileSync(script, "utf8");
       if (hash === hashOf(text)) {
+        remember(runDir, script, hash);
         ctx.step("Script approved", text.replace(/^#.*$/gm, "").trim().slice(0, 140), "check");
         return text;
       }

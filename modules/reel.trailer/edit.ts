@@ -132,9 +132,10 @@ export function planEdit(b: Beats, songSeconds: number, dur: number, clips: Clip
   const TB = (n0: number, n1: number, lines: string[], size: number, color: Text["color"] = "white", y = 1250): Text => ({ t0: n0 === 0 ? 0.08 : r3(c(g(n0)) + 0.05), t1: r3(c(g(n1)) - 0.04), lines, size, color, y });
   const texts: Text[] = [];
   const introCaps: [string[], number, Text["color"]][] = [
-    [["ONE PROMPT"], 120, "white"],
-    [["A WHOLE", "RACING GAME"], 112, "yellow"],
-    [words.loops || words.twists ? [words.loops ? `${words.loops} LOOP${words.loops > 1 ? "S" : ""}` : "", words.twists ? `${words.twists} TWIST${words.twists > 1 ? "S" : ""}` : ""].filter(Boolean) : [`${words.karts} KARTS`], 112, "white"],
+    // about the game only (never how it was made)
+    [[`${words.karts} RIDERS`], 120, "white"],
+    [["FIGHT FOR", "THE LEAD"], 112, "yellow"],
+    [words.loops || words.twists ? [words.loops ? `${words.loops} LOOP${words.loops > 1 ? "S" : ""}` : "", words.twists ? `${words.twists} TWIST${words.twists > 1 ? "S" : ""}` : ""].filter(Boolean) : ["FIRST ACROSS", "THE LINE"], 112, "white"],
   ];
   intro.forEach((n0, j) => {
     if (j < introCaps.length) texts.push(TB(n0, j + 1 < intro.length ? intro[j + 1] : nDrop - 4 * k, ...introCaps[j]));

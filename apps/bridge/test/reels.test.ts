@@ -5,7 +5,7 @@
 
 import type { HarnessEvent, ModuleContext } from "@harness/protocol";
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
@@ -18,6 +18,7 @@ import { cacheKey, presetOf } from "../../../modules/voice/run.ts";
 import { briefsOf } from "../../../modules/campaign/run.ts";
 import { opensRight } from "../../../modules/reel.premise/run.ts";
 import { gameFacts, gameLook } from "../../../modules/reel.explainer/run.ts";
+import { gameLook as adLook, headlineOf } from "../../../modules/ad.image/run.ts";
 import { DEFAULT } from "../../../modules/game/lib/design.ts";
 import { VERTICAL, WIDE, dropOf, headPy, parseBeats, planEdit } from "../../../modules/reel.trailer/edit.ts";
 
@@ -81,6 +82,19 @@ describe("script gate", () => {
     await expect(gate(ctx, "Premise", script)).resolves.toBe("In this world, karts race.");
     expect(steps).toContain("Script approved earlier");
     expect(waiting(run)).toEqual([]);
+    // the go is used up, but the approval stays for this exact text: a third ask (the voice failed) needs no new go
+    expect(readdirSync(join(run, "approvals")).filter((f) => f.endsWith(".go"))).toEqual([]);
+    steps.length = 0;
+    await expect(gate({ ...ctx, node: "premise-3" } as ModuleContext, "Premise", script)).resolves.toBe("In this world, karts race.");
+    expect(steps).toContain("Script approved earlier");
+    // an edit needs a new go: the cell waits (stopped here by its signal)
+    writeFileSync(script, "In this world, karts fly.");
+    const stop = new AbortController();
+    const waited = gate({ ...ctx, node: "premise-4", signal: stop.signal } as ModuleContext, "Premise", script);
+    await new Promise((r) => setTimeout(r, 50));
+    expect(waiting(run).map((w) => w.node)).toEqual(["premise-4"]);
+    stop.abort();
+    await expect(waited).rejects.toThrow("stopped");
   });
 });
 
@@ -174,6 +188,9 @@ describe("trailer edit", () => {
     const lines = e.texts.map((t) => t.lines.join(" "));
     expect(lines).toContain("RACE!");
     expect(lines.at(-1)).toBe("PLAY NOW ON PC");
+    // the captions are about the game, never how it was made
+    expect(lines[0]).toMatch(/^\d+ RIDERS$/);
+    expect(lines.join(" ")).not.toMatch(/PROMPT|BUILT|GENERAT/);
     for (const t of e.texts) expect(t.t0 >= 0 && t.t1 <= 30 && t.t1 > t.t0).toBe(true);
   });
 
@@ -213,5 +230,14 @@ describe("premise and campaign", () => {
     expect(all.toLowerCase()).not.toMatch(/harness|sentence|generat/);
     expect(gameFacts(DEFAULT, { project: "p", node: "n", build: { target: "webgl", dir: "d", seconds: 1, flags: "f" } })[0]).toContain("in the browser");
     expect(gameLook(DEFAULT)).toContain("Blaze");
+  });
+
+  it("draws the ad picture as the game, with game-only defaults", () => {
+    const look = adLook(DEFAULT);
+    expect(look).toContain("show karts racing");
+    expect(look).toContain(DEFAULT.models.kart);
+    expect(look).not.toMatch(/sitting with both arms/);
+    expect(adLook(undefined)).toBe("");
+    expect(headlineOf("make an ad")).toBe("Race. Fight. Win.");
   });
 });
