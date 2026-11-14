@@ -1,6 +1,10 @@
 -- The player's side: keys (or touch) to the Drive remote, a chase camera that rolls with the road through loops
--- and twists, and the HUD (lap, place, speed, countdown, hit feed, results, minimap).
+-- and twists, and the HUD (lap, place, speed, countdown, hit feed, results, minimap, and the rider's class with
+-- its cooldown). A sniper aims with a crosshair that follows the mouse: each send carries the ray from the camera
+-- through it, and the server picks the kart under it. It also moves the scenery, locally: balloons and islands bob,
+-- the clouds and the blimp circle the circuit, and the flags wave.
 
+local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -26,6 +30,17 @@ local accent = Color3.fromHex(hud.accent or "#ffd23c")
 local keys: { [Enum.KeyCode]: boolean } = {}
 local attackQueued = false
 local touchSteer, touching = 0, false
+local touchAim: Vector2? = nil
+
+-- the class of the player's rider (set by the server when a kart is handed out)
+local function myClass(): string
+	return player:GetAttribute("Class") or ""
+end
+
+-- where the sniper aims, in viewport pixels (the GUI ignores the top inset, so it is also the crosshair spot)
+local function aimPoint(): Vector2
+	return touchAim or UserInputService:GetMouseLocation()
+end
 
 UserInputService.InputBegan:Connect(function(input, processed)
 	if processed then
@@ -36,12 +51,15 @@ UserInputService.InputBegan:Connect(function(input, processed)
 		if input.KeyCode == Enum.KeyCode.Space or input.KeyCode == Enum.KeyCode.F or input.KeyCode == Enum.KeyCode.ButtonX then
 			attackQueued = true
 		end
+	elseif input.UserInputType == Enum.UserInputType.MouseButton1 then
+		attackQueued = true
 	elseif input.UserInputType == Enum.UserInputType.Touch then
 		touching = true
 		local w = camera.ViewportSize.X
 		touchSteer = math.clamp((input.Position.X - w / 2) / (w / 4), -1, 1)
 		if input.Position.Y < camera.ViewportSize.Y * 0.4 then
 			attackQueued = true
+			touchAim = Vector2.new(input.Position.X, input.Position.Y)
 		end
 	end
 end)
@@ -77,7 +95,13 @@ task.spawn(function()
 			throttle = 1
 			steer = if touching then touchSteer else 0
 		end
-		Drive:FireServer(throttle, steer, attackQueued)
+		if myClass() == "sniper" then
+			local p = aimPoint()
+			local ray = camera:ViewportPointToRay(p.X, p.Y)
+			Drive:FireServer(throttle, steer, attackQueued, ray.Origin, ray.Direction)
+		else
+			Drive:FireServer(throttle, steer, attackQueued)
+		end
 		attackQueued = false
 		task.wait(1 / 20)
 	end
@@ -112,8 +136,60 @@ local lapLabel = label({ Text = "LAP 1/1", Size = UDim2.fromOffset(260, 46), Pos
 local placeLabel = label({ Text = "", Size = UDim2.fromOffset(200, 80), Position = UDim2.new(1, -224, 0, 18), TextXAlignment = Enum.TextXAlignment.Right, TextColor3 = accent }, gui)
 local speedLabel = label({ Text = "", Size = UDim2.fromOffset(220, 52), Position = UDim2.new(1, -244, 1, -76), TextXAlignment = Enum.TextXAlignment.Right }, gui)
 local bigLabel = label({ Text = "", Size = UDim2.fromScale(0.6, 0.18), Position = UDim2.fromScale(0.2, 0.3), TextColor3 = accent }, gui)
-local hint = label({ Text = "W/S drive   A/D steer   SPACE swing", Size = UDim2.fromOffset(520, 22), Position = UDim2.new(0.5, -260, 1, -36), Font = Enum.Font.GothamMedium }, gui)
+local hint = label({ Text = "W/S drive   A/D steer", Size = UDim2.fromOffset(560, 22), Position = UDim2.new(0.5, -280, 1, -36), Font = Enum.Font.GothamMedium }, gui)
+local classLabel = label({ Text = "", Size = UDim2.fromOffset(420, 30), Position = UDim2.new(0.5, -210, 1, -72) }, gui)
 title.ZIndex, hint.TextTransparency = 2, 0.3
+
+local HELP = {
+	volt = "W/S drive   A/D steer   SPACE electric dash",
+	sniper = "W/S drive   A/D steer   MOUSE aim   CLICK shoot",
+	shrink = "W/S drive   A/D steer   SPACE shrink (don't get touched)",
+	thrower = "W/S drive   A/D steer   items fly forward every 3 s",
+}
+
+-- the sniper's crosshair: a ring and a dot that follow the mouse, red over a kart, with the cooldown under it
+local cross = Instance.new("Frame")
+cross.Name = "Crosshair"
+cross.AnchorPoint = Vector2.new(0.5, 0.5)
+cross.Size = UDim2.fromOffset(38, 38)
+cross.BackgroundTransparency = 1
+cross.Visible = false
+cross.ZIndex = 5
+cross.Parent = gui
+local ring = Instance.new("UIStroke")
+ring.Thickness = 3
+ring.Parent = cross
+Instance.new("UICorner", cross).CornerRadius = UDim.new(1, 0)
+local pip = Instance.new("Frame")
+pip.AnchorPoint = Vector2.new(0.5, 0.5)
+pip.Position = UDim2.fromScale(0.5, 0.5)
+pip.Size = UDim2.fromOffset(6, 6)
+pip.BorderSizePixel = 0
+pip.ZIndex = 5
+pip.Parent = cross
+Instance.new("UICorner", pip).CornerRadius = UDim.new(1, 0)
+local crossText = label({ Text = "", Size = UDim2.fromOffset(120, 18), Position = UDim2.new(0.5, -60, 1, 6), Font = Enum.Font.GothamBold, ZIndex = 5 }, cross)
+
+-- the same test the server makes: a kart whose middle is within 1.8 m of the aim ray
+local function kartUnderAim(myName: string): boolean
+	local folder = workspace:FindFirstChild("Karts")
+	if not folder then
+		return false
+	end
+	local p = aimPoint()
+	local ray = camera:ViewportPointToRay(p.X, p.Y)
+	for _, m in folder:GetChildren() do
+		local root = if m:IsA("Model") then m.PrimaryPart else nil
+		if root and m.Name ~= myName then
+			local v = root.Position + root.CFrame.UpVector * 2.7 - ray.Origin
+			local t = v:Dot(ray.Direction)
+			if t > 0 and t < 150 * Track.SCALE and (v - ray.Direction * t).Magnitude < 1.8 * Track.SCALE then
+				return true
+			end
+		end
+	end
+	return false
+end
 
 local feedBox = Instance.new("Frame")
 feedBox.BackgroundTransparency = 1
@@ -235,6 +311,27 @@ RunService.RenderStepped:Connect(function(dt)
 	if not state then
 		return
 	end
+	local kind = if me and me.k then me.k else myClass()
+	local sniping = kind == "sniper" and built.combat ~= false and state.phase ~= "finished" and not (me and me.f)
+	hint.Text = HELP[kind] or "W/S drive   A/D steer"
+	if me and me.k and built.combat ~= false then
+		classLabel.TextColor3 = Color3.fromHex(me.g or "ffffff")
+		classLabel.Text = string.upper(me.k) .. "   " .. (if me.a then "ACTIVE" elseif me.cd > 0 then string.format("%.1f s", me.cd) else "READY")
+		cross.Visible = sniping
+		UserInputService.MouseIconEnabled = not sniping or touchAim ~= nil
+		if sniping then
+			local p = aimPoint()
+			cross.Position = UDim2.fromOffset(p.X, p.Y)
+			local hot = kartUnderAim(me.n)
+			local c = if me.cd > 0 then Color3.fromRGB(170, 170, 180) elseif hot then Color3.fromRGB(255, 60, 80) else Color3.new(1, 1, 1)
+			ring.Color, pip.BackgroundColor3 = c, c
+			crossText.Text = if me.cd > 0 then string.format("%.1f", me.cd) else ""
+		end
+	else
+		classLabel.Text = ""
+		cross.Visible = false
+		UserInputService.MouseIconEnabled = true
+	end
 	lapLabel.Text = if me then string.format("LAP %d/%d", me.lap, state.laps) else ""
 	placeLabel.Text = if me then ordinal(me.pl) else ""
 	speedLabel.Text = if me then string.format("%d km/h", math.floor(math.abs(me.v) * 3.6)) else ""
@@ -272,5 +369,51 @@ RunService.RenderStepped:Connect(function(dt)
 		end
 		dot.Position = toMap((Track.sample(k.d)))
 		dot.Size = if me and k.n == me.n then UDim2.fromOffset(13, 13) else UDim2.fromOffset(9, 9)
+	end
+end)
+
+----------------------------------------------------------------------------------------------------------------
+-- scenery motion (local only; the server built it anchored and never moves it)
+
+local homes: { [Instance]: CFrame } = {}
+local function homeOf(x: Instance, now: CFrame): CFrame
+	local h = homes[x]
+	if not h then
+		h = now
+		homes[x] = h
+		x.Destroying:Once(function()
+			homes[x] = nil
+		end)
+	end
+	return h
+end
+
+RunService.RenderStepped:Connect(function()
+	local t = os.clock()
+	for _, m in CollectionService:GetTagged("SceneryBob") do
+		if m:IsA("Model") then
+			local home = homeOf(m, m:GetPivot())
+			local amp, period = m:GetAttribute("Amp") or 1, m:GetAttribute("Period") or 8
+			local phase, spin = m:GetAttribute("Phase") or 0, m:GetAttribute("Spin") or 0
+			local y = math.sin(t * math.pi * 2 / period + phase) * amp
+			m:PivotTo(home * CFrame.new(0, y, 0) * CFrame.Angles(0, math.rad(spin * t), 0))
+		end
+	end
+	for _, m in CollectionService:GetTagged("ScenerySpin") do
+		local centre = m:GetAttribute("Centre")
+		if m:IsA("Model") and typeof(centre) == "Vector3" then
+			local home = homeOf(m, m:GetPivot())
+			local turn = CFrame.new(centre) * CFrame.Angles(0, -math.rad((m:GetAttribute("Speed") or 1) * t), 0) * CFrame.new(-centre)
+			m:PivotTo(turn * home)
+		end
+	end
+	for _, b in CollectionService:GetTagged("SceneryWave") do
+		local hinge = b:GetAttribute("Hinge")
+		if b:IsA("BasePart") and typeof(hinge) == "CFrame" then
+			local home = homeOf(b, b.CFrame)
+			local phase = b:GetAttribute("Phase") or 0
+			local swing = CFrame.Angles(0, math.rad(math.sin(t * 2.3 + phase) * 18), math.rad(math.sin(t * 3.1 + phase) * 4))
+			b.CFrame = hinge * swing * hinge:ToObjectSpace(home)
+		end
 	end
 end)

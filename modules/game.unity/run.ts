@@ -4,11 +4,15 @@
 // the game as it grows.
 
 import type { ModuleContext, ModuleInput, ModuleOutput } from "@harness/protocol";
-import { existsSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, readdirSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { unitySections } from "../game/lib/design.ts";
 import { patchState, readState, runDirOf } from "../game/lib/state.ts";
 import { designOf, PARTS, unityFor } from "./lib/parts.ts";
+
+/** the generated meshes already face +Z after the OBJ import (checked in the race shots: with a half turn the karts
+ *  drove tail first and the riders sat backwards) */
+const MODEL_YAW = 0;
 
 export default async function run(ctx: ModuleContext, input: ModuleInput): Promise<ModuleOutput> {
   const runDir = runDirOf(ctx.dir);
@@ -48,6 +52,26 @@ export default async function run(ctx: ModuleContext, input: ModuleInput): Promi
     u.patchConfig({ banners });
     ctx.step(`Imported ${banners.length} banner${banners.length > 1 ? "s" : ""}`, banners.join(", "), "image");
   }
+  // generated 3D models: each slot's OBJ set (beside its model.glb) goes to Resources/Models/<slot>; the game
+  // loads them in place of its primitive kart body, riders, landmarks and trophy
+  const models = (input.params?.models as Record<string, string> | undefined) ?? readState(runDir).models ?? {};
+  const specs: { slot: string; path: string; texture: string; yaw: number; size: number }[] = [];
+  for (const [slot, uri] of Object.entries(models)) {
+    const objDir = join(dirname(join(runDir, uri)), "obj");
+    if (!existsSync(join(objDir, "model.obj"))) continue;
+    const dir = `Models/${slot.replace(/[^\w-]+/g, "-")}`;
+    const files = readdirSync(objDir);
+    // the texture first, so the model's import finds it
+    const tex = files.find((f) => /\.(png|jpe?g)$/i.test(f));
+    for (const f of [...files.filter((f) => f !== "model.obj"), "model.obj"]) {
+      if (!/\.(obj|mtl|png|jpe?g)$/i.test(f)) continue;
+      await u.op("import", { src: join(objDir, f), dest: `Assets/Game/Resources/${dir}/${f}` }, 3 * 60_000);
+    }
+    specs.push({ slot, path: `${dir}/model`, texture: tex ? `${dir}/${tex.replace(/\.[^.]+$/, "")}` : "", yaw: MODEL_YAW, size: 0 });
+  }
+  u.patchConfig({ models: specs });
+  if (specs.length) ctx.step(`Imported ${specs.length} 3D model${specs.length > 1 ? "s" : ""}`, specs.map((m) => m.slot).join(", "), "cube");
+
   patchState(runDir, { unity: { project: u.project, node: ctx.node } });
 
   const done: string[] = [];

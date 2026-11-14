@@ -1,6 +1,8 @@
-// The visible side of a hit: a burst of sparks, an expanding shock ring and a short camera shake.
+// The visible side of a hit: a burst of sparks, an expanding shock ring and a short camera shake; plus the
+// glowing lines of the rider attacks (a straight sniper beam, a jagged volt bolt).
 
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace HarnessGame
 {
@@ -37,6 +39,35 @@ namespace HarnessGame
             fx.ring = ring.transform;
             if (simulateNow) fx.SetAge(0.12f);
             if (Application.isPlaying) Object.Destroy(go, 1.2f);
+        }
+
+        public static LineRenderer Line(GameKit kit, Vector3[] pts, Color color, float width, float life)
+        {
+            var go = new GameObject("Beam");
+            var lr = go.AddComponent<LineRenderer>();
+            lr.positionCount = pts.Length;
+            lr.SetPositions(pts);
+            lr.widthMultiplier = width;
+            lr.numCapVertices = 3;
+            lr.sharedMaterial = kit.Glow(color, 5f);
+            lr.shadowCastingMode = ShadowCastingMode.Off;
+            lr.receiveShadows = false;
+            if (Application.isPlaying) go.AddComponent<FadeLine>().life = life;
+            return lr;
+        }
+
+        public static LineRenderer Beam(GameKit kit, Vector3 from, Vector3 to, Color color) => Line(kit, new[] { from, to }, color, 0.2f, 0.4f);
+
+        public static LineRenderer Bolt(GameKit kit, Vector3 from, Vector3 to, Color color)
+        {
+            const int n = 9;
+            var pts = new Vector3[n];
+            for (int i = 0; i < n; i++)
+            {
+                float t = i / (float)(n - 1);
+                pts[i] = Vector3.Lerp(from, to, t) + (i == 0 || i == n - 1 ? Vector3.zero : Random.insideUnitSphere * 0.45f);
+            }
+            return Line(kit, pts, color, 0.12f, 0.3f);
         }
     }
 

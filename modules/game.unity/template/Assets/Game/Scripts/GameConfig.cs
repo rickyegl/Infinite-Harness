@@ -27,6 +27,39 @@ namespace HarnessGame
         public float height = 1.0f;       // scale
         public string skin = "#f1c27d";
         public string outfit = "";        // empty = kart colour
+        public ClassSpec[] classes = ClassSpec.Defaults();   // handed out round the grid
+        public string player = "sniper";  // the class the player drives
+    }
+
+    /// a rider class and its attack: volt (electric dash), sniper (aimed shot), shrink (small and fast, fragile),
+    /// thrower (throws an item forward on its own)
+    [Serializable]
+    public class ClassSpec
+    {
+        public string kind = "thrower";
+        public string name = "";
+        public float cooldown = 3f;       // seconds between attacks
+        public string color = "";         // gear colour; empty = the class default
+
+        public static ClassSpec[] Defaults() => new[]
+        {
+            new ClassSpec { kind = "volt", name = "Volt", cooldown = 4f, color = "#3cd6ff" },
+            new ClassSpec { kind = "sniper", name = "Sniper", cooldown = 10f, color = "#ff3c5a" },
+            new ClassSpec { kind = "shrink", name = "Shrink", cooldown = 9f, color = "#c45cff" },
+            new ClassSpec { kind = "thrower", name = "Thrower", cooldown = 3f, color = "#ffb23c" },
+        };
+    }
+
+    /// a generated model that replaces a primitive part: slot is kart, rider.<kind>, landmark.<n> or trophy;
+    /// path is Resources-relative (Models/<slot>/model), yaw turns it to face +Z, size is its longest side in metres
+    [Serializable]
+    public class ModelSpec
+    {
+        public string slot = "";
+        public string path = "";
+        public string texture = "";
+        public float yaw = 0f;
+        public float size = 0f;
     }
 
     [Serializable]
@@ -82,6 +115,7 @@ namespace HarnessGame
         public HudSpec hud = new HudSpec();
         public LookSpec look = new LookSpec();
         public string[] banners = new string[0];   // Resources-relative textures shown on track-side boards
+        public ModelSpec[] models = new ModelSpec[0];
         public bool built_track, built_karts, built_riders, built_combat, built_hud;
 
         public static GameConfig Load()
@@ -90,6 +124,28 @@ namespace HarnessGame
             if (ta == null) return new GameConfig();
             try { return JsonUtility.FromJson<GameConfig>(ta.text) ?? new GameConfig(); }
             catch (Exception e) { Debug.LogWarning("game.json: " + e.Message); return new GameConfig(); }
+        }
+
+        public ModelSpec Model(string slot)
+        {
+            if (models != null) foreach (var m in models) if (m != null && m.slot == slot && !string.IsNullOrEmpty(m.path)) return m;
+            return null;
+        }
+
+        public ClassSpec Class(string kind)
+        {
+            var cs = riders.classes != null && riders.classes.Length > 0 ? riders.classes : ClassSpec.Defaults();
+            foreach (var c in cs) if (c.kind == kind) return c;
+            foreach (var c in ClassSpec.Defaults()) if (c.kind == kind) return c;
+            return cs[0];
+        }
+
+        /// the class of kart i: the player gets riders.player, the rest go round the class list
+        public ClassSpec ClassFor(int i, bool isPlayer)
+        {
+            if (isPlayer && !string.IsNullOrEmpty(riders.player)) return Class(riders.player);
+            var cs = riders.classes != null && riders.classes.Length > 0 ? riders.classes : ClassSpec.Defaults();
+            return cs[i % cs.Length];
         }
 
         public static Color Hex(string s, Color fallback)

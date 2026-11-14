@@ -392,6 +392,9 @@ namespace HarnessEditor
             AssetDatabase.ImportAsset(Config, ImportAssetOptions.ForceUpdate);
             if (EditorApplication.isPlaying) return;
             if (EditorSceneManager.GetActiveScene().path != Scene) EditorSceneManager.OpenScene(Scene, OpenSceneMode.Single);
+            // effects left behind by an older shot (they are loose scene objects)
+            foreach (var go in EditorSceneManager.GetActiveScene().GetRootGameObjects())
+                if (go.name == "HitFx" || go.name == "Beam" || go.name == "Item") UnityEngine.Object.DestroyImmediate(go);
             var boot = UnityEngine.Object.FindFirstObjectByType<GameBoot>();
             if (!boot) boot = new GameObject("Game").AddComponent<GameBoot>();
             boot.Rebuild(GameConfig.Load(), false);
@@ -464,6 +467,8 @@ namespace HarnessEditor
             var path = race ? race.path : null;
             var t = cam.transform;
             var keepPos = t.position; var keepRot = t.rotation;
+            // effects a view adds (hit rings, beams, a thrown item) are loose scene objects: remove them after the render
+            var before = new HashSet<GameObject>(EditorSceneManager.GetActiveScene().GetRootGameObjects());
             Kart Pick(int i) => race && race.karts.Count > 0 ? race.karts[Mathf.Clamp(i, 0, race.karts.Count - 1)] : null;
             switch (view)
             {
@@ -517,12 +522,23 @@ namespace HarnessEditor
                     var a = Pick(0); var b = Pick(1);
                     if (a && b)
                     {
-                        // bring two karts side by side, freeze a swing and a hit burst between them
-                        b.dist = a.dist; b.lateral = a.lateral + 2.6f; b.Place(path);
+                        // bring two karts close, freeze the first rider's class attack landing on the second
+                        var kit = GameKit.Load();
+                        var col = Abilities.ColorOf(a);
+                        bool far = a.kind == "sniper" || a.kind == "thrower";
+                        b.dist = a.dist + (far ? 9f : 1.2f); b.lateral = a.lateral + (far ? 1.2f : 2.4f); b.Place(path);
                         if (a.rider) a.rider.Freeze(0.2f);
+                        if (a.kind == "volt") a.dash = 0.4f;
+                        if (a.kind == "shrink") { a.small = 2f; a.size = Abilities.SmallScale; }
+                        a.Place(path);
                         b.stun = 0.5f; b.Place(path);
-                        var at = (a.transform.position + b.transform.position) * 0.5f + Vector3.up * 1.4f;
-                        Effects.Hit(GameKit.Load(), at, GameConfig.Hex(race.cfg.combat.hitColor, Color.yellow), true);
+                        var at = b.transform.position + b.transform.up * 1.1f;
+                        var from = a.transform.position + a.transform.up * 1.3f;
+                        if (a.kind == "volt") Effects.Bolt(kit, from, at, col);
+                        else if (a.kind == "sniper") Effects.Beam(kit, from + a.transform.forward * 0.9f, at, col);
+                        else if (a.kind == "thrower") Prim.Make(PrimitiveType.Sphere, null, Vector3.Lerp(from, at, 0.75f), Vector3.one * 0.55f, kit.Lit(col, 0.6f), "Item");
+                        Effects.Hit(kit, at, col, true);
+                        if (far) at = Vector3.Lerp(from, at, 0.5f);
                         t.position = a.transform.position + a.transform.rotation * new Vector3(1.3f, 2.4f, 5.5f);
                         t.LookAt(at - Vector3.up * 0.4f);
                     }
@@ -573,6 +589,9 @@ namespace HarnessEditor
             Canvas.ForceUpdateCanvases();
             Shots.Save(cam, file, w, h);
             t.SetPositionAndRotation(keepPos, keepRot);
+            if (!EditorApplication.isPlaying)
+                foreach (var go in EditorSceneManager.GetActiveScene().GetRootGameObjects())
+                    if (!before.Contains(go)) UnityEngine.Object.DestroyImmediate(go);
         }
 
         [MenuItem("Harness/Screenshot (overview)")]
@@ -678,8 +697,12 @@ namespace HarnessEditor
             }
             var L = race.path.Length;
             var rows = race.karts.OrderBy(k => k.place).Select(k =>
-                $"{{\"name\":{Q(k.kartName)},\"place\":{k.place},\"laps\":{Mathf.Min(race.cfg.laps, Mathf.FloorToInt(k.dist / L))},\"time\":{(k.finishTime >= 0 ? k.finishTime.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture) : "null")},\"player\":{(k.isPlayer ? "true" : "false")}}}");
-            runningResult = $"{{\"finished\":{(race.phase == RaceManager.Phase.Finished ? "true" : "false")},\"raceSeconds\":{race.clock.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture)},\"hits\":{hits},\"trackMetres\":{Mathf.RoundToInt(L)},\"karts\":[{string.Join(",", rows)}]}}";
+                $"{{\"name\":{Q(k.kartName)},\"place\":{k.place},\"laps\":{Mathf.Min(race.cfg.laps, Mathf.FloorToInt(k.dist / L))},\"time\":{(k.finishTime >= 0 ? k.finishTime.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture) : "null")},\"player\":{(k.isPlayer ? "true" : "false")},\"class\":{Q(k.kind)}}}");
+            var ab = race.abilities;
+            var attacks = string.Join(",", Abilities.Kinds.Select(kd =>
+                $"{Q(kd)}:{{\"riders\":{race.karts.Count(k => k.kind == kd)},\"uses\":{(ab != null && ab.uses.TryGetValue(kd, out var u) ? u : 0)},\"hits\":{(ab != null && ab.hits.TryGetValue(kd, out var h) ? h : 0)}}}"));
+            var player = race.player;
+            runningResult = $"{{\"finished\":{(race.phase == RaceManager.Phase.Finished ? "true" : "false")},\"raceSeconds\":{race.clock.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture)},\"hits\":{hits},\"attacks\":{{{attacks}}},\"playerClass\":{Q(player ? player.kind : "")},\"trackMetres\":{Mathf.RoundToInt(L)},\"karts\":[{string.Join(",", rows)}]}}";
             WriteDone();
             var ex = ExitPlay();
             while (ex.MoveNext()) yield return null;

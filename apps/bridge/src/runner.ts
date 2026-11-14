@@ -249,12 +249,19 @@ export class Run {
   private maybeFinish(): void {
     if (this.inflight > 0 || this.ended) return;
     const cells = [...this.cells.values()].filter((c) => c.id !== "root");
-    const failed = cells.filter((c) => c.failed).length;
+    // the hub's own requests: a failed one is counted apart from the tasks (the task that asked can still finish)
+    const lost = cells.filter((c) => c.parent === "assets" && c.failed).length;
     const hub = this.cells.get("assets");
-    if (hub?.open) this.closeCell("assets", null, `${hub.children} ${hub.children === 1 ? "asset" : "assets"} delivered`);
-    const n = cells.filter((c) => c.parent === "root" && c.id !== "assets").length;
+    if (hub?.open) {
+      const got = hub.children - lost;
+      this.closeCell("assets", null, `${got} ${got === 1 ? "asset" : "assets"} delivered${lost ? `, ${lost} failed` : ""}`);
+    }
+    const tasks = cells.filter((c) => c.parent === "root" && c.id !== "assets");
+    const n = tasks.length;
+    const failed = tasks.filter((c) => c.failed).length;
+    const also = lost ? ` (${lost} ${lost === 1 ? "asset" : "assets"} failed)` : "";
     if (this.planFailed && n === 0) this.emit({ type: "node.error", node: "root", message: "nothing was planned" });
-    else this.emit({ type: "node.done", node: "root", summary: failed ? `${n - failed} of ${n} tasks finished` : `${n} ${n === 1 ? "task" : "tasks"} finished` });
+    else this.emit({ type: "node.done", node: "root", summary: (failed ? `${n - failed} of ${n} tasks finished` : `${n} ${n === 1 ? "task" : "tasks"} finished`) + also });
     this.emit({ type: "run.done", node: "root" });
     this.log.close(failed || this.planFailed ? "failed" : "done");
     this.ended = true;

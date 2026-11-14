@@ -1,0 +1,25 @@
+{
+  "id": "assets.model3d",
+  "label": "3D model",
+  "icon": "cube",
+  "kind": "tool",
+  "maker": "hunyuan3d",
+  "summary": "Makes a textured low-poly 3D model (GLB plus an OBJ set, optionally rigged) from a text prompt on the asset forge GPU runtime. Answers model3d asset requests from other modules.",
+  "accepts": [
+    "text"
+  ],
+  "produces": [
+    "model3d"
+  ],
+  "runtime": "script",
+  "mock": true,
+  "allow": {
+    "write": [
+      "$NODE",
+      "runs/.cache"
+    ],
+    "network": [
+      "127.0.0.1"
+    ]
+  }
+}

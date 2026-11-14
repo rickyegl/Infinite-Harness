@@ -283,53 +283,72 @@ export function gridSvg(karts: { count: number; colors: string[]; names: string[
 }
 
 /** a rider on the kart from the side, with the design's weapon, drawn from the same part sizes as the place */
-export function riderSvg(r: { weapon: string; height: number; skin: string }, kartColor: string): string {
-  const W = 1280, H = 720, s = 52, gx = W / 2 - 40, gy = 560; // 1 stud = s px, ground at gy
-  const P = (x: number, y: number) => [gx + x * s, gy - y * s];
-  const box = (x: number, y: number, w: number, h: number, fill: string, rx = 6) => {
-    const [px, py] = P(x - w / 2, y + h / 2);
-    return `<rect x="${px.toFixed(1)}" y="${py.toFixed(1)}" width="${(w * s).toFixed(1)}" height="${(h * s).toFixed(1)}" rx="${rx}" fill="${fill}"/>`;
-  };
-  const circ = (x: number, y: number, d: number, fill: string, op = 1) => {
-    const [px, py] = P(x, y);
-    return `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${(d * s / 2).toFixed(1)}" fill="${fill}" opacity="${op}"/>`;
-  };
+/** the four rider classes side by side, drawn from the part sizes in the place, each with its class gear */
+export const CLASS_GEAR: Record<string, { name: string; color: string; cooldown: number; attack: string }> = {
+  volt: { name: "Volt", color: "#3cd6ff", cooldown: 4, attack: "SPACE: electric dash, zaps on contact" },
+  sniper: { name: "Sniper", color: "#ff3c5a", cooldown: 10, attack: "mouse crosshair, click to shoot" },
+  shrink: { name: "Shrink", color: "#c45cff", cooldown: 9, attack: "SPACE: small and fast, a touch squashes" },
+  thrower: { name: "Thrower", color: "#ffb23c", cooldown: 3, attack: "throws an item forward on its own" },
+};
+
+export function classesSvg(r: { height: number; skin: string }, kartColors: string[]): string {
+  const W = 1280, H = 720, s = 30, gy = 470; // 1 stud = s px, ground at gy
   const h = Math.min(1.4, Math.max(0.7, r.height));
-  const parts = [
-    box(0, 1.3, 6, 1.2, kartColor), box(-3.9, 1.15, 1.8, 0.9, kartColor), box(2.8, 2.7, 1.1, 0.25, "#1e1e22"), box(0.9, 2.2, 1.6, 1.4, "#1e1e22"),
-    circ(-2, 0.85, 1.7, "#161618"), circ(2, 0.85, 1.7, "#161618"),
-    box(0.6, 3.4, 1 * h, 2 * h, kartColor), circ(0.6, 3.4 + 1.75 * h, 1.4 * h, r.skin), circ(0.65, 3.55 + 1.75 * h, 1.55 * h, kartColor, 0.55),
-    box(-0.2, 3.2, 1.8 * h, 0.6 * h, r.skin),
-  ];
-  const [sx, sy] = P(0.4, 3.9);
-  let weapon = "";
-  if (r.weapon === "glove") weapon = `<g transform="rotate(-25 ${sx} ${sy})"><rect x="${sx - 6}" y="${sy - 1.6 * s}" width="12" height="${1.6 * s}" fill="#b4b4be"/><circle cx="${sx}" cy="${sy - 2.3 * s}" r="${0.85 * s}" fill="#d22828"/></g>`;
-  else if (r.weapon === "noodle") weapon = `<g transform="rotate(-25 ${sx} ${sy})"><path d="M${sx},${sy} q ${0.6 * s},${-1.6 * s} ${0.2 * s},${-3.6 * s}" stroke="${kartColor}" stroke-width="${0.7 * s}" fill="none" stroke-linecap="round" opacity="0.8"/></g>`;
-  else weapon = `<g transform="rotate(-25 ${sx} ${sy})"><rect x="${sx - 10}" y="${sy - 2.2 * s}" width="20" height="${2.2 * s}" fill="#6e4c2c"/><rect x="${sx - 0.55 * s}" y="${sy - 3.7 * s}" width="${1.1 * s}" height="${1.8 * s}" rx="18" fill="${kartColor}"/></g>`;
-  return svgDoc(W, H, text(60, 48, `Rider with a ${r.weapon}`, 26) + `<line x1="80" x2="${W - 80}" y1="${gy}" y2="${gy}" stroke="#2a3244" stroke-width="3"/>` + parts.join("") + weapon + text(W - 60, H - 40, "drawn to scale from the part sizes in the place", 18, DIM, "end", 500));
+  const out: string[] = [];
+  Object.entries(CLASS_GEAR).forEach(([kind, c], i) => {
+    const gx = 160 + i * 320; // kart centre; the kart faces left (-Z), so +Z (back) is to the right
+    const P = (z: number, y: number) => [gx + z * s, gy - y * s];
+    const box = (z: number, y: number, w: number, hh: number, fill: string, rx = 4) => {
+      const [px, py] = P(z - w / 2, y + hh / 2);
+      return `<rect x="${px.toFixed(1)}" y="${py.toFixed(1)}" width="${(w * s).toFixed(1)}" height="${(hh * s).toFixed(1)}" rx="${rx}" fill="${fill}"/>`;
+    };
+    const circ = (z: number, y: number, d: number, fill: string, op = 1) => {
+      const [px, py] = P(z, y);
+      return `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${((d * s) / 2).toFixed(1)}" fill="${fill}" opacity="${op}"/>`;
+    };
+    const kc = kartColors[i % Math.max(1, kartColors.length)] ?? "#e8463c";
+    const top = 3.4 + 1.75 * h;
+    out.push(
+      box(0, 1.3, 6, 1.2, kc), box(-3.9, 1.15, 1.8, 0.9, kc), box(2.8, 2.7, 1.1, 0.25, "#1e1e22"), box(0.9, 2.2, 1.6, 1.4, "#1e1e22"),
+      circ(-2, 0.85, 1.7, "#161618"), circ(2, 0.85, 1.7, "#161618"),
+      box(0.6, 3.4, 1 * h, 2 * h, kc), circ(0.6, top, 1.4 * h, r.skin), circ(0.65, top + 0.15, 1.55 * h, kc, 0.55),
+      box(-0.2, 3.2, 1.8 * h, 0.6 * h, r.skin),
+    );
+    const g = c.color;
+    if (kind === "volt") out.push(box(1.45, 3.5, 1.1, 1.4, "#383842"), circ(1.45, 4.6, 1, g), box(0.6, top + 1, 0.15, 0.9, "#383842"), circ(0.4, 2.6, 0.8, g), circ(-0.7, 2.7, 0.8, g));
+    else if (kind === "sniper") out.push(box(-1.2, 2.9, 3.2, 0.35, "#383842"), box(0.6, 2.8, 1.2, 0.6, "#6e4626"), box(-0.6, 3.3, 1, 0.45, "#383842"), circ(-1.15, 3.3, 0.35, g), box(-0.15, top + 0.1, 0.2, 0.3, g));
+    else if (kind === "shrink") out.push(circ(0.2, 2.5, 1.1, "#ffffff", 0.45), circ(0.2, 2.5, 0.8, g), box(0.2, 3.15, 0.35, 0.4, "#383842"), box(0.65, top + 1, 0.15, 0.5, "#383842"), box(0.65, top + 1.3, 1.8, 0.1, g));
+    else out.push(box(1.45, 3.3, 0.8, 1.5, "#734d29"), circ(1.45, 4.2, 0.7, g), circ(0.4, 2.5, 1, g));
+    out.push(
+      text(gx, 150, c.name, 30, g, "middle", 800),
+      text(gx, 184, `every ${c.cooldown} s`, 18, DIM, "middle", 500),
+      text(gx, gy + 60, c.attack, 16, INK, "middle", 500),
+    );
+  });
+  return svgDoc(W, H, text(60, 48, "Four rider classes, each with its own attack", 26) + `<line x1="40" x2="${W - 40}" y1="${gy}" y2="${gy}" stroke="#2a3244" stroke-width="3"/>` + out.join("") + text(W - 60, H - 40, "drawn to scale from the part sizes in the place; a generated rider model replaces the parts once uploaded", 18, DIM, "end", 500));
 }
 
-/** the reach of a swing around one kart, with what a hit does */
-export function reachSvg(c: { range: number; cooldown: number; slow: number; knock: number; hitColor: string }, color: string): string {
-  const W = 1280, H = 720, cx = 470, cy = 380, s = 34; // px per metre
-  const r = c.range * s;
-  const kart = (x: number, y: number, fill: string) => `<rect x="${x - 0.67 * s}" y="${y - s}" width="${1.33 * s}" height="${2 * s}" rx="8" fill="${fill}"/>`;
-  const body = [
-    `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${c.hitColor}" opacity="0.1" stroke="${c.hitColor}" stroke-width="3" stroke-dasharray="10 8"/>`,
-    kart(cx, cy, color),
-    kart(cx + r * 0.7, cy - r * 0.35, "#8890a0"),
-    `<circle cx="${cx + r * 0.7}" cy="${cy - r * 0.35}" r="${1.4 * s}" fill="none" stroke="${c.hitColor}" stroke-width="5"/>`,
-    `<path d="M${cx + r * 0.7 + 1.6 * s},${cy - r * 0.35} l ${c.knock * 4},0" stroke="${c.hitColor}" stroke-width="5" marker-end="url(#a)"/>`,
-    text(cx, cy + r + 36, `${c.range.toFixed(1)} m reach`, 22, c.hitColor, "middle"),
+/** what each class's attack does, with the numbers the server uses */
+export function attacksSvg(c: { slow: number; knock: number; aiAggression: number }): string {
+  const W = 1280, H = 720;
+  const keep = (x: number) => `keeps ${Math.round(x * 100)}% speed`;
+  const rows: [string, string, string, string][] = [
+    ["volt", "Electric dash", "0.7 s at 1.55x top speed", `zap on contact: ${keep(c.slow)}, ${c.knock.toFixed(0)} m/s shove, 0.8 s spin`],
+    ["sniper", "Crosshair shot", "150 m range, 1.8 m aim radius", `${keep(c.slow * 0.75)}, half shove, 1 s spin`],
+    ["shrink", "Shrink", "4 s at 55% size and 1.3x top speed", `touched while small: squashed, ${keep(0.25)}, 1.2 s spin`],
+    ["thrower", "Thrown item", "flies 22 m/s faster than the kart for 2.2 s", `first kart in its lane: ${keep(c.slow + (1 - c.slow) * 0.3)}, 0.6 s spin`],
   ];
-  const facts = [
-    ["Reach", `${c.range.toFixed(1)} m`],
-    ["Cooldown", `${c.cooldown.toFixed(1)} s`],
-    ["Slow on hit", `${Math.round(c.slow * 100)}%`],
-    ["Shove", `${c.knock.toFixed(1)} m sideways`],
-  ].map(([k, v], i) => text(860, 250 + i * 60, k, 22, DIM, "start", 500) + text(1200, 250 + i * 60, v, 26, INK, "end"));
-  const defs = `<defs><marker id="a" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="${c.hitColor}"/></marker></defs>`;
-  return svgDoc(W, H, defs + text(60, 48, "Combat: swing reach and what a hit does", 26) + body.join("") + facts.join(""));
+  const body = rows.map(([k, title, how, hit], i) => {
+    const y = 170 + i * 120;
+    const g = CLASS_GEAR[k];
+    return (
+      `<rect x="60" y="${y - 46}" width="${W - 120}" height="100" rx="14" fill="#151a26"/><rect x="60" y="${y - 46}" width="10" height="100" rx="4" fill="${g.color}"/>` +
+      text(100, y - 6, `${g.name}: ${title}`, 26, g.color, "start", 800) +
+      text(100, y + 30, `every ${g.cooldown} s, ${how}`, 19, INK, "start", 500) +
+      text(W - 90, y + 30, hit, 19, DIM, "end", 500)
+    );
+  });
+  return svgDoc(W, H, text(60, 64, "Combat: four attacks, all checked on the server", 26) + body.join("") + text(W - 60, H - 30, `AI riders attack after the first 3 s of the race (aggression ${c.aiAggression.toFixed(1)})`, 18, DIM, "end", 500));
 }
 
 /** the HUD layout at 1280x720 with the real minimap from the track */
@@ -340,8 +359,11 @@ export function hudSvg(hud: { title: string; accent: string; minimap: boolean },
   body.push(text(24, 98, `LAP 1/${laps}`, 40, INK, "start", 900));
   body.push(text(W - 24, 82, "2nd", 64, hud.accent, "end", 900));
   body.push(text(W - 24, H - 34, "142 km/h", 44, INK, "end", 900));
-  body.push(text(24, 150, `${names[1] ?? "Kart 2"} bonked ${names[2] ?? "Kart 3"}`, 20, INK, "start", 700));
-  body.push(text(W / 2, H - 14, "W/S drive   A/D steer   SPACE swing", 18, "#cfd5e2", "middle", 500));
+  body.push(text(24, 150, `${names[0] ?? "Kart 1"} sniped ${names[2] ?? "Kart 3"}!`, 20, INK, "start", 700));
+  body.push(text(W / 2, H - 50, "SNIPER   READY", 26, CLASS_GEAR.sniper.color, "middle", 900));
+  body.push(text(W / 2, H - 14, "W/S drive  |  A/D steer  |  MOUSE aim  |  CLICK shoot", 18, "#cfd5e2", "middle", 500));
+  // the crosshair over a kart ahead
+  body.push(`<rect x="${W * 0.56}" y="${H * 0.6}" width="44" height="30" rx="6" fill="${names.length ? "#3c8ee8" : "#888"}"/><circle cx="${W * 0.56 + 22}" cy="${H * 0.6 + 12}" r="19" fill="none" stroke="#ff3c50" stroke-width="3"/><circle cx="${W * 0.56 + 22}" cy="${H * 0.6 + 12}" r="3" fill="#ff3c50"/>`);
   if (hud.minimap && t) {
     const m = 190, x0 = 24, y0 = H - m - 24;
     body.push(`<rect x="${x0}" y="${y0}" width="${m}" height="${m}" fill="#0a0c12" opacity="0.55"/>`);

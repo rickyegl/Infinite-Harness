@@ -27,6 +27,18 @@ export type Design = {
   look: { sky: string; ground: string };
   win: string;
   art: { kind: "image" | "model3d" | "music"; name: string; prompt: string; use: string }[];
+  /** what each generated 3D model shows; the art team makes all of them at once (see modelSlots) */
+  models: { kart: string; riders: Record<RiderClass, string>; landmarks: string[]; trophy: string };
+};
+
+/** the four rider classes, each with its own attack (the engines implement them) */
+export const RIDER_CLASSES = ["volt", "sniper", "shrink", "thrower"] as const;
+export type RiderClass = (typeof RIDER_CLASSES)[number];
+export const CLASS_INFO: Record<RiderClass, { name: string; attack: string }> = {
+  volt: { name: "Volt", attack: "an electric dash: a short burst of speed that zaps anyone it touches" },
+  sniper: { name: "Sniper", attack: "aims with the mouse crosshair and shoots a beam, once every 10 seconds" },
+  shrink: { name: "Shrink", attack: "turns small and fast for a few seconds, but a bump while small slows it down a lot" },
+  thrower: { name: "Thrower", attack: "throws an item forwards every 3 seconds, automatically" },
 };
 
 const str = { type: "string" };
@@ -52,6 +64,7 @@ export const designSchema = obj({
   look: obj({ sky: str, ground: str }),
   win: str,
   art: { type: "array", items: obj({ kind: { type: "string", enum: ["image", "model3d", "music"] }, name: str, prompt: str, use: str }) },
+  models: obj({ kart: str, riders: obj({ volt: str, sniper: str, shrink: str, thrower: str }), landmarks: { type: "array", items: str }, trophy: str }),
 });
 
 const clamp = (v: unknown, lo: number, hi: number, d: number) => (typeof v === "number" && Number.isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d);
@@ -70,7 +83,32 @@ export const DEFAULT: Design = {
   look: { sky: "#7fb4e6", ground: "#5f9e4a" },
   win: "First across the line after the last lap wins.",
   art: [],
+  models: {
+    kart: "a chunky toy racing kart body with a big rear spoiler, side pods and a low open seat, no driver, no wheels",
+    riders: {
+      volt: "a chunky toy racer figure in a padded blue suit with a glowing coil backpack and a lightning bolt helmet, sitting with both arms reaching forward",
+      sniper: "a chunky toy racer figure in a red flight jacket and big round goggles with a long scoped blaster on the back, sitting with both arms reaching forward",
+      shrink: "a chunky toy racer figure in a purple lab coat with a bubbling potion flask on the belt and a propeller cap, sitting with both arms reaching forward",
+      thrower: "a chunky toy racer figure in an orange vest with a bulging satchel of throwing balls across the chest, sitting with both arms reaching forward",
+    },
+    landmarks: [
+      "a giant cartoon lighthouse built from stacked red and white traffic cones",
+      "a huge stone arch shaped like a wrench and a spanner crossing each other",
+    ],
+    trophy: "a shiny golden racing trophy cup with two big handles on a stepped base, a tiny kart on top",
+  },
 };
+
+/** every generated model the games use: slot name, prompt, longest side in studs and a triangle budget */
+export function modelSlots(d: Design): { slot: string; prompt: string; size: number; tris: number }[] {
+  return [
+    { slot: "kart", prompt: d.models.kart, size: 7, tris: 2500 },
+    // the rider sits on the game's own kart, so its model is the figure alone (a "steering wheel" draws a whole car)
+    ...RIDER_CLASSES.map((c) => ({ slot: `rider.${c}`, prompt: `${d.models.riders[c].replace(/,?\s*as if (holding|gripping|on) a steering wheel/gi, "")}, the figure alone with no vehicle, kart, car or seat`, size: 4, tris: 2500 })),
+    ...d.models.landmarks.map((p, i) => ({ slot: `landmark.${i + 1}`, prompt: p, size: 30, tris: 3000 })),
+    { slot: "trophy", prompt: d.models.trophy, size: 5, tris: 2000 },
+  ];
+}
 
 /** fills gaps and clamps every number to what the game code handles well */
 export function tidyDesign(x: Partial<Design> | undefined): Design {
@@ -135,6 +173,16 @@ export function tidyDesign(x: Partial<Design> | undefined): Design {
       .filter((a: any) => a && ["image", "model3d", "music"].includes(a.kind) && typeof a.prompt === "string" && a.prompt.trim())
       .slice(0, 4)
       .map((a: any, i: number) => ({ kind: a.kind, name: text(a.name, `art-${i + 1}`, 40), prompt: a.prompt.trim().slice(0, 300), use: text(a.use, "", 120) })),
+    models: {
+      kart: text(d.models?.kart, D.models.kart, 300),
+      riders: Object.fromEntries(RIDER_CLASSES.map((c) => [c, text(d.models?.riders?.[c], D.models.riders[c], 300)])) as Record<RiderClass, string>,
+      landmarks: (Array.isArray(d.models?.landmarks) ? d.models.landmarks : [])
+        .filter((x: unknown): x is string => typeof x === "string" && !!x.trim())
+        .map((x: string) => x.trim().slice(0, 300))
+        .concat(D.models.landmarks)
+        .slice(0, 2),
+      trophy: text(d.models?.trophy, D.models.trophy, 300),
+    },
   };
 }
 
@@ -175,7 +223,9 @@ export function designMarkdown(d: Design): string {
     "",
     "## Riders and combat",
     "",
-    `Each kart carries a humanoid rider with a ${d.riders.weapon}. A swing reaches ${d.combat.range.toFixed(1)} m, then needs ${d.combat.cooldown.toFixed(1)} s to recover. A hit knocks the victim sideways and cuts its speed to ${Math.round(d.combat.slow * 100)}%, with a burst of colour.`,
+    `Each kart carries a humanoid rider of one of four classes, each with its own attack. A hit knocks the victim sideways and cuts its speed to ${Math.round(d.combat.slow * 100)}%, with a burst of colour.`,
+    "",
+    ...RIDER_CLASSES.map((c) => `- **${CLASS_INFO[c].name}**: ${CLASS_INFO[c].attack}. Looks like ${d.models.riders[c]}.`),
     ...(d.combat.rules ? ["", d.combat.rules] : []),
     ...(d.riders.notes ? ["", d.riders.notes] : []),
     "",
@@ -186,6 +236,12 @@ export function designMarkdown(d: Design): string {
     "## Shared art",
     "",
     ...(d.art.length ? d.art.map((a) => `- **${a.name}** (${a.kind}): ${a.prompt}${a.use ? ` Used for: ${a.use}.` : ""}`) : ["- none requested"]),
+    "",
+    "## 3D models",
+    "",
+    `- **Kart body**: ${d.models.kart}`,
+    ...d.models.landmarks.map((l, i) => `- **Landmark ${i + 1}** (beside the track): ${l}`),
+    `- **Trophy** (at the finish): ${d.models.trophy}`,
     "",
   ].join("\n");
 }

@@ -20,9 +20,18 @@ namespace HarnessGame
         public float throttle, steer;   // inputs, -1..1
         public bool wantsAttack;
         public float stun;          // seconds of spin-out left
-        public float cooldown;      // seconds until the rider can swing again
+        public float cooldown;      // seconds until the rider's attack is ready again
         public float finishTime = -1;
         public int place = 1;
+
+        // rider class and its attack state (see Abilities)
+        public string kind = "thrower";
+        public ClassSpec cls;
+        public float dash;          // seconds of electric dash left (volt)
+        public float small;         // seconds of being small left (shrink)
+        public float size = 1f;     // current visual scale, eases towards 0.55 while small
+        public Kart bumpedBy;       // the kart that touched this one this frame (set by the bump step)
+        public Transform aura;      // glow shown while dashing or small
 
         // driver personality (AI)
         public float skill = 0.9f, lineBias, lineWobble;
@@ -41,7 +50,7 @@ namespace HarnessGame
 
         public int Lap(float trackLength) => Mathf.Max(0, Mathf.FloorToInt(dist / trackLength));
 
-        public static Kart Build(Transform parent, GameKit kit, GameConfig cfg, int i)
+        public static Kart Build(Transform parent, GameKit kit, GameConfig cfg, int i, ClassSpec cls = null)
         {
             var ks = cfg.karts;
             var col = GameConfig.Hex(ks.colors[i % ks.colors.Length], Color.red);
@@ -50,6 +59,8 @@ namespace HarnessGame
             var k = go.AddComponent<Kart>();
             k.index = i;
             k.kartName = ks.names[i % ks.names.Length];
+            k.cls = cls ?? cfg.ClassFor(i, false);
+            k.kind = k.cls.kind;
             k.color = col;
             k.visual = Prim.Node("Visual", go.transform);
             k.body = Prim.Node("Body", k.visual);
@@ -93,8 +104,22 @@ namespace HarnessGame
             lights.Add(hl);
             k.headlights = lights.ToArray();
 
+            // a generated kart body replaces the primitive shell; tyres, hover pad and lamps stay
+            var shell = Models.Spawn(cfg, kit, "kart", k.body, new Vector3(0, 0.18f, 0.05f), 3.0f, col, 0.35f);
+            if (shell != null)
+                foreach (Transform c in k.body)
+                    if (c.name is "Chassis" or "Nose" or "Spoiler" or "Seat" or "Wheel" or "Exhaust" or "Plate") c.gameObject.SetActive(false);
+
             var outfit = string.IsNullOrEmpty(cfg.riders.outfit) ? col : GameConfig.Hex(cfg.riders.outfit, col);
-            k.rider = Rider.Build(k.body, kit, cfg.riders, outfit, cfg.built_riders);
+            var gear = GameConfig.Hex(k.cls.color, Abilities.DefaultColor(k.kind));
+            k.rider = Rider.Build(k.body, kit, cfg.riders, outfit, cfg.built_riders, k.kind, gear);
+            k.rider.UseModel(cfg, kit, k.kind);
+            // sit the rider down in the generated body's seat (its own height varies), hips a little behind the
+            // middle of the figure's box, since the legs reach forward
+            var seat = shell ? Models.Seat(shell, k.body) : null;
+            if (seat is Vector3 st) k.rider.transform.localPosition = new Vector3(st.x, st.y - 0.12f, st.z + 0.15f);
+            k.aura = Prim.Make(PrimitiveType.Sphere, k.visual, new Vector3(0, 0.9f, 0), new Vector3(2.4f, 1.6f, 3.4f), kit.Ghost(gear), "Aura").transform;
+            k.aura.gameObject.SetActive(false);
             k.flashRenderers = k.body.GetComponentsInChildren<Renderer>();
             return k;
         }
@@ -109,7 +134,17 @@ namespace HarnessGame
             var up = pose.rotation * Vector3.up;
             float lift = hoverAmt * (0.35f + 0.06f * Mathf.Sin(Time.time * 9f + index));
             transform.SetPositionAndRotation(pose.position + up * (bob + lift), pose.rotation);
-            if (visual) visual.localRotation = Quaternion.Euler(0, spinAngle, lean);
+            if (visual)
+            {
+                visual.localRotation = Quaternion.Euler(0, spinAngle, lean);
+                visual.localScale = Vector3.one * size;
+            }
+            if (aura)
+            {
+                bool on = dash > 0 || small > 0;
+                aura.gameObject.SetActive(on);
+                if (on) aura.localScale = new Vector3(2.4f, 1.6f, 3.4f) * (1f + 0.08f * Mathf.Sin(Time.time * (dash > 0 ? 60f : 8f)));
+            }
             ShowHover(hoverAmt);
         }
 
@@ -130,6 +165,9 @@ namespace HarnessGame
         public void Tick(float dt)
         {
             if (cooldown > 0) cooldown -= dt;
+            if (dash > 0) dash -= dt;
+            if (small > 0) small -= dt;
+            size = Mathf.MoveTowards(size, small > 0 ? Abilities.SmallScale : 1f, dt * 3f);
             if (stun > 0)
             {
                 stun -= dt;
@@ -150,12 +188,13 @@ namespace HarnessGame
             if (rider) rider.Tick(dt);
         }
 
-        public void Hit(float knock, float slow)
+        public void Hit(float knock, float slow, float stunFor = 0.7f)
         {
             speed *= slow;
             latVel += knock;
-            stun = 0.7f;
+            stun = stunFor;
             flash = 0.35f;
+            dash = 0;
         }
 
         public void ShowHeadlights(bool on) { foreach (var l in headlights) if (l) l.enabled = on; }

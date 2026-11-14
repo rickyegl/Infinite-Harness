@@ -13,15 +13,15 @@ import { fileURLToPath } from "node:url";
 import { type Design, unitySections } from "../../game/lib/design.ts";
 import { patchState, readState, runDirOf } from "../../game/lib/state.ts";
 import { designOf, unityFor } from "../../game.unity/lib/parts.ts";
-import { codeLines, excerpt, gridSvg, hudSvg, luau, placeFor, reachSvg, riderSvg, type TrackData, trackProfileSvg, trackTopSvg, writeSvg } from "./roblox.ts";
+import { codeLines, excerpt, gridSvg, attacksSvg, classesSvg, hudSvg, luau, placeFor, type TrackData, trackProfileSvg, trackTopSvg, writeSvg } from "./roblox.ts";
 
 export type PartId = "track" | "karts" | "humanoids" | "combat" | "ui" | "build";
 
 export const PARTS: { id: PartId; label: string; brief: (d: Design) => string }[] = [
   { id: "track", label: "Track", brief: (d) => `Road parts along the same ${d.track.shape} centre line as the Unity game: loops, twists, banks${d.track.hover ? ", hover sections" : ""}.` },
   { id: "karts", label: "Karts", brief: (d) => `${d.karts.count} part-built karts that drive in track space, players plus AI.` },
-  { id: "humanoids", label: "Humanoids", brief: (d) => `A part-built rider on every kart, each with a ${d.riders.weapon}.` },
-  { id: "combat", label: "Combat", brief: (d) => `Server-side swings: ${d.combat.range.toFixed(1)} m reach, slow and shove on hit, hit feed.` },
+  { id: "humanoids", label: "Humanoids", brief: () => "Four rider classes (volt, sniper, shrink, thrower), each in its own gear, with the generated rider model when it is uploaded." },
+  { id: "combat", label: "Combat", brief: () => "Server-side class attacks: electric dash, crosshair shot every 10 s, shrink and speed boost, thrown item every 3 s; hit feed." },
   { id: "ui", label: "UI", brief: (d) => `ScreenGui HUD for "${d.hud.title}": lap, place, speed, countdown, feed, minimap.` },
   { id: "build", label: "Build", brief: () => "Lint the Luau with selene and build the place file with rojo." },
 ];
@@ -75,20 +75,20 @@ export async function runPart(ctx: ModuleContext, input: ModuleInput): Promise<M
       return { summary: `${d.karts.count} karts, top speed ${(d.karts.topSpeed * 3.6).toFixed(0)} km/h, players take a kart when they join` };
     }
     case "humanoids": {
-      ctx.step("Building the riders from parts", `torso, head, helmet, arms and a ${d.riders.weapon}`, "person");
+      ctx.step("Building the four rider classes", "volt coil, sniper rifle and scope, shrink potion and propeller, thrower satchel", "person");
       place.patchConfig({ riders: s.riders, built: { riders: true } });
-      const src = excerpt(place.source("src/server/Race.server.luau"), "if built.riders then", "weapon = weaponParts");
-      await ctx.evidence("image", writeSvg(ctx, "rider.svg", riderSvg(d.riders, firstColor)), `Rider with a ${d.riders.weapon}`, { fit: "contain" });
+      const src = excerpt(place.source("src/server/Race.server.luau"), "if built.riders then", "classGear(model, cls.kind");
+      await ctx.evidence("image", writeSvg(ctx, "classes.svg", classesSvg(d.riders, d.karts.colors.length ? d.karts.colors : [firstColor])), "Rider classes", { fit: "contain" });
       await ctx.evidence("code", writeLuau(ctx, "riders.luau", src), "Race.server.luau: riders", { lines: codeLines(src, 30, " ") });
-      return { summary: `a rider on every kart, each with a ${d.riders.weapon}` };
+      return { summary: "a rider on every kart in one of four classes: volt, sniper, shrink, thrower; you ride the sniper" };
     }
     case "combat": {
-      ctx.step("Switching on swings", `${d.combat.range.toFixed(1)} m reach, ${d.combat.cooldown.toFixed(1)} s cooldown`, "sword");
+      ctx.step("Switching on the class attacks", "dash every 4 s, shot every 10 s, shrink every 9 s, throw every 3 s", "sword");
       place.patchConfig({ combat: s.combat, built: { combat: true } });
-      const src = excerpt(place.source("src/server/Race.server.luau"), "local function hit(", "-- players");
-      await ctx.evidence("image", writeSvg(ctx, "reach.svg", reachSvg(d.combat, firstColor)), "Swing reach", { fit: "contain" });
-      await ctx.evidence("code", writeLuau(ctx, "combat.luau", src), "Race.server.luau: hits", { lines: codeLines(src, 30, " ") });
-      return { summary: `${d.combat.range.toFixed(1)} m swings that slow by ${Math.round(d.combat.slow * 100)}% and shove, checked on the server` };
+      const src = excerpt(place.source("src/server/Race.server.luau"), "local function land(", "-- players");
+      await ctx.evidence("image", writeSvg(ctx, "attacks.svg", attacksSvg({ slow: d.combat.slow, knock: d.combat.knock, aiAggression: d.combat.aiAggression })), "Class attacks", { fit: "contain" });
+      await ctx.evidence("code", writeLuau(ctx, "combat.luau", src), "Race.server.luau: attacks", { lines: codeLines(src, 30, " ") });
+      return { summary: `four class attacks checked on the server; a hit keeps ${Math.round(d.combat.slow * 100)}% of speed and shoves` };
     }
     case "ui": {
       ctx.step("Laying out the HUD", "lap, place, speed, countdown, hit feed, results, minimap", "layout");
@@ -101,6 +101,16 @@ export async function runPart(ctx: ModuleContext, input: ModuleInput): Promise<M
     case "build":
       return buildPart(ctx, d);
   }
+}
+
+/** which generated 3D models the place loads by asset id, and which are still part-built until their upload */
+function modelLines(m?: { loaded: string[]; waiting: string[] }): string[] {
+  if (!m || (!m.loaded.length && !m.waiting.length)) return [];
+  return [
+    `- 3D models loaded as Roblox assets: ${m.loaded.length ? m.loaded.join(", ") : "none"}`,
+    ...(m.waiting.length ? [`- Part-built until uploaded (needs the author's go-ahead): ${m.waiting.join(", ")}; the files are listed in uploads.json of the Roblox cell`] : []),
+    "",
+  ];
 }
 
 function writeLuau(ctx: ModuleContext, name: string, text: string): string {
@@ -127,6 +137,7 @@ async function buildPart(ctx: ModuleContext, d: Design): Promise<ModuleOutput> {
     "",
     "Built from the Rojo project with `rojo build`; not opened in Studio and not play-tested in Studio yet.",
     "",
+    ...modelLines(readState(runDir).roblox?.models),
     `- Lint: selene, ${lint.errors} errors, ${lint.warnings} warnings`,
     `- Place file: place.rbxlx, ${kb} KB, built in ${b.seconds.toFixed(1)} s`,
     `- Project: ${relative(fileURLToPath(new URL("../../..", import.meta.url)), place.project).split(sep).join("/") || place.project}`,

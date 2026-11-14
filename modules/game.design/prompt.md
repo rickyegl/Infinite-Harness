@@ -22,12 +22,20 @@ What the game code can do (stay inside these ranges; anything outside is clamped
 - **Karts** (`karts`): `count` 2 to 8; `topSpeed` 18 to 34 m/s; `accel` 5 to 14; `grip` 3 to 10; `steer` 5 to
   14; `colors` as `#rrggbb`, one per kart; `names` one short made-up name per kart (one word, up to 12 letters).
 - **Riders** (`riders`): `weapon` club, glove or noodle; `height` 0.8 to 1.25; `skin` `#rrggbb`.
+  Riders come in four classes with fixed attacks: volt (an electric dash that zaps whoever it touches), sniper
+  (aims a crosshair and shoots once every 10 seconds), shrink (turns small and fast, but a bump while small slows
+  it a lot) and thrower (throws an item forwards every 3 seconds). Write `combat.rules` around them.
 - **Combat** (`combat`): `range` 3 to 7 metres; `cooldown` 0.8 to 3 seconds; `knock` 3 to 12 (sideways shove);
   `slow` 0.2 to 0.8 (share of speed the victim keeps); `aiAggression` 0.2 to 1; `hitColor` `#rrggbb`;
   `rules`: two or three sentences a player would read.
 - **HUD** (`hud`): `title` (the game's name, short), `accent` colour, `minimap`.
 - **Look** (`look`): `sky` and `ground` colours for a bright daytime scene.
 - `laps` 1 to 3; `win` one sentence; `pitch` one or two sentences that sell the game.
+- **3D models** (`models`): a 3D artist turns each into a textured low-poly model, so describe one solid object
+  with its shapes, materials and colours, no scene and no background. `kart`: the kart body only (no driver, no
+  wheels). `riders`: one figure per class (`volt`, `sniper`, `shrink`, `thrower`), each sitting with both arms
+  reaching forward, with no vehicle (the game seats it on its own kart), dressed to match its attack.
+  `landmarks`: two big track-side landmarks that give the place its character. `trophy`: the winner's trophy shown at the finish.
 - **Art** (`art`): up to three things the art team should make: track-side banner images (kind `image`, say
   what is on them; they are shown on boards beside the road) and optionally one `music` loop. Each `prompt` is
   a full description an artist could work from. `use` says where it goes.

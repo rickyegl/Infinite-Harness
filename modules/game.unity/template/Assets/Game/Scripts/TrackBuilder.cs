@@ -1,6 +1,7 @@
-﻿// Builds the circuit from a TrackSpec: road slab (top, underside, striped kerbs, low walls) that follows the
+// Builds the circuit from a TrackSpec: road slab (top, underside, striped kerbs, low walls) that follows the
 // track's own up through loops, twists and banks; glowing hover sections with boost chevrons; pillars under
-// raised road; grass, start line and gantry, lamps (lit at night), trees and track-side boards.
+// raised road; grass, start line and gantry, lamps (lit at night), trees and track-side boards, then the scenery
+// (Scenery.cs: mountains, rocks, flags, a grandstand, balloons, islands, clouds, a blimp, arches).
 // All meshes are made in code so the same builder runs in the editor (for screenshots) and in the player.
 
 using System.Collections.Generic;
@@ -48,6 +49,18 @@ namespace HarnessGame
             Lamps(path, go.transform, kit, hw + 4f);
             Decor(path, go.transform, kit, spec, groundY);
             Boards(path, go.transform, kit, cfg, hw + 6f);
+            Landmarks(path, go.transform, kit, cfg, groundY);
+            Trophy(path, go.transform, kit, cfg);
+            // scenery last, round the landmarks and the trophy
+            var taken = new List<Vector4>();
+            foreach (var n in new[] { "Landmarks", "Trophy" })
+            {
+                var t = go.transform.Find(n);
+                if (!t) continue;
+                if (n == "Trophy") taken.Add(new Vector4(t.position.x, t.position.y, t.position.z, 6f));
+                else foreach (Transform c in t) taken.Add(new Vector4(c.position.x, c.position.y, c.position.z, 18f));
+            }
+            Scenery.Build(path, go.transform, kit, cfg, groundY, mid, rad, taken);
             return path;
         }
 
@@ -145,13 +158,14 @@ namespace HarnessGame
             for (float d = 0; d < L; d += 11f)
             {
                 path.Sample(d, out var c, out var tan, out var r, out var up);
-                if (up.y < 0.75f) continue;                       // loops and twists hold themselves up
+                if (up.y < 0.45f) continue;                       // loops and twists hold themselves up
                 var under = c - up * 0.5f;
                 if (under.y - groundY < 2.2f) continue;
                 foreach (float side in new[] { -1f, 1f })
                 {
                     var foot = under + r * (side * (path.HalfWidth - 1f));
                     float hh = foot.y - groundY;
+                    if (hh < 0.8f) continue;                       // the low side of a banked corner
                     Prim.Make(PrimitiveType.Cylinder, root, new Vector3(foot.x, groundY + hh * 0.5f, foot.z), new Vector3(0.7f, hh * 0.5f, 0.7f), steel, "Pillar");
                 }
                 Prim.Make(PrimitiveType.Cube, root, under, new Vector3(path.width + 1f, 0.5f, 0.8f), steel, "Beam", Quaternion.LookRotation(tan, up));
@@ -176,7 +190,7 @@ namespace HarnessGame
         }
 
         /// is this stretch plain, level road where upright things (lamps, boards) can stand beside it?
-        static bool Plain(TrackPath path, float d)
+        internal static bool Plain(TrackPath path, float d)
         {
             if (path.InFeature(d, 25f)) return false;
             for (float k = -8f; k <= 8f; k += 4f)
@@ -187,7 +201,7 @@ namespace HarnessGame
             return true;
         }
 
-        static Quaternion Upright(Quaternion q)
+        internal static Quaternion Upright(Quaternion q)
         {
             var f = q * Vector3.forward; f.y = 0;
             return f.sqrMagnitude > 1e-6f ? Quaternion.LookRotation(f.normalized, Vector3.up) : Quaternion.identity;
@@ -251,6 +265,51 @@ namespace HarnessGame
             }
         }
 
+        /// the generated landmarks: big set pieces off the road where nothing of the circuit passes, turned to face it
+        static void Landmarks(TrackPath path, Transform parent, GameKit kit, GameConfig cfg, float groundY)
+        {
+            var root = Prim.Node("Landmarks", parent);
+            float L = path.Length;
+            for (int n = 1; n <= 4; n++)
+            {
+                string slot = "landmark." + n;
+                if (!Models.Has(cfg, slot)) continue;
+                float size = 26f;
+                // try spots along the lap, both sides, nearer first, until one is clear of all of the road
+                bool placed = false;
+                for (int k = 0; k < 40 && !placed; k++)
+                {
+                    float d = L * (0.12f + 0.45f * (n - 1) + 0.03f * k) % L;
+                    float side = (k + n) % 2 == 0 ? 1 : -1;
+                    float off = side * (path.HalfWidth + size * 0.6f + 6f + (k / 2) * 3f);
+                    var pose = path.PoseAt(d, off);
+                    var pos = pose.position; pos.y = groundY;
+                    float clear = float.MaxValue;
+                    foreach (var p in path.points) clear = Mathf.Min(clear, new Vector2(p.x - pos.x, p.z - pos.z).magnitude);
+                    if (clear < path.HalfWidth + size * 0.55f + 3f) continue;
+                    var centre = path.PoseAt(d, 0).position; centre.y = pos.y;
+                    var t = Prim.Node("Landmark" + n, root, pos);
+                    t.rotation = Quaternion.LookRotation((centre - pos).normalized, Vector3.up);
+                    Models.Spawn(cfg, kit, slot, t, Vector3.zero, size);
+                    placed = true;
+                }
+            }
+        }
+
+        /// the generated trophy on a podium beside the start/finish line
+        static void Trophy(TrackPath path, Transform parent, GameKit kit, GameConfig cfg)
+        {
+            if (!Models.Has(cfg, "trophy")) return;
+            var pose = path.PoseAt(6f, path.HalfWidth + 6.5f);
+            var t = Prim.Node("Trophy", parent);
+            t.SetPositionAndRotation(pose.position, Upright(pose.rotation) * Quaternion.Euler(0, -90f, 0));
+            var stone = kit.Lit(new Color(0.9f, 0.9f, 0.92f), 0.4f);
+            Prim.Make(PrimitiveType.Cylinder, t, new Vector3(0, 0.6f, 0), new Vector3(3.2f, 0.6f, 3.2f), stone, "Podium");
+            Prim.Make(PrimitiveType.Cylinder, t, new Vector3(0, 1.25f, 0), new Vector3(2.4f, 0.05f, 2.4f), kit.Glow(GameConfig.Hex(cfg.hud.accent, Color.yellow), 1.5f), "Rim");
+            var m = Models.Spawn(cfg, kit, "trophy", t, new Vector3(0, 1.3f, 0), 3.6f);
+            if (m) m.gameObject.AddComponent<Spin>();
+        }
+
         /// boards along the outside of the track; they show requested art when it is a texture in Resources
         static void Boards(TrackPath path, Transform parent, GameKit kit, GameConfig cfg, float off)
         {
@@ -276,6 +335,13 @@ namespace HarnessGame
                 Prim.Make(PrimitiveType.Cube, t, new Vector3(3.6f, 0.4f, 0), new Vector3(0.25f, 1.2f, 0.25f), frame);
             }
         }
+    }
+
+    /// turns slowly about its own up axis (the trophy)
+    public class Spin : MonoBehaviour
+    {
+        public float speed = 30f;
+        void Update() => transform.Rotate(0, speed * Time.deltaTime, 0, Space.Self);
     }
 
     /// marks lights and lamp heads that the night preset switches on

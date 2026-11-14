@@ -267,13 +267,40 @@ namespace HarnessGame
 
             // final frames
             var ups = new Vector3[n];
+            void Frames()
+            {
+                for (int i = 0; i < n; i++)
+                {
+                    var t = (pts[(i + 1) % n] - pts[(i + n - 1) % n]).normalized;
+                    var up = Square(refUp[i], t);
+                    var right = Vector3.Cross(up, t);
+                    ups[i] = (up * Mathf.Cos(bank[i]) + right * Mathf.Sin(bank[i])).normalized;
+                }
+            }
+            Frames();
+
+            // keep the road above the grass: a banked corner or the roll into a twist tips one edge (kerb and wall)
+            // down, and karts hang under an inverted stretch. Lift those samples so the lowest of it stays at the
+            // level of the lowest flat road, eased in and out (a running max, then a blur as wide, never undershoots)
+            float floor = float.MaxValue;
+            for (int i = 0; i < n; i++) floor = Mathf.Min(floor, b[i].y);
+            float edge = s.width * 0.5f + 2.6f;
+            var need = new float[n];
             for (int i = 0; i < n; i++)
             {
                 var t = (pts[(i + 1) % n] - pts[(i + n - 1) % n]).normalized;
-                var up = Square(refUp[i], t);
-                var right = Vector3.Cross(up, t);
-                ups[i] = (up * Mathf.Cos(bank[i]) + right * Mathf.Sin(bank[i])).normalized;
+                var right = Vector3.Cross(ups[i], t);
+                float low = Mathf.Min(0f, ups[i].y * 2.6f);
+                foreach (float a in new[] { -edge, edge })
+                    foreach (float l in new[] { 0f, 0.9f })
+                        low = Mathf.Min(low, right.y * a + ups[i].y * l);
+                need[i] = Mathf.Max(0f, floor + 0.15f - (pts[i].y + low));
             }
+            int lr = Mathf.Max(1, Mathf.RoundToInt(12f / ds));
+            var lift = BoxBlur(RunMax(need, lr), lr);
+            bool lifted = false;
+            for (int i = 0; i < n; i++) if (lift[i] > 1e-3f) { pts[i].y += lift[i]; lifted = true; }
+            if (lifted) Frames();
 
             var hv = s.hover ? BoxBlur(hover, Mathf.RoundToInt(6f / ds)) : new float[n];
             var feats = new TrackFeature[wins.Length];
@@ -302,6 +329,20 @@ namespace HarnessGame
             {
                 o[i] = sum / (2 * r + 1);
                 sum += a[(i + r + 1) % n] - a[((i - r) % n + n) % n];
+            }
+            return o;
+        }
+
+        /// circular running maximum over +-r samples
+        static float[] RunMax(float[] a, int r)
+        {
+            int n = a.Length;
+            var o = new float[n];
+            for (int i = 0; i < n; i++)
+            {
+                float m = a[i];
+                for (int k = -r; k <= r; k++) m = Mathf.Max(m, a[((i + k) % n + n) % n]);
+                o[i] = m;
             }
             return o;
         }

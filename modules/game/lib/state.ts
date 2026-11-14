@@ -9,6 +9,8 @@ export type GameState = {
   design?: Design;
   /** run-relative uris of the shared art, by name */
   art?: Record<string, string>;
+  /** run-relative uris of the generated 3D models (model.glb, its OBJ set beside it in obj/), by slot */
+  models?: Record<string, string>;
   unity?: {
     project: string;
     node: string;
@@ -16,7 +18,8 @@ export type GameState = {
     metres?: number;
     build?: { target: string; dir: string; seconds: number; href?: string; flags: string };
   };
-  roblox?: { project: string; node: string; place?: string };
+  /** models: which generated model slots load as Roblox assets, and which still wait for an upload */
+  roblox?: { project: string; node: string; place?: string; models?: { loaded: string[]; waiting: string[] } };
   /** live flags written so far (night, realistic, music, relay) */
   flags?: Record<string, unknown>;
 };

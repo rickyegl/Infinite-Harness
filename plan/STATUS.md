@@ -49,6 +49,16 @@ remove the line when it is answered. See `AGENTS.md` rule 5.
   tunnel, USER-TODO 2), and the place needs `HttpService` turned on. Today the relay is checked both ways
   locally, and a stand-in Roblox rider proves the ghost in the Unity game.
 - (plan 03) **Publishing the Roblox place:** not done, and not to be done without your approval.
+- (plan 03, 3D models) **Upload the generated models to Roblox:** the place loads each generated model from a
+  Roblox asset id, so each `model.glb` has to be uploaded once as a Model asset. That needs three things from
+  you:
+  1. Open Roblox Studio with the MCP plugin connected.
+  2. Approve the upload folder `runs/.cache/roblox-upload/` in Assistant Settings > MCP Permissions.
+  3. Approve the batch: 8 Model assets on your own Roblox account, private, not published. They are kart,
+     rider.volt, rider.sniper, rider.shrink, rider.thrower, landmark.1, landmark.2 and trophy (plus
+     landmark.3 and landmark.4 when the design has them).
+
+  Until then every one of those slots is part-built in the place, and the build report says so.
 
 ## Verified
 
@@ -163,6 +173,24 @@ build, Roblox place, flags).
   - The first render after a rebuild can come out blank (the shots op throws one away); URP can show a one-time
     dialog in a new project; the crossplay ghost's body is faint, so its name tag carries it.
   - Music in the full run is the test placeholder loop.
+
+**3D models, rider classes and scenery (2026-11-13).**
+
+- Generated models from the forge (`assets.model3d`): the kart body, the four rider classes, landmarks and the
+  trophy. A batch of 8 takes about 45 minutes, because the textures run one at a time. A cell gives up only after
+  30 minutes with no change in its forge job (or 4 hours in all), and it reopens a dropped port forward instead of
+  failing. The root summary counts failed assets apart from failed tasks.
+- Unity: the models face +Z after the OBJ import (yaw 0). The rider sits in the kart's seat, found from the
+  kart's vertices (`Models.Seat`; `Editor/ModelImport.cs` keeps them readable). The track is lifted wherever a
+  road edge, a banked side or a twist would dip into the grass, and `Scenery.cs` adds mountains, rocks, bushes,
+  flowers, flags, a grandstand, balloons, floating islands, clouds, a blimp and arches. Checked in the editor
+  shots after the fix: the karts and riders face forward, the riders sit in the karts, and no road dips into the
+  grass at the corners or twists.
+- Roblox: the same seat (worked out from the OBJ by `lib/seat.ts`) and the same scenery (`Scenery.luau`, motion
+  on the client). Linted with selene and built with rojo; not played in Studio, and the models stay part-built
+  until the upload is approved (see "Waiting on the author").
+- Four rider classes in both games: volt (electric dash), sniper (mouse crosshair, one shot every 10 s), shrink
+  (small and fast, slowed hard when touched) and thrower (an item forward every 3 s).
 
 ## The bridge (plan 02)
 

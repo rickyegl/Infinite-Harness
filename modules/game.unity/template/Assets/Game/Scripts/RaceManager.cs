@@ -1,5 +1,5 @@
-// Runs the race: countdown, driving (player input or autopilot, AI drivers), kart-to-kart bumps, rider melee,
-// laps, places and the finish. Everything steps here in one place so the race is the same every time.
+// Runs the race: countdown, driving (player input or autopilot, AI drivers), kart-to-kart bumps, the rider
+// classes' attacks (Abilities), laps, places and the finish. Everything steps here in one place.
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -24,6 +24,7 @@ namespace HarnessGame
         public readonly List<string> feed = new List<string>();
         public float feedAge;
         public System.Action<Kart, Kart> onHit;
+        public Abilities abilities;
 
         public static RaceManager Main { get; private set; }
         void OnEnable() { Main = this; }
@@ -31,6 +32,8 @@ namespace HarnessGame
         public void Setup()
         {
             float L = path.Length;
+            abilities ??= new Abilities(this);
+            abilities.Reset();
             for (int i = 0; i < karts.Count; i++)
             {
                 var k = karts[i];
@@ -38,6 +41,7 @@ namespace HarnessGame
                 k.dist = -6f - row * 5.5f;
                 k.lateral = (col == 0 ? -1 : 1) * path.HalfWidth * 0.4f;
                 k.speed = 0; k.latVel = 0; k.stun = 0; k.finishTime = -1;
+                k.cooldown = 0; k.dash = 0; k.small = 0; k.size = 1f; k.bumpedBy = null;
                 var rnd = new System.Random(cfg.track.seed * 97 + i * 13);
                 k.skill = 0.86f + (float)rnd.NextDouble() * 0.12f;
                 k.lineBias = ((float)rnd.NextDouble() * 2f - 1f) * 0.45f;
@@ -61,10 +65,11 @@ namespace HarnessGame
             {
                 clock += dt;
                 Inputs();
+                abilities?.Decide(dt);
                 // fixed sub-steps keep the bumps stable at low frame rates
                 int steps = Mathf.CeilToInt(dt / 0.02f);
                 for (int s = 0; s < steps; s++) Step(dt / steps);
-                Combat();
+                abilities?.Run(dt);
                 Places();
             }
 #if ENABLE_INPUT_SYSTEM
@@ -103,6 +108,8 @@ namespace HarnessGame
                         if (kb.dKey.isPressed || kb.rightArrowKey.isPressed) k.steer += 1;
                         k.wantsAttack = kb.spaceKey.wasPressedThisFrame || kb.fKey.wasPressedThisFrame;
                     }
+                    var mouse = Mouse.current;
+                    if (mouse != null && mouse.leftButton.wasPressedThisFrame) k.wantsAttack = true;
                     var pad = Gamepad.current;
                     if (pad != null)
                     {
@@ -143,8 +150,9 @@ namespace HarnessGame
             float hw = path.HalfWidth;
             foreach (var k in karts)
             {
-                float top = ks.topSpeed * (k.isPlayer ? 1f : k.skill) * (1f + HoverBoost * path.Hover(k.dist));
+                float top = ks.topSpeed * (k.isPlayer ? 1f : k.skill) * (1f + HoverBoost * path.Hover(k.dist)) * Abilities.SpeedMul(k);
                 float a = k.stun > 0 ? -6f : k.throttle > 0 ? ks.accel * k.throttle * (1f - k.speed / top) : k.throttle < 0 ? -ks.accel * 1.8f : -2f;
+                if (k.dash > 0 && k.stun <= 0) a = Mathf.Max(a, ks.accel * 3f);   // the electric dash kicks in at once
                 if (Mathf.Abs(k.lateral) > hw) a -= 6f;   // on the kerb
                 k.speed = Mathf.Clamp(k.speed + a * dt, 0, top * 1.05f);
                 float curve = Curvature(k.dist);
@@ -173,42 +181,18 @@ namespace HarnessGame
                         float push = (1.7f - Mathf.Abs(dl)) * 0.5f * (dl >= 0 ? 1 : -1);
                         a.lateral += push; b.lateral -= push;
                         a.latVel += push * 2f; b.latVel -= push * 2f;
+                        a.bumpedBy = b; b.bumpedBy = a;   // a small (shrink) rider gets squashed by this
                         var back = ds > 0 ? b : a; var front = ds > 0 ? a : b;
                         back.speed = Mathf.Min(back.speed, front.speed * 0.98f);
                     }
                 }
         }
 
-        void Combat()
+        public void Feed(string line)
         {
-            var c = cfg.combat;
-            if (!cfg.built_combat) return;
-            if (clock < 3f) return;   // let the pack spread out before the riders start swinging
-            foreach (var k in karts)
-            {
-                if (k.cooldown > 0 || k.stun > 0 || k.finishTime >= 0) continue;
-                Kart target = null; float best = c.range;
-                foreach (var o in karts)
-                {
-                    if (o == k || o.stun > 0) continue;
-                    float d = Vector3.Distance(k.transform.position, o.transform.position);
-                    if (d < best) { best = d; target = o; }
-                }
-                bool swing = k.isPlayer && !cfg.autopilot ? k.wantsAttack : target != null && Random.value < c.aiAggression * Time.deltaTime * 2.5f;
-                if (!swing) continue;
-                float side = target != null ? Mathf.Sign(target.lateral - k.lateral + 0.001f) : 1f;
-                k.cooldown = c.cooldown;
-                if (k.rider) k.rider.Swing(side);
-                if (target == null) continue;
-                target.Hit(c.knock * side, c.slow);
-                var at = (k.transform.position + target.transform.position) * 0.5f + k.transform.up * 1.4f;
-                Effects.Hit(kit, at, GameConfig.Hex(c.hitColor, Color.yellow));
-                feed.Add($"{k.kartName} bonked {target.kartName}!");
-                if (feed.Count > 3) feed.RemoveAt(0);
-                feedAge = 0;
-                onHit?.Invoke(k, target);
-                if ((k.isPlayer || target.isPlayer) && ChaseCamera.Main) ChaseCamera.Main.Shake(0.35f);
-            }
+            feed.Add(line);
+            if (feed.Count > 3) feed.RemoveAt(0);
+            feedAge = 0;
         }
 
         void Places()

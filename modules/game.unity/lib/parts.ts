@@ -19,8 +19,8 @@ export type PartId = "track" | "karts" | "humanoids" | "combat" | "ui" | "build"
 export const PARTS: { id: PartId; label: string; brief: (d: Design) => string }[] = [
   { id: "track", label: "Track", brief: (d) => `Lay the ${d.track.shape} circuit: ${d.track.loops} loops, ${d.track.twists} twists, bank ${d.track.bank.toFixed(1)}, ${d.track.drop.toFixed(0)} m drop${d.track.hover ? ", hover sections" : ""}.` },
   { id: "karts", label: "Karts", brief: (d) => `${d.karts.count} arcade karts, top speed ${(d.karts.topSpeed * 3.6).toFixed(0)} km/h.` },
-  { id: "humanoids", label: "Humanoids", brief: (d) => `A rider on every kart, each with a ${d.riders.weapon}.` },
-  { id: "combat", label: "Combat", brief: (d) => `Swings reach ${d.combat.range.toFixed(1)} m; a hit shoves and slows the victim.` },
+  { id: "humanoids", label: "Humanoids", brief: () => "A rider on every kart in one of four classes (volt, sniper, shrink, thrower), each in its own gear." },
+  { id: "combat", label: "Combat", brief: () => "Class attacks: electric dash, crosshair shot every 10 s, shrink and speed boost, thrown item every 3 s." },
   { id: "ui", label: "UI", brief: (d) => `HUD for "${d.hud.title}": lap, place, speed, minimap, hit feed.` },
   { id: "build", label: "Build", brief: () => "Race-test on autopilot, record 10 s of play, build the player." },
 ];
@@ -95,18 +95,18 @@ export async function runPart(ctx: ModuleContext, input: ModuleInput): Promise<M
       return { summary: `${d.karts.count} karts on the grid` };
     }
     case "humanoids": {
-      ctx.step("Seating the riders", `${d.riders.weapon}, height ${d.riders.height.toFixed(2)}`, "person");
+      ctx.step("Seating the riders", `volt, sniper, shrink and thrower classes, height ${d.riders.height.toFixed(2)}`, "person");
       u.patchConfig({ riders: s.riders, built_riders: true });
       await shots(ctx, u, ["rider", "pack"], "Riders");
       await section(ctx, "riders", s.riders);
-      return { summary: `${d.karts.count} riders with a ${d.riders.weapon}` };
+      return { summary: `${d.karts.count} riders in four classes; you ride the sniper` };
     }
     case "combat": {
-      ctx.step("Wiring the swing and the hit", `range ${d.combat.range.toFixed(1)} m, cooldown ${d.combat.cooldown.toFixed(1)} s, victim keeps ${Math.round(d.combat.slow * 100)}% speed`, "sword");
+      ctx.step("Wiring the class attacks", `dash every 4 s, shot every 10 s, shrink every 9 s, throw every 3 s; a hit keeps ${Math.round(d.combat.slow * 100)}% speed`, "sword");
       u.patchConfig({ combat: s.combat, built_combat: true });
       await shots(ctx, u, ["combat", "chase"], "Combat");
       await section(ctx, "combat", s.combat);
-      return { summary: "Riders swing at anyone in range; a hit shoves, slows and flashes" };
+      return { summary: "Four class attacks; a hit shoves, slows, spins and flashes" };
     }
     case "ui": {
       ctx.step("Drawing the HUD", `${d.hud.title}: lap, place, speed${d.hud.minimap ? ", minimap" : ""}, hit feed`, "layout");
@@ -121,7 +121,11 @@ export async function runPart(ctx: ModuleContext, input: ModuleInput): Promise<M
   throw new Error(`unknown part ${part}`);
 }
 
-type Test = { finished: boolean; raceSeconds: number; hits: number; trackMetres: number; karts: { name: string; place: number; laps: number; time: number | null; player: boolean }[] };
+/** per class: riders, attacks used and hits landed in the race test */
+const attackLines = (t: Test) =>
+  t.attacks ? ["| Class | Riders | Attacks used | Hits |", "| --- | --- | --- | --- |", ...Object.entries(t.attacks).map(([k, a]) => `| ${k}${k === t.playerClass ? " (player)" : ""} | ${a.riders} | ${a.uses} | ${a.hits} |`)] : [];
+
+type Test = { finished: boolean; raceSeconds: number; hits: number; attacks?: Record<string, { riders: number; uses: number; hits: number }>; playerClass?: string; trackMetres: number; karts: { name: string; place: number; laps: number; time: number | null; player: boolean }[] };
 
 async function build(ctx: ModuleContext, u: Unity, d: Design): Promise<ModuleOutput> {
   const runDir = runDirOf(ctx.dir);
@@ -131,7 +135,7 @@ async function build(ctx: ModuleContext, u: Unity, d: Design): Promise<ModuleOut
   const t = u.json<Test>(await u.op("play_test", { timeout: 300, file: finish }, 8 * 60_000));
   const order = [...t.karts].sort((a, b) => a.place - b.place).map((k) => `${k.place}. ${k.name}${k.time != null ? ` ${k.time.toFixed(1)} s` : ""}`);
   ctx.step(t.finished ? `Race finished in ${t.raceSeconds.toFixed(0)} s` : "Race did not finish", `${t.hits} hits; ${order.join(", ")}`, t.finished ? "check" : "alert");
-  writeFileSync(join(ctx.dir, "race-test.md"), [`# Race test`, "", `Finished: ${t.finished ? "yes" : "no"} in ${t.raceSeconds.toFixed(1)} s on a ${t.trackMetres} m lap, ${t.hits} hits.`, "", ...order.map((l) => `- ${l}`), ""].join("\n"));
+  writeFileSync(join(ctx.dir, "race-test.md"), [`# Race test`, "", `Finished: ${t.finished ? "yes" : "no"} in ${t.raceSeconds.toFixed(1)} s on a ${t.trackMetres} m lap, ${t.hits} hits.`, "", ...order.map((l) => `- ${l}`), "", ...attackLines(t), ""].join("\n"));
   if (!t.finished) throw new Error("the race test did not finish");
 
   // 2. ten seconds of play from just before the first loop (or twist), to mp4

@@ -1,5 +1,6 @@
 // Heads-up display on a camera-space canvas (so it also shows in rendered screenshots and captures):
-// title, place, lap, speed, countdown, hit feed, finish banner and a minimap of the track with kart dots.
+// title, place, lap, speed, countdown, hit feed, finish banner, a minimap of the track with kart dots, the
+// player's rider class with its cooldown, and (for the sniper) a crosshair that follows the mouse.
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,7 +11,9 @@ namespace HarnessGame
     public class Hud : MonoBehaviour
     {
         public RaceManager race;
-        Text title, place, lap, speed, big, feed, help;
+        Text title, place, lap, speed, big, feed, help, ability;
+        RectTransform root, cross;
+        Image[] crossBits = new Image[0];
         RectTransform map;
         readonly List<RectTransform> dots = new List<RectTransform>();
         Vector2 mapMin, mapMax;
@@ -39,7 +42,13 @@ namespace HarnessGame
             h.speed = h.Label(go.transform, "0 km/h", 30, TextAnchor.LowerRight, new Vector2(1, 0), new Vector2(-24, 20), Color.white);
             h.big = h.Label(go.transform, "", 120, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.5f), new Vector2(0, 60), accent);
             h.feed = h.Label(go.transform, "", 26, TextAnchor.LowerLeft, new Vector2(0, 0), new Vector2(24, 20), new Color(1f, 0.9f, 0.7f));
-            h.help = h.Label(go.transform, "W/S drive  A/D steer  SPACE swing", 18, TextAnchor.LowerCenter, new Vector2(0.5f, 0), new Vector2(0, 12), new Color(1, 1, 1, 0.7f));
+            h.root = go.GetComponent<RectTransform>();
+            var pk = race.player;
+            string kind = pk ? pk.kind : "thrower";
+            h.ability = h.Label(go.transform, "", 24, TextAnchor.LowerRight, new Vector2(1, 0), new Vector2(-24, 62), pk ? Abilities.ColorOf(pk) : accent);
+            h.ability.supportRichText = true;
+            if (pk && kind == "sniper") h.BuildCrosshair(go.transform);
+            h.help = h.Label(go.transform, cfg.built_combat ? Abilities.Help(kind) : "W/S drive  A/D steer", 18, TextAnchor.LowerCenter, new Vector2(0.5f, 0), new Vector2(0, 12), new Color(1, 1, 1, 0.7f));
 
             if (cfg.hud.minimap && race.path) h.BuildMap(go.transform, race.path, accent);
             return h;
@@ -73,6 +82,29 @@ namespace HarnessGame
             mapMin = new Vector2(float.MaxValue, float.MaxValue); mapMax = -mapMin;
             foreach (var p in path.points) { mapMin = Vector2.Min(mapMin, new Vector2(p.x, p.z)); mapMax = Vector2.Max(mapMax, new Vector2(p.x, p.z)); }
             for (int i = 0, step = Mathf.Max(3, path.points.Length / 90); i < path.points.Length; i += step) Dot(MapPos(path.points[i]), 4, new Color(1, 1, 1, 0.7f));
+        }
+
+        void BuildCrosshair(Transform parent)
+        {
+            var g = new GameObject("Crosshair");
+            g.transform.SetParent(parent, false);
+            cross = g.AddComponent<RectTransform>();
+            cross.anchorMin = cross.anchorMax = cross.pivot = new Vector2(0.5f, 0.5f);
+            cross.sizeDelta = new Vector2(60, 60);
+            var bits = new List<Image>();
+            // four ticks around a gap and a centre dot
+            foreach (var (pos, size) in new[] { (new Vector2(0, 17), new Vector2(4, 16)), (new Vector2(0, -17), new Vector2(4, 16)), (new Vector2(17, 0), new Vector2(16, 4)), (new Vector2(-17, 0), new Vector2(16, 4)), (Vector2.zero, new Vector2(5, 5)) })
+            {
+                var b = new GameObject("Tick");
+                b.transform.SetParent(cross, false);
+                var r = b.AddComponent<RectTransform>();
+                r.sizeDelta = size; r.anchoredPosition = pos;
+                var img = b.AddComponent<Image>();
+                img.color = Color.white;
+                b.AddComponent<Shadow>().effectColor = new Color(0, 0, 0, 0.7f);
+                bits.Add(img);
+            }
+            crossBits = bits.ToArray();
         }
 
         Vector2 MapPos(Vector3 w)
@@ -116,6 +148,24 @@ namespace HarnessGame
                 default: big.text = ""; break;
             }
             feed.text = string.Join("\n", race.feed);
+            if (ability && p.cls != null && cfg.built_combat)
+            {
+                string state = p.kind == "thrower" ? (p.cooldown > 0 ? $"next in {p.cooldown:0.0}s" : "throwing") : p.dash > 0 ? "DASH!" : p.small > 0 ? $"small {p.small:0.0}s" : p.cooldown > 0 ? $"{p.cooldown:0.0}s" : "READY";
+                ability.text = $"{p.cls.name.ToUpperInvariant()}  <size=20>{state}</size>";
+            }
+            else if (ability) ability.text = "";
+            if (cross)
+            {
+                var ab = race.abilities;
+                bool live = Application.isPlaying && ab != null;
+                cross.gameObject.SetActive(cfg.built_combat && (!live || ab.aimActive));
+                var at = live ? ab.aim : new Vector2(Screen.width * 0.5f, Screen.height * 0.55f);
+                if (RectTransformUtility.ScreenPointToLocalPointInRectangle(root, at, GetComponent<Canvas>().worldCamera, out var local)) cross.anchoredPosition = local;
+                bool onKart = live && ab.aimOnKart;
+                var c = p.cooldown > 0 ? new Color(1, 1, 1, 0.35f) : onKart ? Abilities.ColorOf(p) : Color.white;
+                foreach (var b in crossBits) b.color = c;
+                cross.localScale = Vector3.one * (onKart && p.cooldown <= 0 ? 0.8f : 1f);
+            }
             if (map)
             {
                 while (dots.Count < race.karts.Count) dots.Add(Dot(Vector2.zero, 10, Color.white));

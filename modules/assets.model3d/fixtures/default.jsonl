@@ -1,0 +1,16 @@
+{"t":1,"type":"node.state","node":".","state":"running"}
+{"t":1165,"type":"node.step","node":".","title":"Sending the prompt to the forge","detail":"One compact low-poly kart body with a broad rounded wedge nose, thick side pods, a recessed seat socket and a short raised rear fin. Use glossy coral painted panels, matte dark purple lower trim and cyan inset strips for hover lighting; no driver, wheels or background.","icon":"spark"}
+{"t":192879,"type":"node.step","node":".","title":"Concept image","icon":"image"}
+{"t":193367,"type":"node.evidence","node":".","kind":"image","uri":"./default/concept.png","caption":"Concept image"}
+{"t":498563,"type":"node.step","node":".","title":"Background removed","icon":"scissors"}
+{"t":499146,"type":"node.evidence","node":".","kind":"image","uri":"./default/cutout.png","caption":"Background removed"}
+{"t":593326,"type":"node.step","node":".","title":"3D shape","icon":"cube"}
+{"t":593573,"type":"node.evidence","node":".","kind":"image","uri":"./default/shape.png","caption":"3D shape"}
+{"t":1161599,"type":"node.step","node":".","title":"Painted texture","icon":"image"}
+{"t":1162086,"type":"node.evidence","node":".","kind":"image","uri":"./default/texture.png","caption":"Painted texture"}
+{"t":1168577,"type":"node.step","node":".","title":"Low-poly reduce","detail":"2498 triangles","icon":"layers"}
+{"t":1169073,"type":"node.evidence","node":".","kind":"image","uri":"./default/decimate.png","caption":"Low-poly reduce"}
+{"t":1169074,"type":"node.step","node":".","title":"Game export","detail":"2498 triangles, 1024 px texture, 7 studs","icon":"box"}
+{"t":1169341,"type":"node.evidence","node":".","kind":"image","uri":"./default/export.png","caption":"Game export"}
+{"t":1170297,"type":"node.evidence","node":".","kind":"model3d","uri":"./default/model.glb","caption":"One compact low-poly kart body with a broad rounded wedge nose, thick side pods, a recessed seat socket and a short raised rear fin. Use glossy coral painted panels, matte dark purple lower trim and cyan inset strips for hover lighting; no driver, wheels or background.","meta":{"triangles":2500,"seconds":1169}}
+{"t":1170302,"type":"node.done","node":".","summary":"Model ready in 19 min"}

@@ -53,8 +53,9 @@ namespace HarnessGame
                     int n = Mathf.Clamp(cfg.karts.count, 2, 8);
                     for (int i = 0; i < n; i++)
                     {
-                        var k = Kart.Build(raceGo.transform, kit, cfg, i);
-                        k.isPlayer = i == n - 1;   // the player starts at the back of the grid
+                        bool isPlayer = i == n - 1;   // the player starts at the back of the grid
+                        var k = Kart.Build(raceGo.transform, kit, cfg, i, cfg.ClassFor(i, isPlayer));
+                        k.isPlayer = isPlayer;
                         race.karts.Add(k);
                     }
                     race.player = race.karts[race.karts.Count - 1];
