@@ -49,6 +49,9 @@ StateEvent.Parent = remotes
 local FeedEvent = Instance.new("RemoteEvent")
 FeedEvent.Name = "Feed"
 FeedEvent.Parent = remotes
+local PickClass = Instance.new("RemoteEvent")
+PickClass.Name = "PickClass"
+PickClass.Parent = remotes
 remotes.Parent = ReplicatedStorage
 
 ----------------------------------------------------------------------------------------------------------------
@@ -478,6 +481,8 @@ if type(RC.classes) == "table" and #RC.classes > 0 then
 		CLASSES = list
 	end
 end
+-- the client's rider pick shows the same names, colours and cooldowns
+remotes:SetAttribute("Classes", HttpService:JSONEncode(CLASSES))
 
 local function classOf(kind: string)
 	for _, c in CLASSES do
@@ -488,7 +493,7 @@ local function classOf(kind: string)
 	return CLASSES[1]
 end
 
--- kart 1 (the first player to join) drives riders.player; the others go round the class list
+-- kart 1 (the first player to join) starts on riders.player until its player picks; the others go round the list
 local function classFor(i: number)
 	if i == 1 then
 		return classOf(if type(RC.player) == "string" then RC.player else "sniper")
@@ -569,12 +574,12 @@ local function seatIn(shell: Model): CFrame?
 	return CFrame.new((lo.X + hi.X) / 2, lo.Y + size.Y * seat.y - 0.04 * len, lo.Z + size.Z * seat.back - 0.05 * len)
 end
 
-local function buildKart(i: number): Kart
+local function buildKart(i: number, kind: string?): Kart
 	local colors = KC.colors or {}
 	local names = KC.names or {}
 	local color = hex(colors[(i - 1) % math.max(1, #colors) + 1], Color3.fromHSV((i * 0.17) % 1, 0.7, 0.9))
 	local name = names[i] or ("Kart " .. i)
-	local cls = classFor(i)
+	local cls = if kind then classOf(kind) else classFor(i)
 	local gear = hex(cls.color, color)
 	local model = make("Model", { Name = name }, nil)
 	model:SetAttribute("Class", cls.kind)
@@ -691,6 +696,7 @@ end
 local laps = math.max(1, Config.laps or 2)
 local phase = "countdown"
 local clock = 3
+local pickHold = 0 -- seconds the countdown has waited for players still on the rider pick
 local order: { Kart } = {}
 
 type Item = { owner: Kart, dist: number, lat: number, speed: number, life: number, ball: BasePart, band: BasePart }
@@ -715,6 +721,7 @@ local function grid()
 		k.pace = 0.9 + math.random() * 0.08
 	end
 	phase, clock = "countdown", 3
+	pickHold = 0
 end
 
 local function lapOf(k: Kart): number
@@ -884,6 +891,9 @@ end
 type Input = { throttle: number, steer: number, attack: boolean, origin: Vector3?, dir: Vector3? }
 local inputs: { [Player]: Input } = {}
 
+-- the rider pick (below) is on when riders and combat are built
+local pickable = built.karts and built.riders and built.combat
+
 local function assign(player: Player)
 	for _, k in karts do
 		if not k.owner then
@@ -891,9 +901,59 @@ local function assign(player: Player)
 			k.model:SetAttribute("Owner", player.UserId)
 			player:SetAttribute("Kart", k.name)
 			player:SetAttribute("Class", k.kind)
+			if pickable and player:GetAttribute("Picked") == nil then
+				player:SetAttribute("Picked", false)
+			end
 			return
 		end
 	end
+end
+
+-- the rider pick: with riders and combat built, each player chooses a class on joining (Client shows the cards)
+-- and the countdown waits for them, up to 30 s. The kart is rebuilt with the new rider in place: its table, and
+-- so its place, laps and owner, stay the same; the attack starts on its cooldown so a swap cannot reload it.
+local function swapRider(k: Kart, kind: string)
+	local fresh = buildKart(k.index, kind)
+	local old = k.model
+	for _, f in { "model", "root", "glow", "aura", "highlight", "kind", "gear", "cooldownMax" } do
+		(k :: any)[f] = (fresh :: any)[f]
+	end
+	k.model:SetAttribute("Owner", old:GetAttribute("Owner"))
+	k.model:PivotTo(old:GetPivot())
+	old:Destroy()
+	k.dash, k.small, k.size, k.scaled = 0, 0, 1, 1
+	k.cool = if phase == "race" then k.cooldownMax else 0
+end
+
+PickClass.OnServerEvent:Connect(function(player, kind)
+	if not pickable or type(kind) ~= "string" then
+		return
+	end
+	local ok = false
+	for _, c in CLASSES do
+		ok = ok or c.kind == kind
+	end
+	if not ok then
+		return
+	end
+	for _, k in karts do
+		if k.owner == player then
+			if k.kind ~= kind then
+				swapRider(k, kind)
+			end
+			player:SetAttribute("Class", kind)
+			player:SetAttribute("Picked", true)
+		end
+	end
+end)
+
+local function waitingOnPick(): boolean
+	for _, k in karts do
+		if k.owner and k.owner:GetAttribute("Picked") == false then
+			return true
+		end
+	end
+	return false
 end
 
 Players.PlayerAdded:Connect(assign)
@@ -1084,7 +1144,11 @@ end
 
 local function step(dt: number)
 	if phase == "countdown" then
-		clock -= dt
+		if pickHold < 30 and waitingOnPick() then
+			pickHold += dt -- hold on 3 while someone is still choosing a rider
+		else
+			clock -= dt
+		end
 		if clock <= 0 then
 			phase, clock = "race", 0
 		end

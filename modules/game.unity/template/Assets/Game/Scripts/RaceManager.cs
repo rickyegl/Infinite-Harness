@@ -74,6 +74,7 @@ namespace HarnessGame
             }
 #if ENABLE_INPUT_SYSTEM
             if (phase == Phase.Finished && Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame) Restart();
+            if (phase == Phase.Finished && Keyboard.current != null && Keyboard.current.cKey.wasPressedThisFrame && cfg.built_riders && GameBoot.Main) { GameBoot.Main.ChooseAgain(); return; }
 #endif
             foreach (var k in karts) { k.Tick(dt); k.Place(path); }
             if (feed.Count > 0) { feedAge += dt; if (feedAge > 2.5f) { feed.RemoveAt(0); feedAge = 0; } }

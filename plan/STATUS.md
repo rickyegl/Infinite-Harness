@@ -186,6 +186,13 @@ build, Roblox place, flags).
   copy ran with the place's own lighting technology. Shot: `artifacts/game.roblox.build/studio-play.jpg`.
 - Four rider classes in both games: volt (electric dash), sniper (mouse crosshair, one shot every 10 s), shrink
   (small and fast, slowed hard when touched) and thrower (an item forward every 3 s).
+- **Rider pick (2026-11-13):** the player now chooses the class. Unity (`ClassSelect.cs`): four cards before the
+  countdown (1-4, Left/Right and Enter, or a click); the race is rebuilt with that rider, and C on the finish
+  screen picks again. On autopilot the pick is skipped; the bridge's play ops take `rider` to pick through the same
+  code (race test with `rider: "volt"` finished in 137 s, player on volt). Roblox: the same cards on joining (and
+  C between races); the server swaps the kart's rider in place (`PickClass` remote), and the countdown waits up to
+  30 s for players still choosing. Played in Studio: a click on Shrink and the key 1 (Volt) each swapped the
+  generated rider and the HUD class, no errors.
 - Full run `20261113-205415` ("Zigvolt Rush", the crazy racing prompt on Unity and Roblox) finished with no
   errors in 42 minutes: all 8 models arrived (the last after 40 minutes, so past the old 30-minute cut-off), and
   "11 assets delivered". The port forward dropped twice during the run and was reopened each time. Unity: built

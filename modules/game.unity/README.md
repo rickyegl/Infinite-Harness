@@ -20,7 +20,9 @@ The Unity side of the game module, hidden from the router.
   yaw is 0. `Editor/ModelImport.cs` keeps those meshes readable, so `Models.Seat` can find the kart's seat from its
   vertices and sit the rider in it. A slot without a model keeps the primitive parts.
 - **Rider classes:** volt (electric dash), sniper (mouse crosshair, one shot every 10 s), shrink (small and fast,
-  slowed hard when touched) and thrower (an item forward every 3 s), in `Abilities.cs`.
+  slowed hard when touched) and thrower (an item forward every 3 s), in `Abilities.cs`. The player picks one on
+  the cards before the race (`ClassSelect.cs`; C on the finish screen picks again); on autopilot the pick is
+  skipped, and the bridge's play ops take `rider` to pick one.
 - **Scenery:** `Scenery.cs` fills the world around the track, seeded from the track: a ring of low-poly mountains,
   rocks, bushes, flowers, flags and a grandstand on the ground; hot-air balloons, floating islands, clouds, a blimp
   and arches over the straights in the air. Nothing is placed on the road, the landmarks or the trophy.

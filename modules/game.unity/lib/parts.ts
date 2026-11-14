@@ -99,7 +99,7 @@ export async function runPart(ctx: ModuleContext, input: ModuleInput): Promise<M
       u.patchConfig({ riders: s.riders, built_riders: true });
       await shots(ctx, u, ["rider", "pack"], "Riders");
       await section(ctx, "riders", s.riders);
-      return { summary: `${d.karts.count} riders in four classes; you ride the sniper` };
+      return { summary: `${d.karts.count} riders in four classes; you pick yours before the race` };
     }
     case "combat": {
       ctx.step("Wiring the class attacks", `dash every 4 s, shot every 10 s, shrink every 9 s, throw every 3 s; a hit keeps ${Math.round(d.combat.slow * 100)}% speed`, "sword");

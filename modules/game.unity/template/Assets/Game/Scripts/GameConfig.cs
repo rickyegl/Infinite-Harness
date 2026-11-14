@@ -141,8 +141,9 @@ namespace HarnessGame
         }
 
         /// the class of kart i: the player gets riders.player, the rest go round the class list
-        public ClassSpec ClassFor(int i, bool isPlayer)
+        public ClassSpec ClassFor(int i, bool isPlayer, string picked = null)
         {
+            if (isPlayer && !string.IsNullOrEmpty(picked)) return Class(picked);
             if (isPlayer && !string.IsNullOrEmpty(riders.player)) return Class(riders.player);
             var cs = riders.classes != null && riders.classes.Length > 0 ? riders.classes : ClassSpec.Defaults();
             return cs[i % cs.Length];

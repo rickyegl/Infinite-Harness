@@ -43,6 +43,7 @@ namespace HarnessEditor
         public string outDir, target, frames;
         public string from = "";   // play_capture: start recording a little before this feature (loop, twist, drop)
         public bool autopilot = true;
+        public string rider = "";  // play ops: pick this rider class on the pick screen first (volt, sniper, shrink, thrower)
         // track_export: a TrackSpec as JSON
         public string spec = "";
     }
@@ -627,6 +628,12 @@ namespace HarnessEditor
             {
                 if (sw.Elapsed.TotalSeconds > 60) throw new Exception("play mode did not start");
                 yield return null;
+            }
+            if (!string.IsNullOrEmpty(op.rider))
+            {
+                var pick = UnityEngine.Object.FindFirstObjectByType<ClassSelect>();
+                if (!pick) throw new Exception("no rider pick on screen (riders or combat not built yet)");
+                pick.Choose(op.rider);   // the same path as a key or click: rebuilds the race with that rider
             }
             GameBoot.Main.race.cfg.autopilot = op.autopilot;
         }

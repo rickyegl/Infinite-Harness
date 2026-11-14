@@ -1,6 +1,7 @@
 ﻿// The one object in the scene. Builds the whole game from game.json under a "Generated" child:
 // in the player at start, and in the editor whenever the bridge asks (so screenshots show the current state).
 // Parts appear as the child cells mark them built (track, karts, riders, combat, HUD).
+// With riders and combat built, a played race opens on the rider pick (ClassSelect) before the countdown.
 
 using UnityEngine;
 
@@ -13,19 +14,24 @@ namespace HarnessGame
         public RaceManager race;
         public Look look;
         public static GameBoot Main { get; private set; }
+        /// the rider the player picked this session; null = not picked yet (the pick shows before the race)
+        public static string PlayerClass;
+        GameConfig cfg;
 
         void OnEnable() { Main = this; }
 
         void Awake()
         {
-            if (Application.isPlaying) Rebuild(GameConfig.Load(), true);
+            if (Application.isPlaying) { PlayerClass = null; Rebuild(GameConfig.Load(), true); }
         }
 
         public void Rebuild(GameConfig cfg, bool playing)
         {
+            this.cfg = cfg;
             var kit = GameKit.Load();
             kit.ClearCache();
             var old = transform.Find("Generated");
+            if (old && cam && cam.transform.IsChildOf(old)) cam = null;   // a camera made last time goes with it
             if (old) { if (Application.isPlaying) { old.gameObject.SetActive(false); Destroy(old.gameObject); } else DestroyImmediate(old.gameObject); }
             var root = new GameObject("Generated").transform;
             root.SetParent(transform, false);
@@ -54,7 +60,7 @@ namespace HarnessGame
                     for (int i = 0; i < n; i++)
                     {
                         bool isPlayer = i == n - 1;   // the player starts at the back of the grid
-                        var k = Kart.Build(raceGo.transform, kit, cfg, i, cfg.ClassFor(i, isPlayer));
+                        var k = Kart.Build(raceGo.transform, kit, cfg, i, cfg.ClassFor(i, isPlayer, PlayerClass));
                         k.isPlayer = isPlayer;
                         race.karts.Add(k);
                     }
@@ -71,7 +77,23 @@ namespace HarnessGame
             if (race.player) chase.Snap();
             else if (race.path) Overview(cam, race.path);
 
-            if (cfg.built_hud && race.path) Hud.Build(root, cam, race, cfg).Refresh();
+            Hud hud = null;
+            if (cfg.built_hud && race.path) { hud = Hud.Build(root, cam, race, cfg); hud.Refresh(); }
+
+            // the rider pick, once per session (and again on C after a race)
+            if (playing && PlayerClass == null && race.player && cfg.built_riders && cfg.built_combat && !cfg.autopilot)
+            {
+                race.phase = RaceManager.Phase.Grid;
+                if (hud) hud.gameObject.SetActive(false);
+                var current = race.player.kind;
+                ClassSelect.Build(root, cam, race, cfg, current, kind =>
+                {
+                    PlayerClass = kind;
+                    if (kind != current) { Rebuild(cfg, true); return; }
+                    race.phase = RaceManager.Phase.Countdown; race.countdown = 3f;
+                    if (hud) hud.gameObject.SetActive(true);
+                });
+            }
             look.Apply(cfg.look.night, cfg.look.realistic, cfg);
 
             if (playing)
@@ -84,6 +106,14 @@ namespace HarnessGame
                 var flags = live.AddComponent<RuntimeFlags>();
                 flags.cfg = cfg;
             }
+        }
+
+        /// back to the rider pick (C on the finish screen)
+        public void ChooseAgain()
+        {
+            if (cfg == null) return;
+            PlayerClass = null;
+            Rebuild(cfg, true);
         }
 
         /// a high three-quarter view of the whole circuit

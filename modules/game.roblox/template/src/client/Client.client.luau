@@ -2,7 +2,7 @@
 -- and twists, and the HUD (lap, place, speed, countdown, hit feed, results, minimap, and the rider's class with
 -- its cooldown). A sniper aims with a crosshair that follows the mouse: each send carries the ray from the camera
 -- through it, and the server picks the kart under it. It also moves the scenery, locally: balloons and islands bob,
--- the clouds and the blimp circle the circuit, and the flags wave.
+-- the clouds and the blimp circle the circuit, and the flags wave. On joining, the player picks a rider class.
 
 local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
@@ -266,6 +266,180 @@ StateEvent.OnClientEvent:Connect(function(s)
 	state = s
 end)
 
+----------------------------------------------------------------------------------------------------------------
+-- the rider pick: four cards when the player joins (and on C between races). 1-4, Left/Right and Enter, or a
+-- click. The server swaps the kart's rider and the countdown waits until everyone has picked.
+
+local PickClass = Race:WaitForChild("PickClass") :: RemoteEvent
+local classInfo: { any } = {}
+do
+	local ok, list = pcall(function()
+		local raw = Race:GetAttribute("Classes")
+		local t0 = os.clock()
+		while raw == nil and os.clock() - t0 < 10 do
+			task.wait(0.1)
+			raw = Race:GetAttribute("Classes")
+		end
+		return game:GetService("HttpService"):JSONDecode(raw or "[]")
+	end)
+	if ok and type(list) == "table" then
+		classInfo = list
+	end
+end
+local DESCRIBE = {
+	volt = "SPACE: an electric dash. Every kart you run into is zapped.",
+	sniper = "Aim with the mouse, CLICK to fire. The shot hits the kart under the crosshair.",
+	shrink = "SPACE: small and fast for a few seconds. Get touched and you are squashed.",
+	thrower = "Throws an item forward on its own. It hits the first kart in your lane.",
+}
+local CARD_W, CARD_H, GAP = 230, 290, 22
+
+local pickGui = Instance.new("ScreenGui")
+pickGui.Name = "RiderPick"
+pickGui.ResetOnSpawn = false
+pickGui.IgnoreGuiInset = true
+pickGui.DisplayOrder = 10
+pickGui.Enabled = false
+pickGui.Parent = player:WaitForChild("PlayerGui")
+local dim = Instance.new("Frame")
+dim.Size = UDim2.fromScale(1, 1)
+dim.BackgroundColor3 = Color3.fromRGB(5, 8, 15)
+dim.BackgroundTransparency = 0.38
+dim.BorderSizePixel = 0
+dim.Parent = pickGui
+label({ Text = string.upper(hud.title or Config.title or ""), Size = UDim2.fromOffset(600, 28), Position = UDim2.new(0.5, -300, 0.5, -258), TextColor3 = accent }, pickGui)
+label({ Text = "CHOOSE YOUR RIDER", Size = UDim2.fromOffset(800, 54), Position = UDim2.new(0.5, -400, 0.5, -226) }, pickGui)
+local row = Instance.new("Frame")
+row.BackgroundTransparency = 1
+row.AnchorPoint = Vector2.new(0.5, 0.5)
+row.Position = UDim2.fromScale(0.5, 0.52)
+row.Size = UDim2.fromOffset(#classInfo * CARD_W + math.max(0, #classInfo - 1) * GAP, CARD_H)
+row.Parent = pickGui
+local rowScale = Instance.new("UIScale")
+rowScale.Parent = row
+label({ Text = "1-4 or LEFT/RIGHT to choose      ENTER to race      or click a rider", Size = UDim2.fromOffset(700, 22), Position = UDim2.new(0.5, -350, 0.5, 196), Font = Enum.Font.GothamMedium, TextTransparency = 0.2 }, pickGui)
+
+local pickOpen = false
+local sel = 1
+local cards: { { stroke: UIStroke, scale: UIScale, color: Color3 } } = {}
+
+local function showPick()
+	for i, c in cards do
+		c.scale.Scale = if i == sel then 1.07 else 0.95
+		c.stroke.Transparency = if i == sel then 0 else 0.65
+	end
+end
+
+local function choose(i: number)
+	local c = classInfo[i]
+	if not c then
+		return
+	end
+	pickOpen, pickGui.Enabled = false, false
+	PickClass:FireServer(c.kind)
+end
+
+for i, c in classInfo do
+	local col = Color3.fromHex(c.color or "#ffffff")
+	local card = Instance.new("TextButton")
+	card.Name = "Card_" .. c.kind
+	card.AutoButtonColor = false
+	card.Text = ""
+	card.BackgroundColor3 = Color3.fromRGB(18, 20, 30)
+	card.Size = UDim2.fromOffset(CARD_W, CARD_H)
+	card.Position = UDim2.fromOffset((i - 1) * (CARD_W + GAP), 0)
+	card.Parent = row
+	Instance.new("UICorner").Parent = card
+	local stroke = Instance.new("UIStroke")
+	stroke.Thickness = 4
+	stroke.Color = col
+	stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	stroke.Parent = card
+	local scale = Instance.new("UIScale")
+	scale.Parent = card
+	local band = Instance.new("Frame")
+	band.BackgroundColor3 = col
+	band.BorderSizePixel = 0
+	band.Size = UDim2.new(1, 0, 0, 62)
+	band.Parent = card
+	Instance.new("UICorner").Parent = band
+	label({ Text = tostring(i), Size = UDim2.fromOffset(26, 22), Position = UDim2.fromOffset(8, 6), TextColor3 = Color3.new(0, 0, 0), TextTransparency = 0.45, TextStrokeTransparency = 1 }, card)
+	label({ Text = string.upper(c.name or c.kind), Size = UDim2.new(1, -64, 0, 40), Position = UDim2.fromOffset(32, 11) }, card)
+	label({
+		Text = DESCRIBE[c.kind] or "",
+		Size = UDim2.new(1, -28, 0, 140),
+		Position = UDim2.fromOffset(14, 78),
+		TextScaled = false,
+		TextSize = 19,
+		TextWrapped = true,
+		Font = Enum.Font.GothamMedium,
+		TextYAlignment = Enum.TextYAlignment.Top,
+	}, card)
+	local every = if c.kind == "thrower" then "an item every %s s" else "ready every %s s"
+	label({ Text = string.format(every, tostring(c.cooldown)), Size = UDim2.new(1, -20, 0, 22), Position = UDim2.new(0, 10, 1, -40), TextColor3 = col }, card)
+	card.Activated:Connect(function()
+		choose(i)
+	end)
+	card.MouseEnter:Connect(function()
+		sel = i
+		showPick()
+	end)
+	table.insert(cards, { stroke = stroke, scale = scale, color = col })
+end
+
+local function openPick()
+	if #classInfo == 0 or player:GetAttribute("Picked") == nil then
+		return
+	end
+	sel = 1
+	for i, c in classInfo do
+		if c.kind == myClass() then
+			sel = i
+		end
+	end
+	rowScale.Scale = math.min(1, (camera.ViewportSize.X - 40) / math.max(1, row.Size.X.Offset))
+	showPick()
+	pickOpen, pickGui.Enabled = true, true
+end
+
+player:GetAttributeChangedSignal("Picked"):Connect(function()
+	if player:GetAttribute("Picked") == false then
+		openPick()
+	elseif pickOpen then
+		pickOpen, pickGui.Enabled = false, false
+	end
+end)
+if player:GetAttribute("Picked") == false then
+	openPick()
+end
+
+local NUMBER_KEYS = { Enum.KeyCode.One, Enum.KeyCode.Two, Enum.KeyCode.Three, Enum.KeyCode.Four }
+UserInputService.InputBegan:Connect(function(input, processed)
+	if processed or input.UserInputType ~= Enum.UserInputType.Keyboard and not input.UserInputType.Name:find("Gamepad") then
+		return
+	end
+	local key = input.KeyCode
+	if pickOpen then
+		for i, k in NUMBER_KEYS do
+			if key == k then
+				choose(i)
+				return
+			end
+		end
+		if key == Enum.KeyCode.Left or key == Enum.KeyCode.DPadLeft then
+			sel = (sel - 2) % #cards + 1
+			showPick()
+		elseif key == Enum.KeyCode.Right or key == Enum.KeyCode.DPadRight then
+			sel = sel % #cards + 1
+			showPick()
+		elseif key == Enum.KeyCode.Return or key == Enum.KeyCode.KeypadEnter or key == Enum.KeyCode.ButtonA then
+			choose(sel)
+		end
+	elseif key == Enum.KeyCode.C and state and state.phase ~= "race" then
+		openPick()
+	end
+end)
+
 local function ordinal(n: number): string
 	local suffix = "th"
 	if n % 100 < 11 or n % 100 > 13 then
@@ -313,12 +487,12 @@ RunService.RenderStepped:Connect(function(dt)
 	end
 	local kind = if me and me.k then me.k else myClass()
 	local sniping = kind == "sniper" and built.combat ~= false and state.phase ~= "finished" and not (me and me.f)
-	hint.Text = HELP[kind] or "W/S drive   A/D steer"
+	hint.Text = (HELP[kind] or "W/S drive   A/D steer") .. (if player:GetAttribute("Picked") ~= nil and state.phase ~= "race" then "   C change rider" else "")
 	if me and me.k and built.combat ~= false then
 		classLabel.TextColor3 = Color3.fromHex(me.g or "ffffff")
 		classLabel.Text = string.upper(me.k) .. "   " .. (if me.a then "ACTIVE" elseif me.cd > 0 then string.format("%.1f s", me.cd) else "READY")
-		cross.Visible = sniping
-		UserInputService.MouseIconEnabled = not sniping or touchAim ~= nil
+		cross.Visible = sniping and not pickOpen
+		UserInputService.MouseIconEnabled = pickOpen or not sniping or touchAim ~= nil
 		if sniping then
 			local p = aimPoint()
 			cross.Position = UDim2.fromOffset(p.X, p.Y)

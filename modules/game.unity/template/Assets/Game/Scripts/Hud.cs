@@ -144,7 +144,7 @@ namespace HarnessGame
             {
                 case RaceManager.Phase.Countdown: big.text = race.countdown > 0 ? Mathf.CeilToInt(race.countdown).ToString() : "GO!"; break;
                 case RaceManager.Phase.Racing: big.text = race.clock < 1f ? "GO!" : ""; break;
-                case RaceManager.Phase.Finished: big.text = $"FINISH!\n<size=48>{Ordinal(p.place)} place</size>"; big.supportRichText = true; break;
+                case RaceManager.Phase.Finished: big.text = $"FINISH!\n<size=48>{Ordinal(p.place)} place</size>\n<size=24>R race again{(cfg.built_riders && Application.isPlaying ? "     C change rider" : "")}</size>"; big.supportRichText = true; break;
                 default: big.text = ""; break;
             }
             feed.text = string.Join("\n", race.feed);

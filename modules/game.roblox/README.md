@@ -17,8 +17,9 @@ Luau in a Rojo project.
 - **Rider classes:** every kart has one of four classes, each with its own gear and attack, all resolved on the
   server: Volt (electric dash every 4 s, zaps karts it touches), Sniper (mouse crosshair, one shot every 10 s; the
   client sends its aim ray), Shrink (small and fast for 4 s every 9 s, but a touch while small squashes it) and
-  Thrower (throws an item forward every 3 s). Players ride `riders.player` (Sniper by default); AI karts take the
-  others in turn. Use and hit counts are kept as `Uses_<class>` and `Hits_<class>` attributes on `workspace.Karts`.
+  Thrower (throws an item forward every 3 s). Each player picks a class on joining (four cards; C picks again
+  between races), and the server swaps the kart's rider in place; until then they ride `riders.player`
+  (Sniper). AI karts take the others in turn. Use and hit counts are kept as `Uses_<class>` and `Hits_<class>` attributes on `workspace.Karts`.
 - **Generated 3D models:** the kart body, the four riders, four trackside landmarks and the finish trophy come from
   `assets.model3d`. The place loads each one with `InsertService:LoadAsset` from a Roblox asset id in
   `Config.models`; a slot without an id keeps its part-built version. Each `model.glb` is uploaded once as a Model

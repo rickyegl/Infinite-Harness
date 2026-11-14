@@ -80,7 +80,7 @@ export async function runPart(ctx: ModuleContext, input: ModuleInput): Promise<M
       const src = excerpt(place.source("src/server/Race.server.luau"), "if built.riders then", "classGear(model, cls.kind");
       await ctx.evidence("image", writeSvg(ctx, "classes.svg", classesSvg(d.riders, d.karts.colors.length ? d.karts.colors : [firstColor])), "Rider classes", { fit: "contain" });
       await ctx.evidence("code", writeLuau(ctx, "riders.luau", src), "Race.server.luau: riders", { lines: codeLines(src, 30, " ") });
-      return { summary: "a rider on every kart in one of four classes: volt, sniper, shrink, thrower; you ride the sniper" };
+      return { summary: "a rider on every kart in one of four classes: volt, sniper, shrink, thrower; each player picks one on joining" };
     }
     case "combat": {
       ctx.step("Switching on the class attacks", "dash every 4 s, shot every 10 s, shrink every 9 s, throw every 3 s", "sword");
