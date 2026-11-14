@@ -31,7 +31,10 @@ what the next agent should know. Keep it short; replace stale lines instead of a
   the relay at `/relay`. Fallbacks: a Windows build instead of WebGL (the WebGL module is not installed), and a
   Roblox place that the pipeline builds and lints but does not open in Studio (it has been played there once by
   hand, with the generated models). Details under "The games" below.
-- **Next:** the module plans (04-07), then plan 08 replaces fixtures with recorded takes and finalises the
+- **Done (plan 04), video on mock:** the asset modules. Image, Image Edit, Cutout, Music and Voice run for real;
+  "show me a house", "make the walls red", "transparent background" chain without paths. Video stays on the mock
+  until the author picks its runtime (USER-TODO 7). Details under "The assets" below.
+- **Next:** the module plans (05-07), then plan 08 replaces fixtures with recorded takes and finalises the
   draft direction files (S37-S40, S42-S47).
 
 ## Waiting on the author
@@ -47,6 +50,17 @@ remove the line when it is answered. See `AGENTS.md` rule 5.
   tunnel, USER-TODO 2), and the place needs `HttpService` turned on. Today the relay is checked both ways
   locally, and a stand-in Roblox rider proves the ghost in the Unity game.
 - (plan 03) **Publishing the Roblox place:** not done, and not to be done without your approval.
+- (plan 04) **Video:** which image-to-video setup to use (USER-TODO 7). The forge's `launcher/h3` would work but
+  downloads about 65 GB of weights, and `plan/LOCAL.md` names a different video model. Until you choose, Video
+  cells use the mock asset.
+- (plan 04) **One more short voice reading?** The recorded Voice fixture also says the lead-in ("Read this in my
+  voice: ..."), because the planner passed the whole sentence. That is fixed (the planner now passes only the
+  script, checked on the mock bridge), but a clean recording costs one more short script of credits.
+- (plan 04) **The chosen song is 2.06 s long** (`video/makeasong.mp3`, 45 KB). Music cells hand it over as it
+  is; the games loop it. Put a longer version in `assets/music/` if you have one (USER-TODO 17).
+- (plan 04) **Pictures in Roblox:** generated art reaches the Unity game; in Roblox a picture needs an uploaded
+  image id, so Roblox keeps its built-in look until you approve uploading the art.
+
 ## Verified
 
 - `node video/tools/resolve.mjs`: 48 shots, 75 bars, 140.6 s; fastest voice line 2.9 words per second.
@@ -121,6 +135,48 @@ remove the line when it is answered. See `AGENTS.md` rule 5.
   - `pnpm typecheck` clean; `pnpm test` (protocol, web, bridge 36 including the router table) passes;
     `pnpm test:bridge`, `pnpm test:live`, `pnpm test:determinism` (96/96) pass; `pnpm film:rough` 140.625 s;
     `pnpm lint:brand` clean (523 files). Fixtures were checked for local paths and keys by grep.
+
+## The assets (plan 04)
+
+- **Modules:** `assets.image` and `assets.image.edit` (the image model behind the local proxy; the model id is
+  only in `harness.local.json`), `assets.cutout` (background removal on the asset forge), `music` (the chosen
+  song), `voice` (the studio's narration tool with the cloned voice). `assets.model3d` is from plan 03.
+  Shared helper `modules/_shared/image.ts`; each module has a README with the exact calls and a fixture recorded
+  from a real run.
+- **Image chain memory:** Image Edit and Cutout take the first image in `refs`, else the last picture an image
+  cell put out in the same run (read from `events.jsonl`). Live run `20261113-222539`: "show me a house" (Image,
+  2 candidates, 1408 x 768, 8 s), "make the walls red" (Image Edit under it, same framing, 9 s), "transparent
+  background" (Cutout under that: RGBA PNG, 66 % transparent, the red house intact). The site draws cutouts on a
+  checkerboard (`meta.checker`) with a before/after wipe.
+- **The image model has no real transparency** (asked for it, it paints a checkerboard). So Cutout has no
+  fallback, and `assets.image` with `transparent` asks for a plain white background and hands the picture to a
+  Cutout cell (not run live yet).
+- **Timings:** Image 8 s (two candidates in parallel), Image Edit 9 s, Cutout 629 s on a cold forge (about
+  8 minutes of runtime setup, then 138 s for the cutout itself, which includes loading the model), Music 1 s,
+  Voice 1.3 s for 13 words. Results are cached (cutout by picture bytes, voice by script, 3D models by prompt),
+  so a repeat costs nothing.
+- **Live backends:** the proxy's image model, the Colab forge (one L4 runtime, shared by Cutout and 3D Model),
+  the voice service through the studio's tool. **Credits used:** one short voice script (13 words, 5.7 s).
+- **On mock:** Video (no `assets.video` module yet; the runner's mock asset answers video requests).
+- **Forge setup steps** in a cell now show neutral stages ("installing, part 2 of 4"); the launcher's own
+  lines named packages and weights. The forge stops 90 s after its last user, but only if this bridge started
+  it, and a bridge restart drops the timer: after testing, check it with `colab status -s forge` in WSL.
+- **Maker badges:** every asset cell carries its `maker` (nano-banana, birefnet, hunyuan3d, suno, elevenlabs).
+  No icon files yet (USER-TODO 19), so the graph shows the neutral glyph on each.
+- **Mock replay:** on a `HARNESS_MOCK=1` bridge the house chain, the song and the voice prompt replay from the
+  new fixtures and deliver their files.
+- **Game run with real assets** `20261113-224654` ("Zapwick Rush", about 41 min): the game cells asked the asset
+  cells for music, two banners and eight models. Music handed over the song; the "Hover Arrows" banner was
+  drawn (7 s) and imported into Unity as `Banners/hover-arrows`; the eight models took about 3 min each, one
+  after another on the forge GPU. Unity built for Windows (15 s) and the race test passed (137 s, 48 hits). A
+  new Unity shot view `board` (in front of the first track-side board) shows the generated banner on the board
+  in the running game. The Roblox place was built, not opened. Result: 10 assets delivered, 1 failed (the second
+  banner, 429).
+- **Image quota:** that 429 was the image model's quota running out, not parallel calls. The proxy answers with
+  `retry-after` of hours, and the quota resets on its own (on 2026-11-13 it was used up at about 23:30, free
+  again about 3.5 h later). `imageCall` now retries short waits (5 to 45 s, up to 6 tries) and fails at once
+  with "the image model's quota is used up; it is free again in about ..." when the wait is longer than 2 min
+  (checked live on run `20261113-234452`). Three pictures at once could not be re-tested while the quota is out.
 
 ## The games (plan 03)
 
@@ -373,6 +429,10 @@ before falling back to the fixture (checked: the full film has 20, one per take,
   verified and can be chosen per module (`AgentOptions.worker`) or in `harness.local.json`.
 - ASSUMED (plan 02): the author named a "high" effort model for the tests; the proxy lists only its "xhigh"
   variant, so `proxy.testModel` is that one (ids in `plan/LOCAL.md`).
+- ASSUMED (plan 04): Cutout has no fallback to the image model, because that model's "transparent" output is a
+  painted checkerboard, not alpha. Without the forge a Cutout cell fails with the reason.
+- ASSUMED (plan 04): Video is not built until the author chooses its runtime; the plan allows shipping it on
+  the mock.
 
 ## Open problems
 
@@ -391,7 +451,7 @@ before falling back to the fixture (checked: the full film has 20, one per take,
 | 01 | done | typecheck, unit tests, determinism 96/96, live test, sheets, rough cut duration, lint:brand | See "The stage". Drafts S37-S40, S42-S47 left for plan 08. |
 | 02 | done | typecheck, unit tests (none skipped), `pnpm dev`, real runs on both workers, no-network probes, proxy routing with both models, prompt.md module run, test:bridge, test:live, determinism, film:rough, lint:brand | See "The bridge". |
 | 03 | done, two fallbacks | full run 20261113-014545, four follow-ups under 5 s, fixtures, typecheck, tests, test:bridge, test:live, determinism, film:rough, lint:brand | Windows build until WebGL is installed; Roblox place not opened in Studio. See "The games". |
-| 04 | not started | | |
+| 04 | done, video on mock | runs 20261113-222539 (house chain), 20261113-223714 (song), 20261113-223729 (voice), 20261113-224654 (full game with real assets), fixtures, mock replay, tests, test:bridge, typecheck, lint:brand, forge stopped (`colab ls`: no sessions) | Video waits for its runtime; `assets.image` with `transparent` not run live; image quota out at the end. See "The assets". |
 | 05 | not started | | |
 | 06 | not started | | |
 | 07 | not started | | |

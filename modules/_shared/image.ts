@@ -49,11 +49,14 @@ export async function imageCall(ctx: ModuleContext, prompt: string, out: string,
     content.push({ type: "image_url", image_url: { url: `data:${mime};base64,${readFileSync(f).toString("base64")}` } });
   }
   content.push({ type: "text", text: prompt });
-  const timeout = AbortSignal.timeout(Math.max(p.timeoutMs ?? 0, 180_000));
+  const perCall = Math.max(p.timeoutMs ?? 0, 180_000);
   let lastErr = "";
-  // the proxy rotates sign-ins; a busy one answers 429/5xx, so try a few times before giving up
-  for (let attempt = 0; attempt < 3; attempt++) {
+  // the proxy rotates sign-ins; a busy one answers 429/5xx (often when several pictures are asked for at once),
+  // so wait and try again for about two minutes before giving up (a used-up quota fails at once, see below)
+  const WAITS = [5, 10, 20, 30, 45];
+  for (let attempt = 0; attempt <= WAITS.length; attempt++) {
     if (ctx.signal.aborted) throw new Error("stopped");
+    const timeout = AbortSignal.timeout(perCall);
     const r = await fetch(`${p.baseUrl.replace(/\/$/, "")}/chat/completions`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...(key ? { Authorization: `Bearer ${key}` } : {}) },
@@ -62,7 +65,15 @@ export async function imageCall(ctx: ModuleContext, prompt: string, out: string,
     });
     if (r.status === 429 || r.status >= 500) {
       lastErr = `the image model is busy (${r.status})`;
-      await new Promise((res) => setTimeout(res, 4000 * (attempt + 1)));
+      const after = Number(r.headers.get("retry-after"));
+      // a long wait means the quota is used up, not a busy moment: say so now instead of retrying for minutes
+      if (Number.isFinite(after) && after > 120) {
+        const m = Math.ceil(after / 60);
+        throw new Error(`the image model's quota is used up; it is free again in about ${m >= 60 ? `${Math.floor(m / 60)} h ${m % 60} min` : `${m} min`}`);
+      }
+      if (attempt === WAITS.length) break;
+      const wait = Number.isFinite(after) && after > 0 ? Math.min(after, 60) : WAITS[attempt];
+      await new Promise((res) => setTimeout(res, wait * 1000));
       continue;
     }
     const j: any = await r.json().catch(() => null);

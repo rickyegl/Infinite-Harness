@@ -512,6 +512,18 @@ namespace HarnessEditor
                     }
                     break;
                 }
+                case "board":
+                {
+                    // the first track-side board, from in front of its face (a Unity quad shows its front to -forward)
+                    var face = GameObject.Find("Boards/Board0/Face") ?? GameObject.Find("Face");
+                    if (face)
+                    {
+                        var f = face.transform;
+                        t.position = f.position - f.forward * 11f + Vector3.up * 1.2f - f.right * 3f;
+                        t.LookAt(f.position);
+                    }
+                    break;
+                }
                 case "pack":
                 {
                     var k = Pick(1);
