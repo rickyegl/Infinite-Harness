@@ -166,7 +166,7 @@
   "id": "reel.explainer",
   "label": "Explainer",
   "kind": "agent",
-  "summary": "A full vertical \"What if\" explainer reel (about 24 s, 1080x1920) in the studio's explainer recipe: script, then a stop for the author's go, then narration in the explainer voice, a motion-graphics composition timed to the words, sounds, captions and the studio's mix. Narrates itself.",
+  "summary": "A full vertical \"What if\" explainer reel about the run's Unity game (about 24 s, 1080x1920) in the studio's explainer recipe: a script from the game's design, then a stop for the author's go, then narration in the explainer voice, a motion-graphics composition timed to the words, sounds, captions and the studio's mix. Narrates itself.",
   "accepts": [
    "text"
   ],

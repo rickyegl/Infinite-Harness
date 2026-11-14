@@ -1,6 +1,6 @@
 // Campaign: one ad set for the run's game, one brief per audience (Unity players, Roblox players). A worker writes
 // the briefs (an angle, a headline and a call to action per audience); then the cell spawns the pieces side by side
-// as its own subtree: the Explainer reel, the Premise reel (Roblox), one Ad Image per audience and the Trailer cut
+// as its own subtree: the Explainer reel (the Unity game), the Premise reel (Roblox), one Ad Image per audience and the Trailer cut
 // (Unity gameplay), and finally the Publish dry run over every reel that came out. Each reel asks the Voice cell
 // for its narration in its own recipe's voice, after the author's go on its script.
 //
@@ -77,7 +77,7 @@ export default async function run(ctx: ModuleContext, input: ModuleInput): Promi
   const roblox = briefs.find((b) => b.audience === "roblox");
   const unity = briefs.find((b) => b.audience === "unity");
   if (want.has("explainer"))
-    jobs.push({ what: "Explainer", run: () => ctx.spawn("reel.explainer", { prompt: `${input.prompt}\nAudiences: ${briefs.map((b) => b.who).join(" and ")}.` }, { label: "Explainer" }) });
+    jobs.push({ what: "Explainer", run: () => ctx.spawn("reel.explainer", { prompt: `${unity?.angle ?? d.pitch}\nFor ${unity?.who ?? "players"}.`, params: { audience: unity?.who ?? "players" } }, { label: "Explainer" }) });
   if (want.has("premise") && roblox)
     jobs.push({ what: "Premise Reel", run: () => ctx.spawn("reel.premise", { prompt: `${roblox.angle}\nFor ${roblox.who}.` }, { label: "Premise Reel" }) });
   if (want.has("ads"))

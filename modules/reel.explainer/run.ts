@@ -1,19 +1,24 @@
-// Explainer reel: the studio's "What if" explainer recipe (explainers/HOW_TO.md), full length (about 24 s; the
-// recipe runs 25-35 s), 1080x1920. Everything lands in the studio's own project folder (explainers/projects/<Name>,
-// made by its `studio.py new`); only the final mp4 and the stills are copied into the run.
+// Explainer reel: the studio's "What if" explainer recipe (explainers/HOW_TO.md) about the run's own Unity game,
+// full length (about 24 s; the recipe runs 25-35 s), 1080x1920. The script explains the game to a player: its
+// premise, the track, the fight, the rider classes and how to win, all taken from the game's design. It never
+// talks about how the game was made. Everything lands in the studio's own project folder
+// (explainers/projects/<Title>_Explainer_<run>, made by its `studio.py new`); only the final mp4 and the stills are
+// copied into the run.
 //
 //   script (worker, Template A with a reveal, facts only)  ->  the author's go (the gate)
 //   ->  narration in the explainer voice (a voice request, preset "explainer"; cached by text and voice)
 //   ->  HyperFrames composition timed to the word timings (worker) -> check -> storyboard -> render
 //   ->  sounds from the studio's local library, bottom captions, the studio's assembler, the limiter
 //
-// params: seconds (default 24), facts (string or string[]; default: what the harness does), audience, rewrite
-// (write a new script even if the project has one). A rerun on the same run reuses the project, the script and
-// the cached narration, so it costs no voice credits and needs no new go.
+// params: seconds (default 24), facts (string or string[]; default: the game's facts from its design), audience,
+// rewrite (write a new script even if the project has one). A rerun on the same run reuses the project, the script
+// and the cached narration, so it costs no voice credits and needs no new go.
 
 import type { ModuleContext, ModuleInput, ModuleOutput } from "@harness/protocol";
 import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { basename, join } from "node:path";
+import { CLASS_INFO, DEFAULT, RIDER_CLASSES, type Design } from "../game/lib/design.ts";
+import { readState, type GameState } from "../game/lib/state.ts";
 import { gate } from "../_shared/gate.ts";
 import { check, render, rules, scaffold, snapshot, tidy } from "../_shared/hyperframes.ts";
 import { assemble, bed, captions, cleanCues, narrate, prepareSfx, secondsOf, soundLibrary, spokenWords, timingLines, titleOf, voiceCached, wordRange, type Cue } from "../_shared/reel.ts";
@@ -22,17 +27,43 @@ import { ensureProject, peaksOf, projectName, runDirOf, stills, storyboard, stud
 export const WPS = 2.7;
 export const PRESET = "explainer";
 
-export const FACTS = [
-  "One sentence typed into the harness builds a playable kart racing game.",
-  "It builds the same game in two engines at once: Unity and Roblox.",
-  "Made the usual way, a racing game is many separate jobs done by hand: the track, the karts, the riders, the combat, the HUD, then testing and building it.",
-  "Under each engine the harness builds six parts side by side: the track, the karts, the riders, combat, the HUD and the build.",
-  "It test-drives the race on autopilot and records the play before it hands the game over.",
-  "The player picks a rider class before the race.",
-  "Every step shows up live as a graph of cells, each with its own pictures and clips, while it works.",
-  "Follow-ups in plain words change the finished game: \"make it night\" relights it, \"make it realistic\" changes its look, \"add music\" scores it.",
-  "It makes its own assets when a part asks for them: pictures, music and narration.",
-];
+const spell = (n: number): string => ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"][n] ?? String(n);
+
+/** where the Unity build plays */
+export const platformOf = (unity: GameState["unity"]): string => (unity?.build?.target === "webgl" ? "in the browser" : "on PC");
+
+/** what the script may say about the game: everything comes from its design and its Unity build */
+export function gameFacts(d: Design, unity: GameState["unity"]): string[] {
+  const t = d.track;
+  const title = d.hud?.title || d.title;
+  const lap = unity?.metres ? `about ${Math.round(unity.metres / 10) * 10} metres a lap` : "";
+  const parts = [
+    t.loops ? `${spell(t.loops)} loop${t.loops > 1 ? "s" : ""}` : "",
+    t.twists ? `${spell(t.twists)} twist${t.twists > 1 ? "s" : ""}` : "",
+    t.hover ? "glowing hover sections" : "",
+    t.drop > 5 ? `a ${Math.round(t.drop)} metre drop` : "",
+  ].filter(Boolean);
+  const track = [lap, parts.length ? `with ${parts.join(", ")}` : ""].filter(Boolean).join(" ") || `a ${t.shape} circuit`;
+  return [
+    `"${title}" is a kart racing game made in Unity that you play ${platformOf(unity)}.`,
+    `The pitch: ${d.pitch}`,
+    `The track: ${track}. A race is ${spell(d.laps)} lap${d.laps > 1 ? "s" : ""}.`,
+    t.notes ? `The track in more detail: ${t.notes}` : "",
+    `${spell(d.karts.count)} karts race, each with a rider who fights with ${d.riders.weapon}s. You drive one kart; the other ${spell(d.karts.count - 1)} are computer riders who fight back.`,
+    d.combat.rules ? `The fight: ${d.combat.rules}` : "",
+    `Before the race you pick one of four rider classes, each with its own attack: ${RIDER_CLASSES.map((c) => `${CLASS_INFO[c].name}, ${CLASS_INFO[c].attack}`).join("; ")}.`,
+    `How to win: ${d.win}`,
+  ].filter(Boolean);
+}
+
+/** the game's look, for the picture */
+export function gameLook(d: Design): string {
+  return [
+    `Title "${d.hud?.title || d.title}", accent ${d.hud.accent}, sky ${d.look.sky}, ground ${d.look.ground}.`,
+    `Kart colours ${d.karts.colors.slice(0, d.karts.count).join(", ")}; riders: ${d.karts.names.slice(0, d.karts.count).join(", ")}.`,
+    `Riders: ${d.riders.notes || `humanoid riders with ${d.riders.weapon}s`}`,
+  ].join("\n");
+}
 
 const fill = (t: string, v: Record<string, string | number>) => t.replace(/\{\{(\w+)\}\}/g, (_, k) => String(v[k] ?? ""));
 
@@ -59,9 +90,13 @@ function lilita(ctx: ModuleContext): string | null {
 export default async function run(ctx: ModuleContext, input: ModuleInput): Promise<ModuleOutput> {
   const p = input.params ?? {};
   const seconds = Math.min(60, Math.max(12, Number(p.seconds) || 24));
-  const facts = Array.isArray(p.facts) ? (p.facts as unknown[]).map(String) : typeof p.facts === "string" ? [p.facts] : FACTS;
+  const runDir = runDirOf(ctx);
+  const state = readState(runDir);
+  const design = state.design ?? DEFAULT;
+  const game = design.hud?.title || design.title || "Kart Racer";
+  const facts = Array.isArray(p.facts) ? (p.facts as unknown[]).map(String) : typeof p.facts === "string" ? [p.facts] : gameFacts(design, state.unity);
   const [lo, hi] = wordRange(seconds, WPS);
-  const name = projectName("Harness Explainer", basename(runDirOf(ctx)));
+  const name = projectName(game, "Explainer", basename(runDir));
   const proj = await ensureProject(ctx, "explainers", name);
   const scriptFile = join(proj, "script.txt");
   ctx.step("Studio project", `explainers/projects/${name}`, "box");
@@ -70,7 +105,7 @@ export default async function run(ctx: ModuleContext, input: ModuleInput): Promi
   const have = existsSync(scriptFile) ? readFileSync(scriptFile, "utf8") : "";
   if (!spokenWords(have).length || p.rewrite === true) {
     const brief = fill(readFileSync(join(import.meta.dirname, "script.md"), "utf8"), {
-      SECONDS: seconds, WORDS_LO: lo, WORDS_HI: hi, LINES: `${Math.round(seconds / 2.7) - 1}-${Math.round(seconds / 2.7) + 1}`,
+      GAME: game, SECONDS: seconds, WORDS_LO: lo, WORDS_HI: hi, LINES: `${Math.round(seconds / 2.7) - 1}-${Math.round(seconds / 2.7) + 1}`,
       BRIEF: [input.prompt, typeof p.audience === "string" ? `Audience: ${p.audience}.` : ""].filter(Boolean).join("\n"),
       FACTS: facts.map((f) => `- ${f}`).join("\n"),
     });
@@ -88,7 +123,7 @@ export default async function run(ctx: ModuleContext, input: ModuleInput): Promi
   // 2. the author's go (a script read before in this voice was approved then)
   const draft = readFileSync(scriptFile, "utf8");
   const script = voiceCached(ctx, draft, PRESET) ? draft : await gate(ctx, "Explainer", scriptFile);
-  const title = titleOf(script) || "What If One Sentence Built Your Game?";
+  const title = titleOf(script) || `What If You Could Play ${game}?`;
 
   // 3. narration in the explainer voice
   const voice = await narrate(ctx, script, PRESET, join(proj, "voice"));
@@ -107,6 +142,7 @@ export default async function run(ctx: ModuleContext, input: ModuleInput): Promi
   const library = soundLibrary(ctx);
   const brief = fill(readFileSync(join(import.meta.dirname, "visuals.md"), "utf8"), {
     REFERENCE: reference(ctx) ?? "(none available)",
+    GAME: gameLook(design),
     SHOTS: Math.round(total / 2.7),
     SOUNDS: library.join(", "),
     RULES: rules("portrait", total),

@@ -65,12 +65,12 @@ remove the line when it is answered. See `AGENTS.md` rule 5.
   2026-11-14). Save it as `assets/music/trailer.wav` (or .mp3), then say "make a trailer" on a game run. Unity
   must be open: the cell records HUD-free clips.
 - (plan 05) **Two scripts wait for your go**, and voice credits are spent only after it. Both are in run
-  `20261113-224654` under the Campaign: the explainer in
-  `explainers/projects/HarnessExplainer_20261113224654/script.txt`, the premise in
+  `20261113-224654`: the explainer (now about the Unity game, not the harness) in
+  `explainers/projects/ZapwickRush_Explainer_20261113224654/script.txt`, the premise in
   `premise/projects/HarnessPremise_20261113224654/script.txt` (edit them there first if you like). The bridge
   that held the cells was stopped, so: open that run in the app, ask again "Make an ad campaign for Unity and
   Roblox players" (it reuses both scripts and stops at the gates), then say "go on both". A go given before the
-  re-ask also counts. Run `20261114-003506` has an earlier standalone explainer draft; ignore it.
+  re-ask also counts. Ignore the older harness explainer drafts (`HarnessExplainer_*`, run `20261114-003506`).
 - (plan 05) **Premise picture:** sets, cast, shots and the Studio capture start on your green flag for the
   combined recording set and racing place. Until then the cell ends after the narration. "Make it night" on
   the premise (a Done-when item) needs that picture, so it is not built yet.
@@ -163,8 +163,10 @@ remove the line when it is answered. See `AGENTS.md` rule 5.
     1920x1080 through `play_capture` (`hud: false` is new in the Unity bridge and `Capture.cs`). `beats.py`
     finds the beat grid, `edit.ts` plans the cut, then `head.py` plus the studio's `render_tail.py` render a
     9:16 cut and a 16:9 cut.
-  - `reel.explainer`: script, gate, the `explainer` voice, a HyperFrames picture, then the studio's sound,
-    captions and assembly. About 24 s.
+  - `reel.explainer`: explains the run's Unity game to players (premise, track, fight, classes, how to win,
+    where to play) from facts read from its design (`gameFacts`); never how it was made (author, 2026-11-14).
+    Script, gate, the `explainer` voice, a HyperFrames picture in the game's colours, then the studio's sound,
+    captions and assembly. About 24 s. The Campaign hands it the Unity brief.
   - `reel.premise`: a Template A script that opens with "In this world,", the gate, the `premise` voice
     (fx A, 1.15x), then a stop before the picture. About 30 s.
   - `motion`: HyperFrames clips.
@@ -184,7 +186,7 @@ remove the line when it is answered. See `AGENTS.md` rule 5.
 - **Campaign live** (run `20261113-224654`): briefs "ZAP PAST THE PACK" (Unity) and "SEND THE PACK
   SPINNING" (Roblox). Explainer, Premise Reel, two Ad Images and the Trailer ran side by side as the Campaign
   subtree. The trailer stopped for the missing track and the ad images for the quota, each with its reason. The
-  explainer draft ("What If One Sentence Built Your Kart Racer?", 60 words) and the premise draft ("Your Kart
+  explainer draft (rewritten about the game: "What If Your Kart Race Had Punching?", 59 words) and the premise draft ("Your Kart
   Gets FASTER When You Brake for Someone...", 112 words, opening "In this world,") wait at their gates.
 - **HUD switch verified in the open editor:** the template is synced and compiles with 0 errors. `play_capture`
   with `hud: false` has no HUD, and the HUD is back on the next capture. The trailer cell now syncs the

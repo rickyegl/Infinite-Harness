@@ -17,6 +17,8 @@ import { MARKER, tableLines, type Entry } from "../../../modules/publish/run.ts"
 import { cacheKey, presetOf } from "../../../modules/voice/run.ts";
 import { briefsOf } from "../../../modules/campaign/run.ts";
 import { opensRight } from "../../../modules/reel.premise/run.ts";
+import { gameFacts, gameLook } from "../../../modules/reel.explainer/run.ts";
+import { DEFAULT } from "../../../modules/game/lib/design.ts";
 import { VERTICAL, WIDE, dropOf, headPy, parseBeats, planEdit } from "../../../modules/reel.trailer/edit.ts";
 
 const tmp = mkdtempSync(join(tmpdir(), "reels-"));
@@ -197,5 +199,19 @@ describe("premise and campaign", () => {
     expect(b[1]).toMatchObject({ who: "Roblox players", headline: "RACE. FIGHT.", cta: "Play free" });
     expect(b[0].headline.length).toBeGreaterThan(0);
     expect(briefsOf("nonsense", ["roblox"], "X")[0].cta).toBe("PLAY NOW");
+  });
+
+  it("explains the Unity game from its design, never the harness", () => {
+    const facts = gameFacts(DEFAULT, { project: "p", node: "game.unity", metres: 1199, build: { target: "windows", dir: "d", seconds: 1, flags: "f" } });
+    const all = facts.join(" | ");
+    expect(facts[0]).toBe('"Brawl Karts" is a kart racing game made in Unity that you play on PC.');
+    expect(all).toContain("about 1200 metres a lap with one loop, one twist, glowing hover sections, a 14 metre drop");
+    expect(all).toContain("A race is two laps.");
+    expect(all).toContain("the other five are computer riders");
+    for (const c of ["Volt", "Sniper", "Shrink", "Thrower"]) expect(all).toContain(c);
+    expect(all).toContain(DEFAULT.win);
+    expect(all.toLowerCase()).not.toMatch(/harness|sentence|generat/);
+    expect(gameFacts(DEFAULT, { project: "p", node: "n", build: { target: "webgl", dir: "d", seconds: 1, flags: "f" } })[0]).toContain("in the browser");
+    expect(gameLook(DEFAULT)).toContain("Blaze");
   });
 });

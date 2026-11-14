@@ -6,6 +6,11 @@ nothing else. Do not run commands and do not fetch anything. A reference composi
 shipped is at `{{REFERENCE}}`: read it for the structure and the scene kit, but make your own scenes (and never
 show a star count).
 
+The Short explains a kart racing game to players. Draw the game in its own colours: karts, riders, the track's
+loops and twists, the classes' attacks. The game's look:
+
+{{GAME}}
+
 ## The recipe (the studio's route A)
 
 - One `<section class="clip">` per shot, a cut every ~2.7 s (1.8-3.3 s), each starting on a word time from the
