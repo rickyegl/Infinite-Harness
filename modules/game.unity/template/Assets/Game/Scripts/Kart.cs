@@ -1,6 +1,7 @@
 // One kart and its rider. Arcade physics in track space: speed along the line, a sideways offset with its own
 // velocity, a pull to the outside in corners, wall bounces, spin-outs. RaceManager steps every kart.
 
+using System.Linq;
 using UnityEngine;
 
 namespace HarnessGame
@@ -35,6 +36,10 @@ namespace HarnessGame
 
         // driver personality (AI)
         public float skill = 0.9f, lineBias, lineWobble;
+        public float aim;           // the AI's chosen line across the road, eased so a new line never snaps the kart
+        // the heading and lean shown, eased: the raw ones follow the sideways speed, which jumps on every bump,
+        // wall and change of line, and made the karts twitch left and right
+        float yawShown, yawV, leanShown, leanV;
 
         public Rider rider;
         public Transform body, visual;
@@ -44,6 +49,8 @@ namespace HarnessGame
         public Light[] headlights = new Light[0];
         // hover sections: wheels fold flat, a glow pad lights up underneath
         public float hoverAmt;
+        TrailRenderer[] trails = new TrailRenderer[0];
+        Transform stars;   // spin over the rider while stunned
         Transform[] tyres = new Transform[0];
         GameObject[] hubs = new GameObject[0];
         Transform pad;
@@ -121,6 +128,17 @@ namespace HarnessGame
             k.aura = Prim.Make(PrimitiveType.Sphere, k.visual, new Vector3(0, 0.9f, 0), new Vector3(2.4f, 1.6f, 3.4f), kit.Ghost(gear), "Aura").transform;
             k.aura.gameObject.SetActive(false);
             k.flashRenderers = k.body.GetComponentsInChildren<Renderer>();
+            // trails from the back corners while dashing or small, and stars that circle a stunned rider
+            k.trails = new[] { -0.6f, 0.6f }.Select(x => Effects.Trail(kit, k.visual, new Vector3(x, 0.45f, -1.3f), gear, 0.5f, 0.35f)).ToArray();
+            foreach (var t in k.trails) t.emitting = false;
+            k.stars = Prim.Node("Stars", k.visual, new Vector3(0, 2.3f, 0));
+            for (int s = 0; s < 4; s++)
+            {
+                float a = s * Mathf.PI * 0.5f;
+                Prim.Make(PrimitiveType.Sphere, k.stars, new Vector3(Mathf.Cos(a) * 0.7f, 0, Mathf.Sin(a) * 0.7f), Vector3.one * 0.26f, kit.Glow(Effects.Hot, 2f), "Star")
+                    .GetComponent<Renderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            }
+            k.stars.gameObject.SetActive(false);
             return k;
         }
 
@@ -128,7 +146,16 @@ namespace HarnessGame
         {
             float bob = stun > 0 ? Mathf.Abs(Mathf.Sin(stun * 12f)) * 0.25f : 0f;
             float lean = Mathf.Clamp(-latVel * 1.6f, -12f, 12f);
-            var pose = path.PoseAt(dist, lateral, Mathf.Clamp(latVel / Mathf.Max(4f, speed) * 40f, -25f, 25f));
+            float yaw = Mathf.Clamp(latVel / Mathf.Max(4f, speed) * 40f, -25f, 25f);
+            float dt = Application.isPlaying ? Time.deltaTime : 0f;
+            if (dt > 0 && stun <= 0)
+            {
+                yawShown = Mathf.SmoothDamp(yawShown, yaw, ref yawV, 0.2f, Mathf.Infinity, dt);
+                leanShown = Mathf.SmoothDamp(leanShown, lean, ref leanV, 0.18f, Mathf.Infinity, dt);
+            }
+            else { yawShown = yaw; leanShown = lean; yawV = leanV = 0; }
+            lean = leanShown;
+            var pose = path.PoseAt(dist, lateral, yawShown);
             float want = path.Hover(dist);
             hoverAmt = Application.isPlaying ? Mathf.MoveTowards(hoverAmt, want, Time.deltaTime * 4f) : want;
             var up = pose.rotation * Vector3.up;
@@ -139,6 +166,12 @@ namespace HarnessGame
                 visual.localRotation = Quaternion.Euler(0, spinAngle, lean);
                 visual.localScale = Vector3.one * size;
             }
+            if (stars)
+            {
+                stars.gameObject.SetActive(stun > 0.05f);
+                if (stun > 0.05f) stars.localRotation = Quaternion.Euler(0, Time.time * 400f, 0);
+            }
+            foreach (var t in trails) if (t) t.emitting = Application.isPlaying && (dash > 0 || small > 0);
             if (aura)
             {
                 bool on = dash > 0 || small > 0;

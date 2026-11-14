@@ -145,10 +145,21 @@ remove the line when it is answered. See `AGENTS.md` rule 5.
 ## The reels (plan 05)
 
 - **Modules:**
-  - `reel.trailer`: the studio's trailer recipe on the run's own game. It records 3 HUD-free clips at
-    1920x1080 through `play_capture` (`hud: false` is new in the Unity bridge and `Capture.cs`). `beats.py`
-    finds the beat grid, `edit.ts` plans the cut, then `head.py` plus the studio's `render_tail.py` render a
-    9:16 cut and a 16:9 cut.
+  - `reel.trailer`: the studio's trailer recipe on the run's own game. It records 3 HUD-free 24 s clips at
+    1920x1080 through `play_capture` with `director: true`: a capture-only camera operator (`Director.cs`) cuts
+    every 3 to 4 s between 9 angles (front, chase, bumper, top, side, quarter, low kerb, high, orbit; the angle
+    used longest ago) onto the fight most likely to happen next, by the riders' own attack rules, and holds the
+    shot until the attack lands. `events.json` logs each cut, hit and attack and whether it was on screen;
+    `edit.ts` keeps each shot inside one angle and places it on the fights (a hit counts more than an attack).
+    The footage is recorded again when its key (capture settings plus the game's scripts) changes. `beats.py`
+    finds the beat grid, then `head.py` plus the studio's `render_tail.py` render a 9:16 cut and a 16:9 cut.
+  - Trailer re-cuts (2026-11-14, author's notes: camera shake, more fighting, not only behind shots, karts
+    shaking left and right): every camera is held in track space (the game's chase camera too; its jitter went
+    from 2.67 to 0.23 px a frame). The karts' heading and lean are eased (about 0.2 s) and the AI eases into a
+    new line, so a bump or a pass no longer snaps them sideways (heading jerk 3.08 to 0.16 degrees a frame in a
+    test capture). Hit effects got streaks, a flash and a ring; pink and violet effect colours are moved off
+    pink. Last cut (`trailer-3`): 15 hits and 17 attacks on screen across 3 clips, contact sheet looked at, sent
+    to the author.
   - `reel.explainer`: explains the run's Unity game to players (premise, track, fight, classes, how to win,
     where to play) from facts read from its design (`gameFacts`); never how it was made (author, 2026-11-14).
     Script, gate, the `explainer` voice, a HyperFrames picture in the game's colours, then the studio's sound,
@@ -231,7 +242,7 @@ remove the line when it is answered. See `AGENTS.md` rule 5.
 - **Fixtures:** recorded from run `20261113-224654` for `reel.trailer`, `reel.explainer`, `reel.premise`,
   `ad.image`, `approve` and `campaign` (the campaign fixture carries its whole subtree). Media shrunk for the
   repo (videos 360 px, narration 16 kHz mono, ad pictures at half size); local paths replaced by `<studio>`.
-  `reel.premise` re-recorded from `premise-night-2` (the recast night reel, its stills and the before/after). The fixture
+  `reel.trailer` re-recorded from `trailer-3` (the director cut). `reel.premise` re-recorded from `premise-night-2` (the recast night reel, its stills and the before/after). The fixture
   recorder now gives run files that share a base name (`stills/still-01.jpg`, `day/still-01.jpg`) their own
   fixture files; before, the before/after pointed both sides at one picture (tested).
   `HARNESS_MOCK=1` replays the whole campaign from them (16 s at speed 20). Worker steps for the CLI's own
@@ -569,7 +580,7 @@ before falling back to the fixture (checked: the full film has 20, one per take,
 | 02 | done | typecheck, unit tests (none skipped), `pnpm dev`, real runs on both workers, no-network probes, proxy routing with both models, prompt.md module run, test:bridge, test:live, determinism, film:rough, lint:brand | See "The bridge". |
 | 03 | done, two fallbacks | full run 20261113-014545, four follow-ups under 5 s, fixtures, typecheck, tests, test:bridge, test:live, determinism, film:rough, lint:brand | Windows build until WebGL is installed; Roblox place not opened in Studio. See "The games". |
 | 04 | done, video on mock | runs 20261113-222539 (house chain), 20261113-223714 (song), 20261113-223729 (voice), 20261113-224654 (full game with real assets), fixtures, mock replay, tests, test:bridge, typecheck, lint:brand, forge stopped (`colab ls`: no sessions) | Video waits for its runtime; `assets.image` with `transparent` not run live; image quota out at the end. See "The assets". |
-| 05 | done | premise picture day and night, the night re-render live through the cell (`premise-night`: Studio take, assembly, before/after), the recast (`premise-day`, `premise-night-2` recorded; `premise-night-3` reused the take), contact sheets looked at, `reel.premise` fixture re-recorded, typecheck, tests (protocol 13, web 7, bridge 59, reels 21 of them), lint:brand; earlier: tests (bridge 56, reels 18), campaign replayed from its fixture in mock mode, router re-record, test:bridge, test:live, determinism 96/96, film:rough (140.6 s, every cut on a beat), lint:brand, motion run + fixture, campaign live run end to end (trailer, explainer, premise narration, ads, publish dry run), fixtures for every reel module, HUD capture in Unity | Nothing published. See "The reels". |
+| 05 | done | trailer re-cut with the camera director (`trailer`, `trailer-2`, `trailer-3`: steady cameras, 9 angles, fights on screen, karts no longer twitch), test captures measured, contact sheets looked at, `reel.trailer` fixture re-recorded, typecheck, tests (protocol 13, web 7, bridge 63, reels 25 of them), lint:brand; premise picture day and night, the night re-render live through the cell (`premise-night`: Studio take, assembly, before/after), the recast (`premise-day`, `premise-night-2` recorded; `premise-night-3` reused the take), contact sheets looked at, `reel.premise` fixture re-recorded, typecheck, tests (protocol 13, web 7, bridge 59, reels 21 of them), lint:brand; earlier: tests (bridge 56, reels 18), campaign replayed from its fixture in mock mode, router re-record, test:bridge, test:live, determinism 96/96, film:rough (140.6 s, every cut on a beat), lint:brand, motion run + fixture, campaign live run end to end (trailer, explainer, premise narration, ads, publish dry run), fixtures for every reel module, HUD capture in Unity | Nothing published. See "The reels". |
 | 06 | not started | | |
 | 07 | not started | | |
 | 08 | not started | | |

@@ -7,7 +7,12 @@
 export type Bar = { t: number; e: number };
 export type Beats = { beat: number; phase: number; double: { beat: number; phase: number }; bars: Bar[] };
 export type Role = "start" | "loop" | "twist";
-export type Clip = { key: string; role: Role; seconds: number };
+/**
+ * A gameplay recording. A director capture also logs `cuts` (the times its camera changes angle, in seconds) and
+ * `hits`: the fights on screen (time, where across the frame, 0-1, and a weight `w`: 1 for a landed hit, less for
+ * an attack that shows but may miss); the edit then keeps each shot inside one angle and puts the fights in it.
+ */
+export type Clip = { key: string; role: Role; seconds: number; cuts?: number[]; hits?: { t: number; x: number; w?: number }[] };
 export type Shot = { t0: number; t1: number; src: string; ss: number; sp?: number; cx?: number; cy?: number; z?: number; z2?: number; fl?: number; pu?: number; dim?: number };
 export type Text = { t0: number; t1: number; lines: string[]; y: number; size: number; color: "white" | "yellow" | "red" };
 export type Edit = {
@@ -86,9 +91,11 @@ export function planEdit(b: Beats, songSeconds: number, dur: number, clips: Clip
   else segs[0][1] = r3(Math.min(songSeconds, s0 + dur)); // no room for the reprise: let the song run on
   const xf = segs.map((_, i) => (i ? 0.06 : 0));
 
-  // gameplay sources: a cursor per clip so no stretch is used twice until a clip wraps
+  // gameplay sources: a director clip is cut by its log (pickWindow); a plain clip by a cursor, so no stretch is
+  // used twice until the clip wraps
   const byRole = (r: Role) => clips.find((x) => x.role === r) ?? clips[0];
   const cursor = new Map(clips.map((x) => [x.key, 0.6]));
+  const used = new Map<string, [number, number][]>(clips.map((x) => [x.key, []]));
   const take = (clip: Clip, len: number, at?: number): number => {
     const need = len + 0.3;
     let ss = at ?? cursor.get(clip.key)!;
@@ -100,6 +107,12 @@ export function planEdit(b: Beats, songSeconds: number, dur: number, clips: Clip
   const add = (n0: number, n1: number, clip: Clip, o: Omit<Shot, "t0" | "t1" | "src" | "ss"> = {}, at?: number) => {
     const t0 = cut(n0);
     const t1 = n1 === Infinity ? dur : cut(n1);
+    if (clip.cuts?.length) {
+      const w = pickWindow(clip, t1 - t0, o.sp ?? 1, used.get(clip.key)!);
+      used.get(clip.key)!.push([w.ss, w.ss + (t1 - t0) * w.sp]);
+      shots.push({ t0, t1, src: clip.key, ss: w.ss, ...o, ...(w.sp !== (o.sp ?? 1) ? { sp: w.sp } : {}), ...(w.cx !== undefined && o.cx === undefined ? { cx: w.cx } : {}) });
+      return;
+    }
     shots.push({ t0, t1, src: clip.key, ss: take(clip, (t1 - t0) * (o.sp ?? 1), at), ...o });
   };
   const start = byRole("start");
@@ -157,6 +170,50 @@ export function planEdit(b: Beats, songSeconds: number, dur: number, clips: Clip
     energy.push(Math.round(bar.e * 100) / 100);
   }
   return { dur, beat: B, segs, xf, drop: DROP, hit: HIT, shots, texts, cuts: shots.map((s) => s.t0), energy };
+}
+
+/** the camera angles of a director clip, as [start, end] seconds, a frame in from each cut */
+export function segmentsOf(clip: Clip): [number, number][] {
+  const edge = [0, ...(clip.cuts ?? []).filter((c) => c > 0.05 && c < clip.seconds - 0.05), clip.seconds];
+  const segs: [number, number][] = [];
+  for (let i = 0; i + 1 < edge.length; i++) segs.push([r3(edge[i] + (i ? 0.04 : 0)), r3(edge[i + 1] - 0.04)]);
+  return segs;
+}
+
+/**
+ * Where to take a shot of `len` trailer seconds (played at speed `sp`) from a director clip: inside one camera
+ * angle, with as much fighting on screen as fits (hits by their weight, the first about a third of the way in), avoiding stretches already
+ * used. When no angle is long enough the shot is slowed to fit the longest (not below 0.35x). cx centres the
+ * crop on the hits (the vertical cut keeps the middle of the frame).
+ */
+export function pickWindow(clip: Clip, len: number, sp: number, used: [number, number][]): { ss: number; sp: number; cx?: number } {
+  const segs = segmentsOf(clip);
+  const hits = clip.hits ?? [];
+  let speed = sp;
+  let fit = segs.filter(([a, b]) => b - a >= len * speed);
+  if (!fit.length) {
+    const [a, b] = segs.reduce((m, s) => (s[1] - s[0] > m[1] - m[0] ? s : m), segs[0]);
+    speed = Math.max(0.35, Math.min(sp, (b - a) / len));
+    fit = segs.filter(([x, y]) => y - x >= len * speed - 1e-6);
+    if (!fit.length) fit = [[a, b]];
+  }
+  const span = len * speed;
+  let best = { ss: fit[0][0], score: -Infinity, n: 0, xs: [] as number[] };
+  for (const [a, b] of fit) {
+    const hi = Math.max(a, b - span);
+    const starts = [a, hi, ...hits.filter((h) => h.t >= a && h.t <= b).map((h) => h.t - span * 0.33)];
+    for (const s0 of starts) {
+      const ss = Math.min(hi, Math.max(a, s0));
+      const inside = hits.filter((h) => h.t >= ss + 0.05 && h.t <= ss + span - 0.05);
+      const overlap = used.reduce((o, [u0, u1]) => o + Math.max(0, Math.min(u1, ss + span) - Math.max(u0, ss)), 0) / Math.max(0.1, span);
+      const score = Math.min(inside.reduce((n, h) => n + (h.w ?? 1), 0), 3) - overlap * 3 + (ss >= 0.5 ? 0.1 : 0);
+      if (score > best.score + 1e-9) best = { ss, score, n: inside.length, xs: inside.map((h) => h.x) };
+    }
+  }
+  // rounded down: rounding up can push a window that ends on the cut past it
+  const out: { ss: number; sp: number; cx?: number } = { ss: Math.floor(best.ss * 1000 + 1e-6) / 1000, sp: speed };
+  if (best.xs.length) out.cx = r3(Math.min(0.68, Math.max(0.32, 0.5 + (best.xs.reduce((a, x) => a + x, 0) / best.xs.length - 0.5) * 0.7)));
+  return out;
 }
 
 const COLORS: Record<Text["color"], string> = { white: "(255, 255, 255)", yellow: "(255, 222, 60)", red: "(255, 90, 90)" };

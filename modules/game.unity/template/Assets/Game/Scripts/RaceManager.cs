@@ -24,6 +24,7 @@ namespace HarnessGame
         public readonly List<string> feed = new List<string>();
         public float feedAge;
         public System.Action<Kart, Kart> onHit;
+        public System.Action<Kart> onAttack;   // a rider used its attack (it may miss)
         public Abilities abilities;
 
         public static RaceManager Main { get; private set; }
@@ -40,7 +41,7 @@ namespace HarnessGame
                 int row = i / 2, col = i % 2;
                 k.dist = -6f - row * 5.5f;
                 k.lateral = (col == 0 ? -1 : 1) * path.HalfWidth * 0.4f;
-                k.speed = 0; k.latVel = 0; k.stun = 0; k.finishTime = -1;
+                k.speed = 0; k.latVel = 0; k.stun = 0; k.finishTime = -1; k.aim = k.lateral;
                 k.cooldown = 0; k.dash = 0; k.small = 0; k.size = 1f; k.bumpedBy = null;
                 var rnd = new System.Random(cfg.track.seed * 97 + i * 13);
                 k.skill = 0.86f + (float)rnd.NextDouble() * 0.12f;
@@ -133,7 +134,9 @@ namespace HarnessGame
                     if (ds > 0 && ds < 9f && Mathf.Abs(o.lateral - k.lateral) < 2.2f && o.speed < k.speed)
                         target = o.lateral + (o.lateral > 0 ? -3f : 3f);
                 }
-                k.steer = Mathf.Clamp((target - k.lateral) * 0.35f - k.latVel * 0.25f, -1, 1);
+                // ease towards the new line (a pass, a corner) instead of jumping to it
+                k.aim = Mathf.MoveTowards(k.aim, target, Time.deltaTime * 5f);
+                k.steer = Mathf.Clamp((k.aim - k.lateral) * 0.35f - k.latVel * 0.25f, -1, 1);
                 float cornerCap = cfg.karts.topSpeed * Mathf.Lerp(1f, 0.62f, Mathf.Clamp01(Mathf.Abs(curve) * 60f));
                 k.throttle = k.speed < cornerCap * k.skill ? 1f : 0.2f;
                 if (done) k.throttle = k.speed > 8f ? 0f : 0.4f;

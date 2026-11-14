@@ -99,14 +99,14 @@ namespace HarnessGame
                 {
                     // an AI volt steers into whoever it is dashing at
                     var t = Ahead(k, 0f, 20f, 4f);
-                    if (t != null) k.steer = Mathf.Clamp((t.lateral - k.lateral) * 0.6f, -1f, 1f);
+                    if (t != null) k.steer = Mathf.Clamp((t.lateral - k.lateral) * 0.6f - k.latVel * 0.25f, -1f, 1f);
                     k.throttle = 1f;
                 }
                 else if (!Human(k))
                 {
                     // a shrunken kart just ahead is fair game: AI riders try to touch it
                     var t = Ahead(k, 0f, 14f, 5f);
-                    if (t != null && t.small > 0) k.steer = Mathf.Clamp((t.lateral - k.lateral) * 0.5f, -1f, 1f);
+                    if (t != null && t.small > 0) k.steer = Mathf.Clamp((t.lateral - k.lateral) * 0.5f - k.latVel * 0.25f, -1f, 1f);
                 }
                 if (k.cooldown > 0) continue;
                 switch (k.kind)
@@ -136,6 +136,7 @@ namespace HarnessGame
         {
             k.cooldown = k.cls != null ? k.cls.cooldown : 3f;
             Count(uses, k.kind);
+            race.onAttack?.Invoke(k);
         }
 
         public void Dash(Kart k)
@@ -159,6 +160,9 @@ namespace HarnessGame
             if (k.rider) k.rider.Swing(1f);
             var vis = Prim.Make(PrimitiveType.Sphere, null, Vector3.zero, Vector3.one * 0.55f, race.kit.Lit(ColorOf(k), 0.6f), "Item").transform;
             Prim.Make(PrimitiveType.Cube, vis, Vector3.zero, new Vector3(1.25f, 0.25f, 0.25f), race.kit.Glow(ColorOf(k), 2f), "Band");
+            var trail = Effects.Trail(race.kit, vis, Vector3.zero, ColorOf(k), 0.45f, 0.3f);
+            trail.transform.SetParent(null, true);   // the item spins; the trail follows its centre, not its tumble
+            vis.gameObject.AddComponent<Follow>().trail = trail.transform;
             items.Add(new Item { owner = k, dist = k.dist + 1.6f, lateral = k.lateral, speed = k.speed + ThrowSpeed, life = ThrowLife, vis = vis });
         }
 
@@ -295,6 +299,19 @@ namespace HarnessGame
             race.Feed($"{by.kartName} {verb} {target.kartName}!");
             race.onHit?.Invoke(by, target);
             if ((by.isPlayer || target.isPlayer) && ChaseCamera.Main) ChaseCamera.Main.Shake(kind == "sniper" ? 0.5f : 0.35f);
+        }
+    }
+
+    /// keeps a thrown item's trail on the item (not spinning with it) and lets it fade out after the item goes
+    public class Follow : MonoBehaviour
+    {
+        public Transform trail;
+        void LateUpdate() { if (trail) trail.position = transform.position; }
+        void OnDestroy()
+        {
+            if (!trail) return;
+            if (Application.isPlaying) Object.Destroy(trail.gameObject, 0.35f);
+            else Object.DestroyImmediate(trail.gameObject);
         }
     }
 

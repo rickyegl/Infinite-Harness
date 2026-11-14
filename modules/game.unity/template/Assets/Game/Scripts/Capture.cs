@@ -1,23 +1,39 @@
 // Records the game camera to numbered JPGs at a fixed frame rate (Time.captureFramerate), so a 10 s capture
 // is smooth however slow the machine renders. The editor bridge turns the frames into an mp4 with ffmpeg.
+// With director on, a Director moves the camera between angles, and events.json beside the frames logs each cut
+// (frame, angle, kart), each landed hit (frame, class, whether its target was on screen and where across it) and
+// each attack (the same, for the attacker: a dash, a shot or a throw shows even when it misses), so the trailer's
+// edit can keep a shot inside one angle and put the fights in.
 
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Text;
 using UnityEngine;
 
 namespace HarnessGame
 {
+    [DefaultExecutionOrder(1000)]   // after the cameras have moved
     public class Capture : MonoBehaviour
     {
         public string outDir;
         public int fps = 30, width = 1280, height = 720;
         public float seconds = 10f, warmup = 0.5f;
         public bool hud = true;         // false: hide every HUD canvas while recording
+        public bool director;           // true: a Director cuts between angles on the fights (trailers)
         public float startDist = -1f;   // when >= 0, wait until the player's kart is this far along the lap
         public int frame;
         public bool done;
+        public int hitCount;
         RenderTexture rt;
         Texture2D tex;
         float t;
+        Director dir;
+        RaceManager hooked;
+        int loggedShot = -1;
+        readonly List<(Kart by, Kart target)> pending = new List<(Kart, Kart)>();
+        readonly List<Kart> attacking = new List<Kart>();
+        readonly StringBuilder cuts = new StringBuilder(), hits = new StringBuilder(), attacks = new StringBuilder();
 
         void Start()
         {
@@ -27,15 +43,33 @@ namespace HarnessGame
             tex = new Texture2D(width, height, TextureFormat.RGB24, false);
         }
 
+        void OnHit(Kart by, Kart target) => pending.Add((by, target));
+        void OnAttack(Kart by) => attacking.Add(by);
+
         void LateUpdate()
         {
             if (done) return;
-            t += Time.deltaTime;
-            if (t < warmup) return;
             var race = RaceManager.Main;
-            if (startDist >= 0 && race && race.player && race.player.dist < startDist) return;
+            if (hooked != race) { Unhook(); if (race) { race.onHit += OnHit; race.onAttack += OnAttack; } hooked = race; }
             var cam = Camera.main;
-            if (!cam) return;
+            if (director && cam && !dir) { dir = cam.GetComponent<Director>(); if (!dir) dir = cam.gameObject.AddComponent<Director>(); }
+            t += Time.deltaTime;
+            bool rolling = t >= warmup && !(startDist >= 0 && race && race.player && race.player.dist < startDist) && cam;
+            if (!rolling) { pending.Clear(); attacking.Clear(); return; }
+            if (dir && dir.shot != loggedShot && dir.subject)
+            {
+                loggedShot = dir.shot;
+                cuts.Append(cuts.Length > 0 ? "," : "").Append("{\"f\":").Append(frame).Append(",\"rig\":\"").Append(dir.rig).Append("\",\"kart\":\"").Append(Esc(dir.subject.kartName)).Append("\"}");
+            }
+            foreach (var (by, target) in pending)
+            {
+                if (!by || !target) continue;
+                Log(hits, cam, by.kind, target);
+                hitCount++;
+            }
+            foreach (var by in attacking) if (by) Log(attacks, cam, by.kind, by);
+            pending.Clear();
+            attacking.Clear();
             if (!hud)
                 foreach (var c in Object.FindObjectsByType<Canvas>(FindObjectsSortMode.None))
                     if (c.enabled) c.enabled = false;
@@ -51,12 +85,30 @@ namespace HarnessGame
             {
                 done = true;
                 Time.captureFramerate = 0;
+                File.WriteAllText(Path.Combine(outDir, "events.json"), "{\"fps\":" + fps + ",\"frames\":" + frame + ",\"cuts\":[" + cuts + "],\"hits\":[" + hits + "],\"attacks\":[" + attacks + "]}");
                 File.WriteAllText(Path.Combine(outDir, "done.json"), "{\"frames\":" + frame + ",\"fps\":" + fps + "}");
             }
         }
 
+        /// one fight event: the frame, the class, and whether the kart was on screen and where across it
+        void Log(StringBuilder sb, Camera cam, string kind, Kart k)
+        {
+            var v = cam.WorldToViewportPoint(k.transform.position + k.transform.up * 0.8f);
+            bool seen = v.z > 0 && v.x > 0.04f && v.x < 0.96f && v.y > 0.04f && v.y < 0.96f;
+            sb.Append(sb.Length > 0 ? "," : "").Append("{\"f\":").Append(frame).Append(",\"kind\":\"").Append(kind)
+                .Append("\",\"seen\":").Append(seen ? "true" : "false").Append(",\"x\":").Append(Mathf.Clamp01(v.x).ToString("0.###", CultureInfo.InvariantCulture)).Append('}');
+        }
+
+        void Unhook()
+        {
+            if (hooked) { hooked.onHit -= OnHit; hooked.onAttack -= OnAttack; }
+        }
+
+        static string Esc(string s) => (s ?? "").Replace("\\", "").Replace("\"", "");
+
         void OnDestroy()
         {
+            Unhook();
             Time.captureFramerate = 0;
             if (rt) rt.Release();
         }

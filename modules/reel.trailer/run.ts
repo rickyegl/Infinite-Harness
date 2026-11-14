@@ -1,5 +1,6 @@
 // Trailer: the studio's launch-trailer recipe (trailers/HOW_TO.md) on the run's own game. It records fresh
-// gameplay from the Unity game (start, loop and twist clips at 1920x1080), finds the track's beat grid with the
+// gameplay from the Unity game (start, loop and twist clips at 1920x1080, each 24 s of a camera director cutting
+// between angles on the fights, with a log of its cuts and the hits on screen), finds the track's beat grid with the
 // studio's beats.py, plans the edit (edit.ts: splices on beats, accelerating cuts, the drop and the logo hit),
 // writes one head.py per aspect and renders each with the studio's own render_tail.py: a 9:16 cut and a 16:9 cut
 // of about 30 s, music only, -14 LUFS. Everything lands in the studio project trailers/projects/<Name>.
@@ -11,15 +12,46 @@
 // ("vertical", "wide"; default both).
 
 import type { ModuleContext, ModuleInput, ModuleOutput } from "@harness/protocol";
-import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { basename, join } from "node:path";
 import { DEFAULT } from "../game/lib/design.ts";
 import { readState } from "../game/lib/state.ts";
 import { unityFor } from "../game.unity/lib/parts.ts";
+import { TEMPLATE } from "../game.unity/lib/unity.ts";
 import { REPO, beatGrid, duration, ensureProject, ff, peaksOf, projectName, python, runDirOf, stills, storyboard, studioRoot, studioTool, uriOf, videoSize, waveform, ffEnv, why } from "../_shared/studio.ts";
 import { type Clip, type Frame, type Role, VERTICAL, WIDE, headPy, parseBeats, planEdit } from "./edit.ts";
 
 const EXT = ["wav", "mp3", "flac", "m4a", "ogg"];
+
+/** each gameplay clip: seconds of a director capture (camera angles cut on the fights) at 1920x1080, no HUD */
+export const CAPTURE = { seconds: 24, fps: 30, width: 1920, height: 1080, warmup: 3, hud: false, director: true } as const;
+
+/**
+ * what recorded footage depends on: the capture spec and the game's own scripts (camera, director, effects,
+ * karts). Footage with another key is recorded again, so a code change never reuses old clips.
+ */
+export function footageKey(spec: object = CAPTURE, scripts = join(TEMPLATE, "Assets", "Game", "Scripts")): string {
+  const h = createHash("sha1").update(JSON.stringify(spec));
+  for (const f of readdirSync(scripts).filter((f) => f.endsWith(".cs")).sort()) h.update(`\0${f}\0`).update(readFileSync(join(scripts, f)));
+  return h.digest("hex");
+}
+
+type Fight = { t: number; x: number; kind: string; seen: boolean };
+type Log = { key: string; cuts: number[]; hits: Fight[]; attacks?: Fight[] };
+type Event = { f: number; kind: string; seen: boolean; x: number };
+
+/** a capture's events.json (frames) as seconds */
+export function logOf(events: { fps: number; cuts: { f: number }[]; hits: Event[]; attacks?: Event[] }, key: string): Log {
+  const s = (f: number) => Math.round((f / events.fps) * 1000) / 1000;
+  const fight = (h: Event): Fight => ({ t: s(h.f), x: h.x, kind: h.kind, seen: h.seen });
+  return { key, cuts: events.cuts.map((c) => s(c.f)).filter((t) => t > 0), hits: events.hits.map(fight), attacks: (events.attacks ?? []).map(fight) };
+}
+
+/** what the edit scores in a clip: each hit on screen, and each attack on screen at a lower weight (it can miss) */
+export function fightsOf(log: Log): { t: number; x: number; w: number }[] {
+  return [...log.hits.filter((h) => h.seen).map((h) => ({ t: h.t, x: h.x, w: 1 })), ...(log.attacks ?? []).filter((a) => a.seen).map((a) => ({ t: a.t, x: a.x, w: 0.4 }))].sort((a, b) => a.t - b.t);
+}
 
 /** the author's trailer track */
 export function trackOf(p: Record<string, unknown>): string | null {
@@ -83,19 +115,30 @@ export default async function run(ctx: ModuleContext, input: ModuleInput): Promi
       ...(design.track.twists ? [{ key: "C", role: "twist" as Role, from: "twist", what: "the twist" }] : design.track.drop > 5 ? [{ key: "C", role: "twist" as Role, from: "drop", what: "the drop" }] : []),
     ];
     const shown: string[] = [];
+    const key = footageKey();
+    let onScreen = 0, attacksOnScreen = 0;
     for (const c of plan) {
       const mp4 = join(proj, "footage", `${c.key}.mp4`);
-      if (!existsSync(mp4)) {
-        ctx.step(`Recording ${c.what}`, "12 s of the chase camera at 1920x1080 on autopilot, no HUD", "record");
+      const logFile = join(proj, "footage", `${c.key}.json`);
+      const old = existsSync(logFile) ? (JSON.parse(readFileSync(logFile, "utf8")) as Log) : null;
+      if (!existsSync(mp4) || old?.key !== key) {
+        ctx.step(`Recording ${c.what}`, `${CAPTURE.seconds} s on autopilot at ${CAPTURE.width}x${CAPTURE.height}, no HUD, the camera cutting between angles on the fights`, "record");
         const cap = join(proj, "footage", `${c.key}_frames`);
-        await u.op("play_capture", { outDir: cap, seconds: 12, fps: 30, width: 1920, height: 1080, warmup: 3, from: c.from, hud: false }, 12 * 60_000);
-        await ff(ctx, ["-y", "-v", "error", "-framerate", "30", "-i", join(cap, "frame_%05d.jpg"), "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "16", "-movflags", "+faststart", mp4], 5 * 60_000, "encoding the capture");
+        await u.op("play_capture", { outDir: cap, ...CAPTURE, from: c.from, timeout: 900 }, 15 * 60_000);
+        const events = join(cap, "events.json");
+        if (!existsSync(events)) throw new Error("the capture wrote no events.json (the Unity project has an older Capture.cs)");
+        writeFileSync(logFile, JSON.stringify(logOf(JSON.parse(readFileSync(events, "utf8")), key), null, 1));
+        await ff(ctx, ["-y", "-v", "error", "-framerate", String(CAPTURE.fps), "-i", join(cap, "frame_%05d.jpg"), "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "16", "-movflags", "+faststart", mp4], 5 * 60_000, "encoding the capture");
         rmSync(cap, { recursive: true, force: true });
       }
-      clips.push({ key: c.key, role: c.role, seconds: await duration(ctx, mp4) });
+      const log = JSON.parse(readFileSync(logFile, "utf8")) as Log;
+      onScreen += log.hits.filter((h) => h.seen).length;
+      attacksOnScreen += (log.attacks ?? []).filter((a) => a.seen).length;
+      clips.push({ key: c.key, role: c.role, seconds: await duration(ctx, mp4), cuts: log.cuts, hits: fightsOf(log) });
       src[c.key] = mp4;
-      shown.push(...(await stills(ctx, mp4, join(ctx.dir, "footage"), [2, 6, 10].map((t) => t + plan.indexOf(c) * 0.01), 480)));
+      shown.push(...(await stills(ctx, mp4, join(ctx.dir, "footage"), [4, 12, 20].map((t) => t + plan.indexOf(c) * 0.01), 480)));
     }
+    ctx.step("Fights on camera", `${onScreen} hits and ${attacksOnScreen} attacks on screen across ${plan.length} clips; each shot stays inside one camera angle and is placed on the fights`, "spark");
     if (shown.length) await storyboard(ctx, shown, `Gameplay: ${plan.map((c) => c.what).join(", ")}`, 2);
   }
   for (const c of clips) size[c.key] = await videoSize(ctx, src[c.key]);

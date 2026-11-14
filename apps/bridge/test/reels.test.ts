@@ -20,7 +20,8 @@ import { lightingOf, opensRight, takeKey } from "../../../modules/reel.premise/r
 import { gameFacts, gameLook } from "../../../modules/reel.explainer/run.ts";
 import { gameLook as adLook, headlineOf } from "../../../modules/ad.image/run.ts";
 import { DEFAULT } from "../../../modules/game/lib/design.ts";
-import { VERTICAL, WIDE, dropOf, headPy, parseBeats, planEdit } from "../../../modules/reel.trailer/edit.ts";
+import { VERTICAL, WIDE, dropOf, headPy, parseBeats, pickWindow, planEdit, segmentsOf } from "../../../modules/reel.trailer/edit.ts";
+import { CAPTURE, fightsOf, footageKey, logOf } from "../../../modules/reel.trailer/run.ts";
 
 const tmp = mkdtempSync(join(tmpdir(), "reels-"));
 afterAll(() => rmSync(tmp, { recursive: true, force: true }));
@@ -198,6 +199,54 @@ describe("trailer edit", () => {
     expect(lines[0]).toMatch(/^\d+ RIDERS$/);
     expect(lines.join(" ")).not.toMatch(/PROMPT|BUILT|GENERAT/);
     for (const t of e.texts) expect(t.t0 >= 0 && t.t1 <= 30 && t.t1 > t.t0).toBe(true);
+  });
+
+  it("keeps each shot of a director clip inside one camera angle, on a hit", () => {
+    const cuts = [3, 6.2, 9.5, 12.8, 16, 19.1, 21.4];
+    const dirClips = clips.map((c, i) => ({ ...c, seconds: 24, cuts, hits: [{ t: 1.5 + i, x: 0.8 }, { t: 7.4 + i, x: 0.3 }, { t: 14 + i, x: 0.5 }, { t: 20, x: 0.62 }] }));
+    const e = planEdit(parseBeats(out), 75, 30, dirClips, words);
+    const segs = segmentsOf(dirClips[0]);
+    expect(segs[0]).toEqual([0, 2.96]);
+    expect(segs.at(-1)).toEqual([21.44, 23.96]);
+    let onHit = 0;
+    for (const s of e.shots) {
+      const clip = dirClips.find((c) => c.key === s.src)!;
+      const a = s.ss, z = s.ss + (s.t1 - s.t0) * (s.sp ?? 1);
+      expect(segmentsOf(clip).some(([x, y]) => a >= x - 1e-6 && z <= y + 1e-6)).toBe(true);
+      if (clip.hits.some((h) => h.t > a && h.t < z)) onHit++;
+      if (s.cx !== undefined) expect(s.cx >= 0.32 && s.cx <= 0.68).toBe(true);
+    }
+    expect(onHit).toBeGreaterThan(e.shots.length / 3);
+  });
+
+  it("prefers a landed hit to an attack that may miss", () => {
+    const clip = { key: "A", role: "start" as const, seconds: 12, cuts: [4, 8], hits: [{ t: 2, x: 0.5, w: 0.4 }, { t: 6, x: 0.5, w: 1 }] };
+    const w = pickWindow(clip, 1.5, 1, []);
+    expect(w.ss).toBeGreaterThan(4);
+    expect(w.ss + 1.5).toBeLessThan(8);
+  });
+
+  it("picks windows round hits, avoids reuse, slows a shot too long for any angle", () => {
+    const clip = { key: "A", role: "start" as const, seconds: 12, cuts: [4, 8], hits: [{ t: 5, x: 0.9 }] };
+    const w = pickWindow(clip, 1, 1, []);
+    expect(w.ss).toBeLessThan(5);
+    expect(w.ss + 1).toBeGreaterThan(5);
+    expect(w.cx).toBeCloseTo(0.68);
+    const again = pickWindow(clip, 1, 1, [[w.ss, w.ss + 1]]);
+    expect(again.ss + 1 <= w.ss || again.ss >= w.ss + 1).toBe(true);
+    const long = pickWindow(clip, 5, 1, []);
+    expect(long.sp).toBeCloseTo(3.96 / 5, 3);   // the longest angle, 0-3.96 s
+    expect(long.ss + 5 * long.sp).toBeLessThanOrEqual(12);
+  });
+
+  it("logs a capture in seconds and keys footage on the spec and the game's scripts", () => {
+    const log = logOf({ fps: 30, cuts: [{ f: 0 }, { f: 90 }], hits: [{ f: 45, kind: "volt", seen: true, x: 0.4 }, { f: 60, kind: "sniper", seen: false, x: 0 }] }, "k");
+    expect(log).toEqual({ key: "k", cuts: [3], hits: [{ t: 1.5, x: 0.4, kind: "volt", seen: true }, { t: 2, x: 0, kind: "sniper", seen: false }], attacks: [] });
+    // attacks on screen count for less than hits; off-screen ones not at all
+    const both = logOf({ fps: 30, cuts: [], hits: [{ f: 45, kind: "volt", seen: true, x: 0.4 }], attacks: [{ f: 30, kind: "thrower", seen: true, x: 0.6 }, { f: 33, kind: "sniper", seen: false, x: 1 }] }, "k");
+    expect(fightsOf(both)).toEqual([{ t: 1, x: 0.6, w: 0.4 }, { t: 1.5, x: 0.4, w: 1 }]);
+    expect(footageKey()).toMatch(/^[0-9a-f]{40}$/);
+    expect(footageKey({ ...CAPTURE, seconds: 12 })).not.toBe(footageKey());
   });
 
   it("writes a head for each aspect", () => {
