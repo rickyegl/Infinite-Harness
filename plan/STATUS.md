@@ -29,7 +29,8 @@ what the next agent should know. Keep it short; replace stale lines instead of a
 - **Done (plan 03), with two fallbacks:** the game agents. One prompt builds the game in Unity and Roblox,
   with six part cells under each engine, and four live follow-ups (night, realistic, music, crossplay) through
   the relay at `/relay`. Fallbacks: a Windows build instead of WebGL (the WebGL module is not installed), and a
-  Roblox place that is built and linted but not opened in Studio. Details under "The games" below.
+  Roblox place that the pipeline builds and lints but does not open in Studio (it has been played there once by
+  hand, with the generated models). Details under "The games" below.
 - **Next:** the module plans (04-07), then plan 08 replaces fixtures with recorded takes and finalises the
   draft direction files (S37-S40, S42-S47).
 
@@ -42,19 +43,10 @@ remove the line when it is answered. See `AGENTS.md` rule 5.
   prompt was cancelled, so it is not installed (USER-TODO 1). Until then the Build cell makes a Windows player,
   and there is no "Play in browser". Once it is installed, rerun the game prompt: Build switches to WebGL by
   itself, and the bridge serves it at `/runs/<id>/artifacts/webgl/`.
-- (plan 03) **Roblox Studio:** the author chose "Unity only for now". Open
-  `runs/<id>/artifacts/game.roblox.build/place.rbxlx` in Studio and press Play to confirm the place plays.
-  Nothing has run it in Studio yet.
 - (plan 03) **Roblox side of crossplay:** a Roblox server can reach the relay only through a public URL (a
   tunnel, USER-TODO 2), and the place needs `HttpService` turned on. Today the relay is checked both ways
   locally, and a stand-in Roblox rider proves the ghost in the Unity game.
 - (plan 03) **Publishing the Roblox place:** not done, and not to be done without your approval.
-- (plan 03, 3D models) **Play-test the Roblox place with the uploaded models:** the 8 models of run
-  `20261113-205415` are uploaded (2026-11-13) to the game's own Roblox account as Model assets, all passed
-  moderation, and their ids are in `runs/.cache/roblox-assets.json`, so the place now loads them. It has not been
-  played yet: copying the scripts into the open place needs either `http://127.0.0.1` on Studio's Assistant HTTP
-  allowlist (a local file server feeds them) or the Rojo plugin connected.
-
 ## Verified
 
 - `node video/tools/resolve.mjs`: 48 shots, 75 bars, 140.6 s; fastest voice line 2.9 words per second.
@@ -160,8 +152,8 @@ build, Roblox place, flags).
   plan 04).
 - Rough edges:
   - No WebGL build yet (Windows fallback; see "Waiting on the author").
-  - The Roblox place has never been opened in Studio. Roblox music needs an uploaded audio id
-    (`Flags.musicId`), so the music follow-up plays only in Unity.
+  - The Roblox place has been played in Studio once, by hand (see the 3D models block below). Roblox music
+    needs an uploaded audio id (`Flags.musicId`), so the music follow-up plays only in Unity.
   - The Roblox track depends on the open Unity editor (it exports the centre line from there).
   - Keep the Unity editor in front: in the background, play mode can run many times slower (one race test took
     over 8 minutes and timed out).
@@ -182,9 +174,16 @@ build, Roblox place, flags).
   shots after the fix: the karts and riders face forward, the riders sit in the karts, and no road dips into the
   grass at the corners or twists.
 - Roblox: the same seat (worked out from the OBJ by `lib/seat.ts`) and the same scenery (`Scenery.luau`, motion
-  on the client). Linted with selene and built with rojo; not played in Studio yet (see "Waiting on the
-  author"). The models are uploaded to the game's Roblox account and the rebuilt place has their ids;
-  `luau()` now writes whole numbers as they are (a 15-digit id came out with a stray fraction).
+  on the client). Linted with selene and built with rojo. The 8 models of run `20261113-205415` are uploaded
+  (2026-11-13) to the game's own Roblox account as Model assets (all passed moderation; ids in
+  `runs/.cache/roblox-assets.json`), and the rebuilt place has their ids. `luau()` now writes whole numbers as
+  they are (a 15-digit id came out with a stray fraction).
+- Played in Studio (2026-11-13), in the game account's own place, with the scripts copied in through the MCP
+  plugin (not saved or published): all 19 model copies loaded (8 karts, 8 riders in four classes, 2 landmarks,
+  the trophy); the kart faces forward with the rider in its seat, the trophy stands on its podium, the AI karts
+  race and attack. Studio logs "No asset content representation found" for some content ids of the uploaded
+  meshes; the meshes and their colours still show. Lighting.Technology cannot be set from the plugin, so that
+  copy ran with the place's own lighting technology. Shot: `artifacts/game.roblox.build/studio-play.jpg`.
 - Four rider classes in both games: volt (electric dash), sniper (mouse crosshair, one shot every 10 s), shrink
   (small and fast, slowed hard when touched) and thrower (an item forward every 3 s).
 - Full run `20261113-205415` ("Zigvolt Rush", the crazy racing prompt on Unity and Roblox) finished with no
