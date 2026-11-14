@@ -6,7 +6,7 @@
 // The picture (sets on the game's place, the cast, the shot list) is authored in the recording place in Roblox
 // Studio after the author's green flag: the project then has gen_shots.py and project.json. With those, the cell
 // generates the shots for the lighting, records a take in Studio (capture.py) or reuses the last one when the shots
-// are unchanged, and assembles the reel with the cached narration, captions, sounds and bed. Without them it ends
+// and the cast are unchanged, and assembles the reel with the cached narration, captions, sounds and bed. Without them it ends
 // after the narration and says so.
 //
 // params: seconds (default 30), rewrite (a new script even if the project has one), lighting ("day" | "night";
@@ -110,8 +110,16 @@ export function lightingOf(param: unknown, prompt?: string): "day" | "night" {
 
 type Take = { shots: string; start: number; end: number; frames: number };
 
+/** what a take depends on: the shot list and, when the project has one, the cast build (capture.py applies it) */
+export function takeKey(proj: string): string {
+  const h = createHash("sha1").update(readFileSync(join(proj, "Shots.lua")));
+  const cast = join(proj, "build_cast.lua");
+  if (existsSync(cast)) h.update("\0cast\0").update(readFileSync(cast));
+  return h.digest("hex");
+}
+
 /**
- * Shots for the lighting (the project's gen_shots.py), a take (reused when its Shots.lua is unchanged, else
+ * Shots for the lighting (the project's gen_shots.py), a take (reused when its Shots.lua and build_cast.lua are unchanged, else
  * recorded by capture.py in Roblox Studio), the studio's assembly with the cached narration, captions, sounds and
  * bed, then stills and the before/after against the other lighting when that one exists.
  */
@@ -120,12 +128,12 @@ async function picture(ctx: ModuleContext, proj: string, lighting: "day" | "nigh
   ctx.step(`Shots (${lighting})`, "the project's shot list with the lighting preset", lighting === "night" ? "moon" : "sun");
   const g = await ctx.sh(py, ["gen_shots.py", ...(lighting === "night" ? ["--night"] : [])], { cwd: proj, timeoutMs: 60_000 });
   if (g.code !== 0) throw new Error(`the shot generator failed: ${why(g)}`);
-  const shots = createHash("sha1").update(readFileSync(join(proj, "Shots.lua"))).digest("hex");
+  const shots = takeKey(proj);
   const metaFile = join(proj, "capture", `take_${lighting}.json`);
   const clean = join(proj, "capture", `capture_clean_${lighting}.mkv`);
   let take: Take | null = existsSync(metaFile) && existsSync(clean) ? (JSON.parse(readFileSync(metaFile, "utf8")) as Take) : null;
   const reused = !!take && take.shots === shots && !retake;
-  if (reused) ctx.step("Take reused", `the ${lighting} take already has these exact shots`, "check");
+  if (reused) ctx.step("Take reused", `the ${lighting} take already has these exact shots and cast`, "check");
   else {
     ctx.step("Recording in Roblox Studio", `${place}: sync the shots, Play, record the viewport, cut the set-change holds`, "record");
     const r = await ctx.sh(py, [join(import.meta.dirname, "capture.py"), studioRoot(ctx), proj, lighting, "--place", place], { cwd: proj, env: ffEnv(ctx), timeoutMs: 6 * 60_000 });

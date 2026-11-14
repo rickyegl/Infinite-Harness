@@ -16,7 +16,7 @@ import { resolutionOf, secondsOf } from "../../../modules/motion/run.ts";
 import { MARKER, tableLines, type Entry } from "../../../modules/publish/run.ts";
 import { accountOf, cacheKey, presetOf } from "../../../modules/voice/run.ts";
 import { briefsOf } from "../../../modules/campaign/run.ts";
-import { lightingOf, opensRight } from "../../../modules/reel.premise/run.ts";
+import { lightingOf, opensRight, takeKey } from "../../../modules/reel.premise/run.ts";
 import { gameFacts, gameLook } from "../../../modules/reel.explainer/run.ts";
 import { gameLook as adLook, headlineOf } from "../../../modules/ad.image/run.ts";
 import { DEFAULT } from "../../../modules/game/lib/design.ts";
@@ -271,5 +271,20 @@ describe("fixture recording", () => {
     const img = lines.find((l) => l.kind === "image") as { uri: string; meta: { before: string } };
     expect(img.uri).toBe("./default/still-01-2.jpg");
     expect(img.meta.before).toBe("./default/still-01-3.jpg");
+  });
+});
+
+describe("premise take key", () => {
+  it("changes with the shots and with the cast, so a recast never reuses an old take", () => {
+    const d = join(tmp, "premise-key");
+    mkdirSync(d, { recursive: true });
+    writeFileSync(join(d, "Shots.lua"), "return {}");
+    const bare = takeKey(d);
+    writeFileSync(join(d, "build_cast.lua"), "-- Thrower = Zoe");
+    const zoe = takeKey(d);
+    expect(zoe).not.toBe(bare);
+    expect(takeKey(d)).toBe(zoe);
+    writeFileSync(join(d, "build_cast.lua"), "-- Thrower = Jade");
+    expect(takeKey(d)).not.toBe(zoe);
   });
 });

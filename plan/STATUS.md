@@ -159,7 +159,8 @@ remove the line when it is answered. See `AGENTS.md` rule 5.
     before). Lighting comes from the `lighting` param, else "night" in the prompt, else day. The cell generates
     `Shots.lua` for the lighting, records a take in Studio with `capture.py` (sync, Play, the studio recorder on
     the portrait monitor, stop on "[cutscene] done", cut the set-change holds, measure the white slates), or
-    reuses the last take when its `Shots.lua` hash is the same (`retake: true` forces a new one). It then
+    reuses the last take when its key (the hash of `Shots.lua` and the project's `build_cast.lua`, which
+    `capture.py` runs before recording) is the same (`retake: true` forces a new one). It then
     assembles with the cached narration, captions, sounds and bed, and adds a wipe before/after against the other
     lighting when that reel exists. About 25.6 s.
   - `motion`: HyperFrames clips.
@@ -197,8 +198,13 @@ remove the line when it is answered. See `AGENTS.md` rule 5.
     at night, same narration" (`premise-night`) ran the cell end to end: it recorded a new night take in Studio
     by itself (1533 frames, 0 set holds), assembled it, and attached the day/night wipe at 13.6 s. Contact sheets
     looked at for both: no pink, no black or white frames, no freezes, captions in sync. Same narration files
-    (hash checked), no new voice credits. The take-reuse path (unchanged shots) is written and typechecked but
-    not run live. Studio-side notes: the project's `STATE.md` in the studio.
+    (hash checked), no new voice credits. Recast on the author's ask (2026-11-14): Ben's hair turned 90 degrees
+    clockwise (the turn the source rig had and the cast copy lost) and the thrower is now Jade (curly hair,
+    argyle vest; the author picked her from a line-up). The take key then took in `build_cast.lua`, so the cast
+    change made the cell record anew: `premise-day` and `premise-night-2` each recorded a take in Studio and
+    assembled (sheets looked at; magenta-rule hits only on Ben's open mouth and the flashback's dark scanlines,
+    nothing pink to the eye). `premise-night-3` ("at night again") then reused the night take live ("Take
+    reused", no Studio, 30 s). Studio-side notes: the project's `STATE.md` in the studio.
   - Both scripts passed the gate as "Script approved earlier" (the go's from 2026-11-14, kept in the ledger).
   - Publish dry run: 3 posts planned for the explainer (TikTok dev_en, Instagram dev_en, YouTube explainers),
     nothing posted. No studio account posts trailers; the premise reel was not routed in that dry run (it had
@@ -225,7 +231,7 @@ remove the line when it is answered. See `AGENTS.md` rule 5.
 - **Fixtures:** recorded from run `20261113-224654` for `reel.trailer`, `reel.explainer`, `reel.premise`,
   `ad.image`, `approve` and `campaign` (the campaign fixture carries its whole subtree). Media shrunk for the
   repo (videos 360 px, narration 16 kHz mono, ad pictures at half size); local paths replaced by `<studio>`.
-  `reel.premise` re-recorded from `premise-night` (the night reel, its stills and the before/after). The fixture
+  `reel.premise` re-recorded from `premise-night-2` (the recast night reel, its stills and the before/after). The fixture
   recorder now gives run files that share a base name (`stills/still-01.jpg`, `day/still-01.jpg`) their own
   fixture files; before, the before/after pointed both sides at one picture (tested).
   `HARNESS_MOCK=1` replays the whole campaign from them (16 s at speed 20). Worker steps for the CLI's own
@@ -563,7 +569,7 @@ before falling back to the fixture (checked: the full film has 20, one per take,
 | 02 | done | typecheck, unit tests (none skipped), `pnpm dev`, real runs on both workers, no-network probes, proxy routing with both models, prompt.md module run, test:bridge, test:live, determinism, film:rough, lint:brand | See "The bridge". |
 | 03 | done, two fallbacks | full run 20261113-014545, four follow-ups under 5 s, fixtures, typecheck, tests, test:bridge, test:live, determinism, film:rough, lint:brand | Windows build until WebGL is installed; Roblox place not opened in Studio. See "The games". |
 | 04 | done, video on mock | runs 20261113-222539 (house chain), 20261113-223714 (song), 20261113-223729 (voice), 20261113-224654 (full game with real assets), fixtures, mock replay, tests, test:bridge, typecheck, lint:brand, forge stopped (`colab ls`: no sessions) | Video waits for its runtime; `assets.image` with `transparent` not run live; image quota out at the end. See "The assets". |
-| 05 | done | premise picture day and night, the night re-render live through the cell (`premise-night`: Studio take, assembly, before/after), contact sheets looked at, `reel.premise` fixture re-recorded, typecheck, tests (protocol 13, web 7, bridge 58, reels 20 of them), lint:brand; earlier: tests (bridge 56, reels 18), campaign replayed from its fixture in mock mode, router re-record, test:bridge, test:live, determinism 96/96, film:rough (140.6 s, every cut on a beat), lint:brand, motion run + fixture, campaign live run end to end (trailer, explainer, premise narration, ads, publish dry run), fixtures for every reel module, HUD capture in Unity | The premise take-reuse path is not run live; nothing published. See "The reels". |
+| 05 | done | premise picture day and night, the night re-render live through the cell (`premise-night`: Studio take, assembly, before/after), the recast (`premise-day`, `premise-night-2` recorded; `premise-night-3` reused the take), contact sheets looked at, `reel.premise` fixture re-recorded, typecheck, tests (protocol 13, web 7, bridge 59, reels 21 of them), lint:brand; earlier: tests (bridge 56, reels 18), campaign replayed from its fixture in mock mode, router re-record, test:bridge, test:live, determinism 96/96, film:rough (140.6 s, every cut on a beat), lint:brand, motion run + fixture, campaign live run end to end (trailer, explainer, premise narration, ads, publish dry run), fixtures for every reel module, HUD capture in Unity | Nothing published. See "The reels". |
 | 06 | not started | | |
 | 07 | not started | | |
 | 08 | not started | | |

@@ -17,8 +17,10 @@ game: about 30 s (the recipe runs 35-45 s), 9:16, in the premise narrator's voic
   ends after the narration and says so; it never stands in a fake video. With them:
   - **Lighting:** `params.lighting` ("day" or "night"), else "night" in the prompt ("make it night"), else day.
   - **Take:** `gen_shots.py` writes Shots.lua for the lighting. If `capture/take_<lighting>.json` holds the same
-    Shots.lua hash, that take is reused; otherwise (or with `params.retake`) `capture.py` records one: it pushes
-    the shots into the place whose name contains `params.place` (default "Global Set"), presses Play, records the
+    key (the hash of Shots.lua and the project's `build_cast.lua`), that take is reused; otherwise (or with
+    `params.retake`) `capture.py` records one: it pushes the shots into the place whose name contains
+    `params.place` (default "Global Set"), runs `build_cast.lua` there (so a cast change on disk is what gets
+    recorded), presses Play, records the
     viewport with the studio recorder, stops Play, cuts the set-change holds and measures the white slate. It needs
     Studio open in its full-screen layout on the portrait monitor and not in Play, and it fails on a bad take (no
     finished runner, no slate, too little picture).

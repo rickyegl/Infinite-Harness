@@ -3,7 +3,8 @@
     python capture.py <studio root> <project dir> <day|night> [--place "Global Set"] [--seconds 62]
                       [--box 28,218,1024,1606]
 
-The project's Shots.lua must already be generated. This pushes it into the recording place, resets the preview,
+The project's Shots.lua must already be generated. This pushes it into the recording place, runs the project's
+build_cast.lua there when it has one (so the cast on disk is the cast recorded), resets the preview,
 starts the studio recorder on the portrait monitor, presses Play, waits for the cutscene runner to finish, stops
 Play, cuts the set-change holds (strip_holds.py) and measures where the picture starts (the end of the white slate,
 measured here because find_slate misreads a light sky). Writes capture/capture_<lighting>.mkv and
@@ -66,6 +67,11 @@ def main():
         if not mode or mode.group(1) != "Edit":
             raise SystemExit(f"Studio is not in Edit mode ({mode.group(1) if mode else 'unknown'}): stop Play first")
         preview.sync(s, proj.name)
+        cast = proj / "build_cast.lua"  # the cast on disk is the cast recorded (re-runnable by design)
+        if cast.exists():
+            got = s.luau(cast.read_text(encoding="utf-8"))
+            if "MISSING" in (got or ""):
+                raise SystemExit(f"build_cast.lua: {got.strip()[-200:]}")
         s.luau('local SP = require(game.ServerStorage:FindFirstChild("ShotPreview", true)); SP.reset()\n'
                'workspace.CurrentCamera.FieldOfView = 70\ngame:GetService("Selection"):Set({})\nreturn "ok"')
         rec = subprocess.Popen([sys.executable, str(root / "premise" / "tools" / "record.py"), str(raw), "--seconds", str(int(seconds))],
