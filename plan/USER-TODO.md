@@ -23,7 +23,7 @@ Fill these into `harness.local.json` / `plan/LOCAL.md`, or tell the agent.
 
 | # | What | Blocks |
 |---|---|---|
-| 7 | Image-to-video on Colab: notebook or launcher location and how it is started. | 04 (Video) |
+| 7 | Image-to-video on Colab: which notebook or launcher is the one to use, and how it is started. Found so far (plan 04): the forge's `launcher/h3` sets up a node-graph server with an image-to-video model, about 65 GB of weights to download; `launcher/qwen` is a chat notebook, not video. `plan/LOCAL.md` names a different video model. Until then the Video cell is the mock. | 04 (Video) |
 | 8 | Forecast-model script or notebook, if one exists. | 07 (Forecast, Anomaly) |
 | 9 | PCB tool or project, if one exists. Which board should the film show? | 07 (PCB), S38 |
 | 10 | House floor-plan / DWG workflow, if one exists. | 07 (Drafting) |

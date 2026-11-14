@@ -1,0 +1,27 @@
+{
+  "id": "assets.image",
+  "label": "Image",
+  "icon": "image",
+  "kind": "tool",
+  "maker": "nano-banana",
+  "summary": "Makes a new picture from a text prompt (a scene, an object, a banner, a texture). For changes to a picture made earlier in the run use Image Edit; for a transparent background use Cutout. Answers image asset requests from other modules.",
+  "accepts": [
+    "text"
+  ],
+  "produces": [
+    "image"
+  ],
+  "runtime": "script",
+  "needs": [
+    "proxy"
+  ],
+  "mock": true,
+  "allow": {
+    "write": [
+      "$NODE"
+    ],
+    "network": [
+      "proxy"
+    ]
+  }
+}

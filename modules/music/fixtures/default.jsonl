@@ -1,0 +1,4 @@
+{"t":1,"type":"node.state","node":".","state":"running"}
+{"t":39,"type":"node.step","node":".","title":"Taking the chosen song","detail":"for: play the chosen song","icon":"music"}
+{"t":903,"type":"node.evidence","node":".","kind":"audio","uri":"./default/song.mp3","caption":"The chosen song","meta":{"seconds":2.06}}
+{"t":905,"type":"node.done","node":".","summary":"Song ready (2.1 s)"}

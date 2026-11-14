@@ -1,0 +1,21 @@
+{
+  "id": "music",
+  "label": "Music",
+  "icon": "music",
+  "kind": "tool",
+  "maker": "suno",
+  "summary": "Returns the run's chosen song (an audio file the author picked; nothing is generated). Answers music asset requests from other modules, such as a game's race music.",
+  "accepts": [
+    "text"
+  ],
+  "produces": [
+    "audio"
+  ],
+  "runtime": "script",
+  "mock": true,
+  "allow": {
+    "write": [
+      "$NODE"
+    ]
+  }
+}

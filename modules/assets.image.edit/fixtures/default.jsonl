@@ -1,0 +1,7 @@
+{"t":1,"type":"node.state","node":".","state":"running"}
+{"t":9,"type":"node.evidence","node":".","kind":"image","uri":"./default/before.jpg","caption":"Before"}
+{"t":10,"type":"node.step","node":".","title":"Editing the picture","detail":"make the walls red","icon":"image"}
+{"t":8924,"type":"node.step","node":".","title":"Edit ready","detail":"1408 x 768, same framing","icon":"check"}
+{"t":8926,"type":"node.output","node":".","name":"image","uri":"./default/image.jpg","kind":"image"}
+{"t":8927,"type":"node.evidence","node":".","kind":"image","uri":"./default/image.jpg","caption":"After","meta":{"reveal":"wipe","before":"./default/before.jpg"}}
+{"t":8928,"type":"node.done","node":".","summary":"Edited in 9 s"}

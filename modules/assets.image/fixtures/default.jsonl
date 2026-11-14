@@ -1,0 +1,8 @@
+{"t":2,"type":"node.state","node":".","state":"running"}
+{"t":11,"type":"node.step","node":".","title":"Drawing 2 candidates","detail":"show me a house","icon":"image"}
+{"t":8799,"type":"node.evidence","node":".","kind":"image","uri":"./default/candidate-1.jpg","caption":"Candidate 1"}
+{"t":8800,"type":"node.evidence","node":".","kind":"image","uri":"./default/candidate-2.jpg","caption":"Candidate 2"}
+{"t":8804,"type":"node.step","node":".","title":"Picked candidate 1","detail":"1408 x 768","icon":"check"}
+{"t":8806,"type":"node.output","node":".","name":"image","uri":"./default/image.jpg","kind":"image"}
+{"t":8807,"type":"node.evidence","node":".","kind":"image","uri":"./default/image.jpg","caption":"show me a house","meta":{"width":1408,"height":768}}
+{"t":8808,"type":"node.done","node":".","summary":"Picture ready in 9 s"}

@@ -1,0 +1,6 @@
+{"t":3,"type":"node.state","node":".","state":"running"}
+{"t":11,"type":"node.step","node":".","title":"Reading the script in the cloned voice","detail":"Read this in my voice: Welcome to Infinite Harness. One prompt, every tool.","icon":"wave"}
+{"t":1346,"type":"node.step","node":".","title":"Word timings","detail":"13 words, 5.7 s","icon":"check"}
+{"t":1348,"type":"node.evidence","node":".","kind":"audio","uri":"./default/narration.wav","caption":"Read this in my voice: Welcome to Infinite Harness. One prompt, every tool.","meta":{"words":[{"w":"Read","start":0,"end":0.348},{"w":"this","start":0.383,"end":0.522},{"w":"in","start":0.58,"end":0.65},{"w":"my","start":0.708,"end":0.824},{"w":"voice:","start":0.894,"end":1.382},{"w":"Welcome","start":1.625,"end":2.067},{"w":"to","start":2.113,"end":2.183},{"w":"Infinite","start":2.299,"end":2.752},{"w":"Harness.","start":2.786,"end":3.379},{"w":"One","start":3.587,"end":3.831},{"w":"prompt,","start":3.878,"end":4.319},{"w":"every","start":4.389,"end":4.702},{"w":"tool.","start":4.76,"end":5.712}],"seconds":5.712}}
+{"t":1349,"type":"node.output","node":".","name":"words.json","uri":"./default/words.json","kind":"doc"}
+{"t":1349,"type":"node.done","node":".","summary":"Read 13 words in 5.7 s"}

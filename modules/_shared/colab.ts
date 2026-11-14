@@ -56,6 +56,18 @@ async function healthy(url: string, token: string): Promise<boolean> {
   }
 }
 
+/** A launcher progress line ("== ... ==") as a neutral stage, without package or weight names. */
+export function setupStage(line: string): string {
+  const s = line.replace(/^==\s*|\s*==\s*$/g, "");
+  const n = /^\[(\d+)\/(\d+)\]/.exec(s);
+  if (n) return n[1] === "0" ? "downloading the weights" : `installing, part ${n[1]} of ${n[2]}`;
+  if (/^creating/i.test(s)) return "asking for a GPU runtime";
+  if (/^runtime ready/i.test(s)) return "runtime ready";
+  if (/^uploading/i.test(s)) return "uploading the code";
+  if (/^setting up/i.test(s)) return "installing packages and weights (about 10 minutes)";
+  return "working";
+}
+
 function launcher(config: Record<string, any>, action: string, log: string): void {
   const forge = config.paths?.forge;
   if (!forge || !existsSync(join(forge, "launcher", "colab-launcher.sh"))) throw new Error("paths.forge is not set to the asset forge project");
@@ -85,11 +97,14 @@ async function start(config: Record<string, any>, say: (t: string, d?: string) =
   writeFileSync(UP_LOG, "");
   launcher(config, "up", UP_LOG);
   const t0 = Date.now();
+  let told = "";
   while (!/^REMOTE \d+/m.test(readFileSync(UP_LOG, "utf8"))) {
     if (signal.aborted) throw new Error("stopped");
     if (Date.now() - t0 > 45 * 60_000) throw new Error("the forge did not come up in 45 minutes");
     const last = readFileSync(UP_LOG, "utf8").split("\n").filter((l) => /^== /.test(l)).pop();
-    if (last) say("Setting up the forge", last.replace(/^== |==$/g, "").trim());
+    // the launcher's own lines name packages and weights; the cell shows only the stage
+    const stage = last ? setupStage(last) : "";
+    if (stage && stage !== told) say("Setting up the forge", (told = stage));
     await sleep(15_000);
   }
   launcher(config, "keepalive", join(STATE, "keepalive.log"));

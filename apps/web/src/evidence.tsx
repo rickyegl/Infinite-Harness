@@ -21,6 +21,7 @@ export type EvProps = {
 };
 
 const fill: CSSProperties = { position: "absolute", inset: 0, width: "100%", height: "100%" };
+const CHECKER: CSSProperties = { background: "repeating-conic-gradient(#3a3d46 0% 25%, #23252c 0% 50%) 0 0 / 32px 32px" };
 const meta = <T,>(ev: EvidenceRec, k: string, d: T): T => ((ev.meta ?? {})[k] ?? d) as T;
 
 export function Evidence(p: EvProps) {
@@ -60,13 +61,16 @@ function ImageEv({ ev, age, url, prev, beatMs, w, h }: EvProps) {
   const fit = meta(ev, "fit", "contain") as CSSProperties["objectFit"];
   const prevSrc = prev && prev.kind === "image" ? url(prev.uri) : meta<string | null>(ev, "before", null) ? url(meta(ev, "before", "")) : null;
   const img = (src: string, style: CSSProperties = {}) => <img src={src} style={{ ...fill, objectFit: fit, ...style }} alt="" draggable={false} />;
+  // a transparent picture (a cutout) sits on a checkerboard, which also hides the picture under it
+  const topImg = (style: CSSProperties = {}) =>
+    meta(ev, "checker", false) ? <div style={{ ...fill, ...CHECKER, ...style }}>{img(url(ev.uri))}</div> : img(url(ev.uri), style);
   let top: ReactNode;
-  if (reveal === "cut") top = img(url(ev.uri));
+  if (reveal === "cut") top = topImg();
   else if (reveal === "wipe") {
     const f = easeInOut(clamp01(age / (meta(ev, "wipeBeats", 2) * beatMs)));
     top = (
       <>
-        {img(url(ev.uri), { clipPath: `inset(0 ${(1 - f) * 100}% 0 0)` })}
+        {topImg({ clipPath: `inset(0 ${(1 - f) * 100}% 0 0)` })}
         {f > 0 && f < 1 ? <div style={{ position: "absolute", top: 0, bottom: 0, left: `${f * 100}%`, width: 3, background: color.accent, boxShadow: `0 0 24px ${color.accent}` }} /> : null}
       </>
     );
@@ -74,13 +78,13 @@ function ImageEv({ ev, age, url, prev, beatMs, w, h }: EvProps) {
     const f = clamp01(age / (meta(ev, "revealBeats", 3) * beatMs));
     top = (
       <>
-        {img(url(ev.uri), { filter: `blur(${(1 - easeOut(f)) * 18}px) contrast(${1 + (1 - f) * 0.6})` })}
+        {topImg({ filter: `blur(${(1 - easeOut(f)) * 18}px) contrast(${1 + (1 - f) * 0.6})` })}
         <Noise w={w} h={h} opacity={(1 - f) * 0.9} seed={Math.floor(age / 50)} />
       </>
     );
   } else {
     const f = clamp01(age / 380);
-    top = img(url(ev.uri), { opacity: easeOut(f), filter: `blur(${(1 - f) * 10}px)` });
+    top = topImg({ opacity: easeOut(f), filter: `blur(${(1 - f) * 10}px)` });
   }
   const showPrev = prevSrc && (reveal === "wipe" || (reveal === "fade" && age < 400) || (reveal === "noise" && false));
   return (

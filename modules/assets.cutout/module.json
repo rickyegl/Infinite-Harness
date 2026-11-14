@@ -1,0 +1,26 @@
+{
+  "id": "assets.cutout",
+  "label": "Cutout",
+  "icon": "scissors",
+  "kind": "tool",
+  "maker": "birefnet",
+  "summary": "Removes the background of a picture and returns a transparent PNG ('transparent background', 'cut it out'). Without an input image it cuts out the last picture of the run.",
+  "accepts": [
+    "text",
+    "image"
+  ],
+  "produces": [
+    "image"
+  ],
+  "runtime": "script",
+  "mock": true,
+  "allow": {
+    "write": [
+      "$NODE",
+      "runs/.cache"
+    ],
+    "network": [
+      "127.0.0.1"
+    ]
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "id": "assets.image.edit",
+  "label": "Image Edit",
+  "icon": "image",
+  "kind": "tool",
+  "maker": "nano-banana",
+  "summary": "Changes a picture made earlier in the run (or a given image) as asked, keeping its framing: 'make the walls red', 'add snow', 'night time'. Without an input image it edits the last picture of the run.",
+  "accepts": [
+    "text",
+    "image"
+  ],
+  "produces": [
+    "image"
+  ],
+  "runtime": "script",
+  "needs": [
+    "proxy"
+  ],
+  "mock": true,
+  "allow": {
+    "write": [
+      "$NODE"
+    ],
+    "network": [
+      "proxy"
+    ]
+  }
+}

@@ -1,0 +1,16 @@
+{"t": 1, "type": "node.state", "node": ".", "state": "running"}
+{"t": 46, "type": "node.evidence", "node": ".", "kind": "image", "uri": "./default/before.jpg", "caption": "Before"}
+{"t": 57, "type": "node.step", "node": ".", "title": "Reconnecting to the asset forge", "detail": "opening the port forward again", "icon": "chip"}
+{"t": 30802, "type": "node.step", "node": ".", "title": "Starting the asset forge", "detail": "a GPU runtime on Colab: install, weights, server (10 to 20 minutes the first time)", "icon": "chip"}
+{"t": 46476, "type": "node.step", "node": ".", "title": "Setting up the forge", "detail": "uploading the code", "icon": "chip"}
+{"t": 61492, "type": "node.step", "node": ".", "title": "Setting up the forge", "detail": "installing packages and weights (about 10 minutes)", "icon": "chip"}
+{"t": 76499, "type": "node.step", "node": ".", "title": "Setting up the forge", "detail": "installing, part 1 of 4", "icon": "chip"}
+{"t": 196636, "type": "node.step", "node": ".", "title": "Setting up the forge", "detail": "installing, part 2 of 4", "icon": "chip"}
+{"t": 376806, "type": "node.step", "node": ".", "title": "Setting up the forge", "detail": "installing, part 4 of 4", "icon": "chip"}
+{"t": 406836, "type": "node.step", "node": ".", "title": "Setting up the forge", "detail": "installing, part 2 of 3", "icon": "chip"}
+{"t": 466885, "type": "node.step", "node": ".", "title": "Setting up the forge", "detail": "installing, part 3 of 3", "icon": "chip"}
+{"t": 486066, "type": "node.step", "node": ".", "title": "Sending the picture to the forge", "detail": "916 KB", "icon": "spark"}
+{"t": 490410, "type": "node.step", "node": ".", "title": "Removing the background", "icon": "scissors"}
+{"t": 628995, "type": "node.output", "node": ".", "name": "image", "uri": "./default/cutout.png", "kind": "image"}
+{"t": 628996, "type": "node.evidence", "node": ".", "kind": "image", "uri": "./default/cutout.png", "caption": "Background removed", "meta": {"checker": true, "reveal": "wipe", "before": "./default/before.jpg", "width": 1408, "height": 768}}
+{"t": 628997, "type": "node.done", "node": ".", "summary": "Cut out in 629 s"}
