@@ -49,16 +49,11 @@ remove the line when it is answered. See `AGENTS.md` rule 5.
   tunnel, USER-TODO 2), and the place needs `HttpService` turned on. Today the relay is checked both ways
   locally, and a stand-in Roblox rider proves the ghost in the Unity game.
 - (plan 03) **Publishing the Roblox place:** not done, and not to be done without your approval.
-- (plan 03, 3D models) **Upload the generated models to Roblox:** the place loads each generated model from a
-  Roblox asset id, so each `model.glb` has to be uploaded once as a Model asset. That needs three things from
-  you:
-  1. Open Roblox Studio with the MCP plugin connected.
-  2. Approve the upload folder `runs/.cache/roblox-upload/` in Assistant Settings > MCP Permissions.
-  3. Approve the batch: 8 Model assets on your own Roblox account, private, not published. They are kart,
-     rider.volt, rider.sniper, rider.shrink, rider.thrower, landmark.1, landmark.2 and trophy (plus
-     landmark.3 and landmark.4 when the design has them).
-
-  Until then every one of those slots is part-built in the place, and the build report says so.
+- (plan 03, 3D models) **Play-test the Roblox place with the uploaded models:** the 8 models of run
+  `20261113-205415` are uploaded (2026-11-13) to the game's own Roblox account as Model assets, all passed
+  moderation, and their ids are in `runs/.cache/roblox-assets.json`, so the place now loads them. It has not been
+  played yet: copying the scripts into the open place needs either `http://127.0.0.1` on Studio's Assistant HTTP
+  allowlist (a local file server feeds them) or the Rojo plugin connected.
 
 ## Verified
 
@@ -187,8 +182,9 @@ build, Roblox place, flags).
   shots after the fix: the karts and riders face forward, the riders sit in the karts, and no road dips into the
   grass at the corners or twists.
 - Roblox: the same seat (worked out from the OBJ by `lib/seat.ts`) and the same scenery (`Scenery.luau`, motion
-  on the client). Linted with selene and built with rojo; not played in Studio, and the models stay part-built
-  until the upload is approved (see "Waiting on the author").
+  on the client). Linted with selene and built with rojo; not played in Studio yet (see "Waiting on the
+  author"). The models are uploaded to the game's Roblox account and the rebuilt place has their ids;
+  `luau()` now writes whole numbers as they are (a 15-digit id came out with a stray fraction).
 - Four rider classes in both games: volt (electric dash), sniper (mouse crosshair, one shot every 10 s), shrink
   (small and fast, slowed hard when touched) and thrower (an item forward every 3 s).
 - Full run `20261113-205415` ("Zigvolt Rush", the crazy racing prompt on Unity and Roblox) finished with no

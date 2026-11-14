@@ -53,7 +53,8 @@ const luauStr = (s: string) =>
 export function luau(v: unknown, ind = ""): string {
   if (v === null || v === undefined) return "nil";
   if (typeof v === "boolean") return String(v);
-  if (typeof v === "number") return Number.isFinite(v) ? String(Math.round(v * 1e4) / 1e4) : "0";
+  // whole numbers as they are: rounding a 15-digit asset id through v * 1e4 would add a stray fraction
+  if (typeof v === "number") return !Number.isFinite(v) ? "0" : Number.isInteger(v) ? String(v) : String(Math.round(v * 1e4) / 1e4);
   if (typeof v === "string") return luauStr(v);
   const next = ind + "\t";
   if (Array.isArray(v)) {
