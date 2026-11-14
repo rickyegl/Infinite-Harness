@@ -191,6 +191,12 @@ build, Roblox place, flags).
   until the upload is approved (see "Waiting on the author").
 - Four rider classes in both games: volt (electric dash), sniper (mouse crosshair, one shot every 10 s), shrink
   (small and fast, slowed hard when touched) and thrower (an item forward every 3 s).
+- Full run `20261113-205415` ("Zigvolt Rush", the crazy racing prompt on Unity and Roblox) finished with no
+  errors in 42 minutes: all 8 models arrived (the last after 40 minutes, so past the old 30-minute cut-off), and
+  "11 assets delivered". The port forward dropped twice during the run and was reopened each time. Unity: built
+  for Windows, and the race test finished in 137 s with 33 hits, every class firing; in the capture and finish
+  frames the generated kart faces forward with the rider in its seat, and the scenery is in place. Roblox:
+  place built, lint clean (105 KB).
 
 ## The bridge (plan 02)
 
