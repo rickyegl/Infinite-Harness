@@ -4,7 +4,7 @@
   "icon": "wave",
   "kind": "tool",
   "maker": "elevenlabs",
-  "summary": "Reads a short script aloud in the author's cloned voice and returns the audio with a timing for every word (for captions). Its prompt is the exact words to say, nothing else (no \"read this\" lead-in). Uses voice credits: one short script per request.",
+  "summary": "Reads exact words aloud and returns the audio with a timing for every word (for captions): the author's cloned voice, or a studio narrator when a reel asks for one. Its prompt is the exact words to say, nothing else (no \"read this\" lead-in). Only for a request to read given words; trailers, explainers, premise reels and campaigns narrate themselves. Uses voice credits: one script per request.",
   "accepts": [
     "text"
   ],

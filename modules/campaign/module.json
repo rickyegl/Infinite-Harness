@@ -1,0 +1,26 @@
+{
+  "id": "campaign",
+  "label": "Campaign",
+  "icon": "megaphone",
+  "kind": "agent",
+  "summary": "An ad campaign for the run's game: one brief per audience (Unity players, Roblox players), then the Explainer reel, the Premise reel, one Ad Image per audience and the Trailer cut side by side, each reel narrated in its own voice after the author's go, and a Publish dry run of the set.",
+  "accepts": [
+    "text"
+  ],
+  "produces": [
+    "doc",
+    "image",
+    "video",
+    "audio"
+  ],
+  "runtime": "cli-agent",
+  "mock": true,
+  "allow": {
+    "tools": [
+      "harness.report_step"
+    ],
+    "write": [
+      "$NODE"
+    ]
+  }
+}

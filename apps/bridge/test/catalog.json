@@ -136,66 +136,68 @@
  {
   "id": "reel.trailer",
   "label": "Trailer",
-  "kind": "agent",
-  "summary": "Cut a game trailer from gameplay captures, narration and music.",
+  "kind": "tool",
+  "summary": "A beat-cut launch trailer of the run's own game (about 30 s, 9:16 and 16:9) in the studio's trailer recipe: fresh gameplay recorded from the game, the author's track, cuts on the beat that speed up into the drop, captions and a logo ending. Needs a game built in the run first.",
   "accepts": [
-   "video",
-   "audio",
-   "text"
+   "text",
+   "video"
   ],
   "produces": [
+   "frames",
+   "chart",
+   "image",
    "video"
   ]
  },
  {
   "id": "reel.premise",
-  "label": "Premise reel",
+  "label": "Premise Reel",
   "kind": "agent",
-  "summary": "Make a short video that pitches an idea or premise.",
+  "summary": "A Roblox premise Short in the studio's recipe set in the run's own racing game (about 30 s, 9:16): an \"In this world,\" script, a stop for the author's go, then narration in the premise voice. The Studio picture (sets, shots, capture) starts after the author's green flag.",
   "accepts": [
-   "text",
-   "image",
-   "video"
+   "text"
   ],
   "produces": [
-   "video"
+   "doc",
+   "audio"
   ]
  },
  {
   "id": "reel.explainer",
   "label": "Explainer",
   "kind": "agent",
-  "summary": "Make a short explainer video of how something works.",
+  "summary": "A full vertical \"What if\" explainer reel (about 24 s, 1080x1920) in the studio's explainer recipe: script, then a stop for the author's go, then narration in the explainer voice, a motion-graphics composition timed to the words, sounds, captions and the studio's mix. Narrates itself.",
   "accepts": [
-   "text",
-   "image",
-   "video"
+   "text"
   ],
   "produces": [
+   "doc",
+   "audio",
+   "frames",
    "video"
   ]
  },
  {
   "id": "motion",
-  "label": "Motion graphics",
+  "label": "Motion",
   "kind": "agent",
-  "summary": "Animated titles, logos and motion graphics.",
+  "summary": "Motion graphics: turns a short brief (a title card, kinetic type, a number count-up, a logo sting, a lower third) into an HTML/GSAP composition and renders it to an mp4. Default 3 s at 1920x1080; say vertical or 9:16 for a 1080x1920 clip, or give a length in seconds. Shows storyboard stills, then the clip.",
   "accepts": [
    "text",
    "image"
   ],
   "produces": [
+   "frames",
    "video"
   ]
  },
  {
   "id": "ad.image",
-  "label": "Ad image",
+  "label": "Ad Image",
   "kind": "tool",
-  "summary": "Design one ad image with copy for a given audience and format.",
+  "summary": "One ad image for one audience at platform sizes (feed 1:1, story 9:16, optional link 1.91:1): a picture from Image plus a headline and a call to action set as text.",
   "accepts": [
-   "text",
-   "image"
+   "text"
   ],
   "produces": [
    "image"
@@ -204,31 +206,40 @@
  {
   "id": "campaign",
   "label": "Campaign",
-  "kind": "orchestrator",
-  "summary": "Plan and produce an ad campaign for the audiences the request names: ad images, copy and short ad videos per audience and platform.",
+  "kind": "agent",
+  "summary": "An ad campaign for the run's game: one brief per audience (Unity players, Roblox players), then the Explainer reel, the Premise reel, one Ad Image per audience and the Trailer cut side by side, each reel narrated in its own voice after the author's go, and a Publish dry run of the set.",
   "accepts": [
-   "text",
-   "image",
-   "video"
+   "text"
   ],
   "produces": [
+   "doc",
    "image",
    "video",
+   "audio"
+  ]
+ },
+ {
+  "id": "approve",
+  "label": "Approve",
+  "kind": "tool",
+  "summary": "The author's go-ahead on a script that is waiting for approval in a reel or campaign cell (\"go\", \"approved\", \"looks good, voice it\"). Runs under the cell it approves; its prompt may name which script (the explainer, the premise, the Roblox one).",
+  "accepts": [
+   "text"
+  ],
+  "produces": [
    "doc"
   ]
  },
  {
   "id": "publish",
   "label": "Publish",
-  "kind": "agent",
-  "summary": "Publish finished deliverables to a store page or a channel.",
+  "kind": "tool",
+  "summary": "A dry-run publishing plan for the run's reels: which account posts each one and when, from the studio's schedulers. Never uploads or schedules anything.",
   "accepts": [
-   "code",
-   "video",
-   "image"
+   "video"
   ],
   "produces": [
-   "link"
+   "doc"
   ]
  },
  {

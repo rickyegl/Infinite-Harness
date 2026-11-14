@@ -375,6 +375,9 @@ export class Run {
       signal: this.abort.signal,
       mock: this.cfg.mock.enabled,
       step: (title, detail, icon) => run.emit({ type: "node.step", node: id, title, ...(detail ? { detail } : {}), ...(icon ? { icon } : {}) }),
+      state: (state) => {
+        if (cell.open) run.emit({ type: "node.state", node: id, state });
+      },
       evidence: async (kind, file, caption, meta) => {
         (cell.attached ??= new Set()).add(resolve(abs(file)));
         const uri = run.artifact(cell, abs(file));

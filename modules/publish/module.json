@@ -1,0 +1,20 @@
+{
+  "id": "publish",
+  "label": "Publish",
+  "icon": "megaphone",
+  "kind": "tool",
+  "summary": "A dry-run publishing plan for the run's reels: which account posts each one and when, from the studio's schedulers. Never uploads or schedules anything.",
+  "accepts": [
+    "video"
+  ],
+  "produces": [
+    "doc"
+  ],
+  "runtime": "script",
+  "mock": true,
+  "allow": {
+    "write": [
+      "$NODE"
+    ]
+  }
+}

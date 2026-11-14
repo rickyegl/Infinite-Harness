@@ -31,7 +31,6 @@ export const ACT1 =
 // Act 1 leaves these cells; Act 5 runs as follow-ups in the same run
 const act1: Existing[] = [
   { id: "game", module: "game", label: "Racing game" },
-  { id: "voice", module: "voice", label: "Narration" },
   { id: "trailer", module: "reel.trailer", label: "Game trailer" },
   { id: "campaign", module: "campaign", label: "Ad campaign" },
   { id: "host", module: "host", label: "Browser host" },
@@ -63,9 +62,9 @@ export const CASES: Case[] = [
     name: "act 1",
     prompt: ACT1,
     existing: [],
-    // ASSUMED: "Game (Unity+Roblox)" is one game cell whose prompt names both engines; Voice is the
-    // trailer's and campaign's narration (router.md rule 7)
-    must: ["game", "reel.trailer", "campaign", "voice", "host", "recorder", "verify"],
+    // ASSUMED: "Game (Unity+Roblox)" is one game cell whose prompt names both engines. No voice node: the
+    // trailer and the campaign's reels narrate themselves after the author's go (router.md rule 7, plan 05)
+    must: ["game", "reel.trailer", "campaign", "host", "recorder", "verify"],
     mentions: { game: ["unity", "roblox"], campaign: ["unity", "roblox"] },
     order: [["host", "game"], ["verify", "game"]],
   },
@@ -76,5 +75,6 @@ export const CASES: Case[] = [
     must: [module],
     only: true,
   })),
+  { name: "approve a waiting script", prompt: "The explainer script looks good, go.", existing: act1, must: ["approve"], only: true },
   { name: "smoke", prompt: "say hello three ways", existing: [], must: ["mock.agent"], only: true, catalog: "installed" },
 ];

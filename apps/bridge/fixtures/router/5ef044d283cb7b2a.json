@@ -1,0 +1,128 @@
+{
+  "prompt": "Make a motor driver PCB.",
+  "existing": [
+    {
+      "id": "game",
+      "module": "game",
+      "label": "Racing game"
+    },
+    {
+      "id": "trailer",
+      "module": "reel.trailer",
+      "label": "Game trailer"
+    },
+    {
+      "id": "campaign",
+      "module": "campaign",
+      "label": "Ad campaign"
+    },
+    {
+      "id": "host",
+      "module": "host",
+      "label": "Browser host"
+    },
+    {
+      "id": "recorder",
+      "module": "recorder",
+      "label": "Process video"
+    },
+    {
+      "id": "verify",
+      "module": "verify",
+      "label": "Verifier"
+    },
+    {
+      "id": "house",
+      "module": "assets.image",
+      "label": "house"
+    },
+    {
+      "id": "house-red",
+      "module": "assets.image.edit",
+      "label": "house red"
+    },
+    {
+      "id": "house-cutout",
+      "module": "assets.cutout",
+      "label": "house cutout"
+    },
+    {
+      "id": "house-plan",
+      "module": "drafting",
+      "label": "house plan"
+    },
+    {
+      "id": "house-3d",
+      "module": "blender",
+      "label": "house 3d"
+    },
+    {
+      "id": "house-render",
+      "module": "blender.render",
+      "label": "house render"
+    },
+    {
+      "id": "house-video",
+      "module": "assets.video",
+      "label": "house video"
+    },
+    {
+      "id": "study",
+      "module": "study",
+      "label": "study"
+    },
+    {
+      "id": "robot",
+      "module": "cad",
+      "label": "robot"
+    }
+  ],
+  "catalog": [
+    "game",
+    "game.unity",
+    "game.roblox",
+    "assets.image",
+    "assets.image.edit",
+    "assets.cutout",
+    "assets.model3d",
+    "assets.video",
+    "voice",
+    "music",
+    "reel.trailer",
+    "reel.premise",
+    "reel.explainer",
+    "motion",
+    "ad.image",
+    "campaign",
+    "approve",
+    "publish",
+    "host",
+    "verify",
+    "recorder",
+    "drafting",
+    "blender",
+    "blender.render",
+    "study",
+    "cad",
+    "sim",
+    "pcb",
+    "forecast",
+    "anomaly"
+  ],
+  "backend": "proxy",
+  "modelKey": "proxy.testModel",
+  "ms": 3214,
+  "recordedAt": "2026-11-14T06:47:46.970Z",
+  "plan": {
+    "nodes": [
+      {
+        "id": "pcb",
+        "module": "pcb",
+        "label": "Circuit board",
+        "prompt": "Make a motor driver PCB.",
+        "after": [],
+        "under": null
+      }
+    ]
+  }
+}

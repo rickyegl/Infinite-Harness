@@ -1,0 +1,12 @@
+{"t":1,"type":"node.state","node":".","state":"running"}
+{"t":36,"type":"node.step","node":".","title":"Writing the composition","detail":"3 s, landscape","icon":"pencil"}
+{"t":33961,"type":"node.step","node":".","title":"Wrote index.html","icon":"pencil"}
+{"t":38899,"type":"node.evidence","node":".","kind":"code","uri":"./default/index.html","caption":"index.html"}
+{"t":47228,"type":"node.step","node":".","title":"Composition passes its check","icon":"check"}
+{"t":52294,"type":"node.evidence","node":".","kind":"frames","uri":"./default/frame-00-at-0.45s.png","caption":"Storyboard","meta":{"frames":["./default/frame-00-at-0.45s.png","./default/frame-01-at-1.05s.png","./default/frame-02-at-1.8s.png","./default/frame-03-at-2.55s.png"],"fps":2,"loop":true,"fit":"contain"}}
+{"t":52295,"type":"node.step","node":".","title":"Rendering","detail":"30 fps","icon":"film"}
+{"t":73696,"type":"node.step","node":".","title":"Rendered","detail":"3.0 s clip in 21.3 s","icon":"check"}
+{"t":73697,"type":"node.evidence","node":".","kind":"video","uri":"./default/motion.mp4","caption":"Make a 3 second title card that says READY","meta":{"frames":["./default/frame-00-at-0.45s.png","./default/frame-01-at-1.05s.png","./default/frame-02-at-1.8s.png","./default/frame-03-at-2.55s.png"],"fps":2,"loop":true,"fit":"contain","seconds":3,"renderSeconds":21.3}}
+{"t":73699,"type":"node.output","node":".","name":"motion.mp4","uri":"./default/motion.mp4","kind":"video"}
+{"t":73700,"type":"node.output","node":".","name":"index.html","uri":"./default/index.html","kind":"code"}
+{"t":73701,"type":"node.done","node":".","summary":"3.0 s motion clip"}

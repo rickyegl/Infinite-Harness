@@ -31,6 +31,10 @@ Rules:
 5. When the person wants the process shown or recorded on a video, add the recorder node; it starts at
    once (empty `after`) because it records the whole run.
 6. Hosting or publishing comes `after` the node that builds what is hosted.
-7. A trailer, an ad campaign or an explainer video needs narration: add one voice node for it when a voice
-   module exists, and make the video nodes come `after` it.
-8. Do not add nodes the person did not ask for, except the verifier (rule 4) and voice (rule 7).
+7. A trailer, an ad campaign, an explainer or a premise reel narrates itself: its module writes the script,
+   waits for the author's go and asks for the voice it needs. Do not add a voice node for them. Use the voice
+   module only when the person asks for exact words to be read aloud.
+8. Do not add nodes the person did not ask for, except the verifier (rule 4).
+9. A short go-ahead on a script that is waiting ("go", "approved", "looks good, voice it") is one approve node
+   `under` the cell whose script it approves (or the campaign above it). Put in its prompt which script, when
+   the person said (for example "the explainer" or "the Roblox one").

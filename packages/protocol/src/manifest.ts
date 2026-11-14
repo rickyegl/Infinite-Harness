@@ -79,6 +79,8 @@ export interface ModuleContext {
   /** true when HARNESS_MOCK=1 */
   mock: boolean;
   step(title: string, detail?: string, icon?: string): void;
+  /** "waiting" while the cell waits on the author (a script for approval); "running" when it carries on */
+  state(state: "waiting" | "running"): void;
   /** copies `file` into the run when it lives elsewhere; returns its uri */
   evidence(kind: EvidenceKind, file: string, caption?: string, meta?: Record<string, unknown>): Promise<string>;
   output(name: string, file: string, kind: string, href?: string): Promise<string>;

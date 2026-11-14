@@ -121,6 +121,7 @@ its `prompt.md` leads and the cell's task follows.
 // run.ts
 export default async function run(ctx: ModuleContext, input: ModuleInput): Promise<ModuleOutput>;
 // ctx.step(title, detail?) ctx.evidence(kind, file, caption?) ctx.output(name, file, kind, href?)
+// ctx.state("waiting" | "running")                      <- the cell waits on the author (a script gate), then resumes
 // ctx.request(moduleId, input): Promise<ModuleOutput>   <- asset handoff: emits node.request / node.deliver
 // ctx.spawn(moduleId, input, {label})                  <- child cell under this node
 // ctx.sh(cmd, args, opts) ctx.agent(prompt, opts)      <- subprocess / headless CLI worker, events streamed

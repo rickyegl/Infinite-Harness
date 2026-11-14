@@ -34,7 +34,12 @@ what the next agent should know. Keep it short; replace stale lines instead of a
 - **Done (plan 04), video on mock:** the asset modules. Image, Image Edit, Cutout, Music and Voice run for real;
   "show me a house", "make the walls red", "transparent background" chain without paths. Video stays on the mock
   until the author picks its runtime (USER-TODO 7). Details under "The assets" below.
-- **Next:** the module plans (05-07), then plan 08 replaces fixtures with recorded takes and finalises the
+- **Built (plan 05), waiting on the author:** the reel modules: Trailer, Explainer, Premise Reel, Motion,
+  Ad Image, Campaign, Publish (dry run) and Approve, plus the script gate. Motion and Publish are done and
+  verified. Explainer and Premise have drafted their scripts and stop at the gate, so no voice credits have been
+  spent. Trailer is proven on a stand-in track and waits for the author's track. The premise picture waits for
+  the green flag. Details under "The reels" below.
+- **Next:** finish plan 05 once the author answers (below), then plans 06-07, then plan 08 replaces fixtures with recorded takes and finalises the
   draft direction files (S37-S40, S42-S47).
 
 ## Waiting on the author
@@ -56,6 +61,15 @@ remove the line when it is answered. See `AGENTS.md` rule 5.
 - (plan 04) **One more short voice reading?** The recorded Voice fixture also says the lead-in ("Read this in my
   voice: ..."), because the planner passed the whole sentence. That is fixed (the planner now passes only the
   script, checked on the mock bridge), but a clean recording costs one more short script of credits.
+- (plan 05) **Trailer track:** generate it from the song prompt sent in chat on 2026-11-14 (also in "The reels"
+  below). Save it as `assets/music/trailer.wav` (or .mp3), then say "make a trailer" on a game run. Unity must be
+  open so the cell can record HUD-free clips.
+- (plan 05) **Two scripts wait for your go**, and voice credits are spent only after it. Explainer: run
+  `20261114-003506`. Premise: run `20261113-224654`, node `premise`. Read and edit `script.txt` in each studio
+  project, then say "go" (or "go on the premise") as a follow-up on that run.
+- (plan 05) **Premise picture:** sets, cast, shots and the Studio capture start on your green flag for the
+  combined recording set and racing place. Until then the cell ends after the narration.
+- (plan 05) **Ad Image live run:** waits for the image quota, which was used up at the end of plan 04.
 - (plan 04) **The chosen song is 2.06 s long** (`video/makeasong.mp3`, 45 KB). Music cells hand it over as it
   is; the games loop it. Put a longer version in `assets/music/` if you have one (USER-TODO 17).
 
@@ -133,6 +147,42 @@ remove the line when it is answered. See `AGENTS.md` rule 5.
   - `pnpm typecheck` clean; `pnpm test` (protocol, web, bridge 36 including the router table) passes;
     `pnpm test:bridge`, `pnpm test:live`, `pnpm test:determinism` (96/96) pass; `pnpm film:rough` 140.625 s;
     `pnpm lint:brand` clean (523 files). Fixtures were checked for local paths and keys by grep.
+
+## The reels (plan 05)
+
+- **Modules:**
+  - `reel.trailer`: the studio's trailer recipe on the run's own game. It records 3 HUD-free clips at
+    1920x1080 through `play_capture` (`hud: false` is new in the Unity bridge and `Capture.cs`). `beats.py`
+    finds the beat grid, `edit.ts` plans the cut, then `head.py` plus the studio's `render_tail.py` render a
+    9:16 cut and a 16:9 cut.
+  - `reel.explainer`: script, gate, the `explainer` voice, a HyperFrames picture, then the studio's sound,
+    captions and assembly. About 24 s.
+  - `reel.premise`: a Template A script that opens with "In this world,", the gate, the `premise` voice
+    (fx A, 1.15x), then a stop before the picture. About 30 s.
+  - `motion`: HyperFrames clips.
+  - `ad.image`: an image-model picture, with the type set in code.
+  - `campaign`: one brief per audience, then the pieces side by side, then a Publish dry run.
+  - `publish`: a dry run only, with sockets and writers blocked.
+  - `approve`: a hash-bound go.
+- **Lengths** (the author: "full length, a bit shorter"): premise about 30 s (its recipe runs 35-45 s),
+  explainer about 24 s (its recipe runs about 30 s), trailer 30 s.
+- **Proven:**
+  - The trailer planner and engine, on a stand-in track in the scratchpad: 900 frames, 30.0 s, -13.9 LUFS,
+    fast render 73 s.
+  - Motion "title card that says READY": run `20261114-004831`, 3.0 s, render 21 s, fixture re-recorded.
+  - Publish dry run, against the real studio (test).
+  - Router re-recorded: Act 1 routes to Game, Trailer, Campaign, Host, Recorder and Verify. "go" routes to
+    Approve.
+- **Drafts waiting** (gate, no credits used): explainer, 60 words; premise "Your Kart Gets FASTER When You
+  Brake for Someone...", 112 words.
+- **Song prompt for the trailer track** (instrumental):
+  > High-energy electronic kart-racing anthem, 140 BPM, punchy four-on-the-floor kick, distorted synth bass,
+  > bright arcade lead, revving engine risers. Short intro, an 8-bar build with a snare roll and riser, a
+  > one-beat silence, then a huge drop with sidechained bass and chopped shouts of "GO!". Video game trailer
+  > energy, instrumental.
+- **Credits used in plan 05:** none (no narration yet, no image calls).
+- **No fixtures yet** for the reels, Campaign or Approve. They are recorded from real runs once the scripts are
+  approved. Each has `mock: true` and a README.
 
 ## The assets (plan 04)
 
@@ -436,12 +486,17 @@ before falling back to the fixture (checked: the full film has 20, one per take,
   variant, so `proxy.testModel` is that one (ids in `plan/LOCAL.md`).
 - ASSUMED (plan 04): Cutout has no fallback to the image model, because that model's "transparent" output is a
   painted checkerboard, not alpha. Without the forge a Cutout cell fails with the reason.
+- ASSUMED (plan 05): reel lengths are about 30 s for the premise and trailer and about 24 s for the
+  explainer, shorter than each recipe as the author asked.
+- ASSUMED (plan 05): the campaign's briefs come from a worker, with plain defaults for any audience it misses.
+  The trailer belongs to the Unity audience (Unity gameplay) and the premise reel to the Roblox audience.
 - ASSUMED (plan 04): Video is not built until the author chooses its runtime; the plan allows shipping it on
   the mock.
 
 ## Open problems
 
-- The opening line no longer asks for a cloned voice, but the Voice cell still appears in S09 and S16.
+- The opening line no longer asks for a cloned voice, but the Voice cell still appears in S09 and S16. Since plan
+  05 that is right: the reels ask Voice for their narration, each in its own recipe's voice.
 - Audio files are not in git (`video/audio/` is ignored), except `video/makeasong.mp3`. `score.wav` and its
   takes live only on this machine; keep them. Regenerating from the seeds in `cues.json` may not give
   identical takes.
@@ -457,7 +512,7 @@ before falling back to the fixture (checked: the full film has 20, one per take,
 | 02 | done | typecheck, unit tests (none skipped), `pnpm dev`, real runs on both workers, no-network probes, proxy routing with both models, prompt.md module run, test:bridge, test:live, determinism, film:rough, lint:brand | See "The bridge". |
 | 03 | done, two fallbacks | full run 20261113-014545, four follow-ups under 5 s, fixtures, typecheck, tests, test:bridge, test:live, determinism, film:rough, lint:brand | Windows build until WebGL is installed; Roblox place not opened in Studio. See "The games". |
 | 04 | done, video on mock | runs 20261113-222539 (house chain), 20261113-223714 (song), 20261113-223729 (voice), 20261113-224654 (full game with real assets), fixtures, mock replay, tests, test:bridge, typecheck, lint:brand, forge stopped (`colab ls`: no sessions) | Video waits for its runtime; `assets.image` with `transparent` not run live; image quota out at the end. See "The assets". |
-| 05 | not started | | |
+| 05 | built, waiting on the author | typecheck, tests (reels 14, router table), router re-record, motion run + fixture, lint:brand | Trailer track, script approvals, premise green flag, image quota. See "The reels". | |
 | 06 | not started | | |
 | 07 | not started | | |
 | 08 | not started | | |

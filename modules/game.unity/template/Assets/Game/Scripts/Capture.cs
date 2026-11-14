@@ -11,6 +11,7 @@ namespace HarnessGame
         public string outDir;
         public int fps = 30, width = 1280, height = 720;
         public float seconds = 10f, warmup = 0.5f;
+        public bool hud = true;         // false: hide every HUD canvas while recording
         public float startDist = -1f;   // when >= 0, wait until the player's kart is this far along the lap
         public int frame;
         public bool done;
@@ -35,6 +36,9 @@ namespace HarnessGame
             if (startDist >= 0 && race && race.player && race.player.dist < startDist) return;
             var cam = Camera.main;
             if (!cam) return;
+            if (!hud)
+                foreach (var c in Object.FindObjectsByType<Canvas>(FindObjectsSortMode.None))
+                    if (c.enabled) c.enabled = false;
             Shots.Render(cam, rt);
             var prev = RenderTexture.active;
             RenderTexture.active = rt;

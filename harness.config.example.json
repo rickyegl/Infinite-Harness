@@ -42,6 +42,12 @@
     "forecast": "<forecast script, optional>"
   },
   "colab": { "session": "forge", "gpu": "L4", "keepAlive": false },
-  "voice": { "envFile": "<path to the .env that holds the voice key and voice id>" },
+  "voice": {
+    "envFile": "<path to the .env that holds the voice key and voice id>",
+    "presets": {
+      "premise": { "voice": "<voice id of the premise narrator>", "fx": "A", "speed": 1.15, "maxChars": 900 },
+      "explainer": { "voice": "<voice id of the explainer narrator>", "model": "<its model id>", "fx": "none", "maxChars": 700 }
+    }
+  },
   "brandDenyList": ["<vendor and model names that must never appear as text in UI, docs or frames; maker icons are exempt by path, see the contract>"]
 }

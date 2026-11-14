@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" data-resolution="landscape">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, height=1080">
+  <title>READY</title>
+  <script src="gsap.min.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: #0b1010; }
+    #root { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #0b1010; color: #f3f5e9; }
+    .rule { position: absolute; left: 150px; width: 1620px; height: 2px; background: #333e37; }
+    #top-rule { top: 156px; }
+    #bottom-rule { bottom: 156px; }
+    #accent { position: absolute; left: 150px; top: 156px; width: 112px; height: 8px; background: #c5f548; transform-origin: left center; }
+    #title { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; margin: 0; font-family: 'Arial Black', 'Segoe UI', Arial, sans-serif; font-size: 330px; font-weight: 900; line-height: 1; letter-spacing: -18px; }
+    .letter { display: inline-block; }
+    #underline { position: absolute; top: 742px; left: 400px; width: 1120px; height: 16px; background: #c5f548; transform-origin: left center; }
+    #pulse { position: absolute; left: 150px; top: 156px; width: 1620px; height: 768px; border: 2px solid #c5f548; opacity: 0; }
+  </style>
+</head>
+<body>
+  <div id="root" data-composition-id="main" data-start="0" data-duration="3" data-width="1920" data-height="1080">
+    <div id="top-rule" class="clip rule" data-start="0" data-duration="3" data-track-index="0"></div>
+    <div id="bottom-rule" class="clip rule" data-start="0" data-duration="3" data-track-index="0"></div>
+    <div id="accent" class="clip" data-start="0" data-duration="3" data-track-index="1"></div>
+    <div id="pulse" class="clip" data-start="0" data-duration="3" data-track-index="2"></div>
+    <h1 id="title" class="clip" data-start="0" data-duration="3" data-track-index="3" aria-label="READY"><span class="letter clip" data-start="0" data-duration="3" data-track-index="4">R</span><span class="letter clip" data-start="0" data-duration="3" data-track-index="5">E</span><span class="letter clip" data-start="0" data-duration="3" data-track-index="6">A</span><span class="letter clip" data-start="0" data-duration="3" data-track-index="7">D</span><span class="letter clip" data-start="0" data-duration="3" data-track-index="8">Y</span></h1>
+    <div id="underline" class="clip" data-start="0" data-duration="3" data-track-index="9"></div>
+  </div>
+  <script>
+    window.__timelines = window.__timelines || {};
+    window.__timelines["main"] = gsap.timeline({ paused: true });
+    const tl = window.__timelines["main"];
+    tl.fromTo('.rule', { scaleX: 0, transformOrigin: 'left center' }, { scaleX: 1, duration: 0.65, ease: 'power3.out' }, 0)
+      .fromTo('#accent', { scaleX: 0 }, { scaleX: 1, duration: 0.45, ease: 'expo.out' }, 0.1)
+      .fromTo('.letter', { y: 160, opacity: 0, scaleX: 0.7, rotation: 5 }, { y: 0, opacity: 1, scaleX: 1, rotation: 0, duration: 0.68, stagger: 0.075, ease: 'expo.out' }, 0.14)
+      .fromTo('#underline', { scaleX: 0 }, { scaleX: 1, duration: 0.6, ease: 'expo.out' }, 0.53)
+      .fromTo('#pulse', { opacity: 0.65, scale: 0.97 }, { opacity: 0, scale: 1.035, duration: 0.6, ease: 'power3.out' }, 0.65)
+      .to('#title', { scale: 1.025, duration: 0.3, ease: 'power3.out' }, 2.35)
+      .to('#underline', { scaleX: 0.1, duration: 0.3, ease: 'power3.out' }, 2.35)
+      .to('#title', { scale: 1, duration: 0.25, ease: 'power3.out' }, 2.65)
+      .set('#root', { opacity: 1 }, 3);
+  </script>
+</body>
+</html>

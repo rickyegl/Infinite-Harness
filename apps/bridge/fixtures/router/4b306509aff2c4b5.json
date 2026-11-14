@@ -1,0 +1,83 @@
+{
+  "prompt": "Show me a house.",
+  "existing": [
+    {
+      "id": "game",
+      "module": "game",
+      "label": "Racing game"
+    },
+    {
+      "id": "trailer",
+      "module": "reel.trailer",
+      "label": "Game trailer"
+    },
+    {
+      "id": "campaign",
+      "module": "campaign",
+      "label": "Ad campaign"
+    },
+    {
+      "id": "host",
+      "module": "host",
+      "label": "Browser host"
+    },
+    {
+      "id": "recorder",
+      "module": "recorder",
+      "label": "Process video"
+    },
+    {
+      "id": "verify",
+      "module": "verify",
+      "label": "Verifier"
+    }
+  ],
+  "catalog": [
+    "game",
+    "game.unity",
+    "game.roblox",
+    "assets.image",
+    "assets.image.edit",
+    "assets.cutout",
+    "assets.model3d",
+    "assets.video",
+    "voice",
+    "music",
+    "reel.trailer",
+    "reel.premise",
+    "reel.explainer",
+    "motion",
+    "ad.image",
+    "campaign",
+    "approve",
+    "publish",
+    "host",
+    "verify",
+    "recorder",
+    "drafting",
+    "blender",
+    "blender.render",
+    "study",
+    "cad",
+    "sim",
+    "pcb",
+    "forecast",
+    "anomaly"
+  ],
+  "backend": "proxy",
+  "modelKey": "proxy.testModel",
+  "ms": 3065,
+  "recordedAt": "2026-11-14T06:47:35.229Z",
+  "plan": {
+    "nodes": [
+      {
+        "id": "house",
+        "module": "assets.image",
+        "label": "House image",
+        "prompt": "Show me a house.",
+        "after": [],
+        "under": null
+      }
+    ]
+  }
+}

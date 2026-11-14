@@ -18,6 +18,7 @@
     "motion",
     "ad.image",
     "campaign",
+    "approve",
     "publish",
     "host",
     "verify",
@@ -34,77 +35,66 @@
   ],
   "backend": "proxy",
   "modelKey": "proxy.testModel",
-  "ms": 19612,
-  "recordedAt": "2026-11-13T05:37:41.141Z",
+  "ms": 10232,
+  "recordedAt": "2026-11-14T06:47:42.378Z",
   "plan": {
     "nodes": [
       {
+        "id": "recorder",
+        "module": "recorder",
+        "label": "Process recording",
+        "prompt": "Record the screen for the whole run and cut the process into a video.",
+        "after": [],
+        "under": null
+      },
+      {
         "id": "game",
         "module": "game",
-        "label": "Build 3D game",
+        "label": "3D racing game",
         "prompt": "Make a 3d racing game where humanoids fight while racing on Unity and Roblox.",
         "after": [],
         "under": null
       },
       {
-        "id": "voice",
-        "module": "voice",
-        "label": "Record voice narration",
-        "prompt": "Write and record narration and voice-over lines for the 3d racing game where humanoids fight while racing on Unity and Roblox, covering the game trailer and the ad campaign tailored to Unity and Roblox players.",
-        "after": [],
-        "under": null
-      },
-      {
-        "id": "recorder",
-        "module": "recorder",
-        "label": "Record run process",
-        "prompt": "Record the screen for the whole run and cut the process into a video to show the process.",
-        "after": [],
-        "under": null
-      },
-      {
-        "id": "host",
-        "module": "host",
-        "label": "Host on browser",
-        "prompt": "Host the 3d racing game where humanoids fight while racing on browser.",
+        "id": "trailer",
+        "module": "reel.trailer",
+        "label": "Game trailer",
+        "prompt": "Make a game trailer for the 3d racing game.",
         "after": [
           "game"
         ],
         "under": null
       },
       {
-        "id": "trailer",
-        "module": "reel.trailer",
-        "label": "Cut game trailer",
-        "prompt": "Make a game trailer for the 3d racing game where humanoids fight while racing on Unity and Roblox.",
+        "id": "campaign",
+        "module": "campaign",
+        "label": "Ad campaign",
+        "prompt": "Make an ad campaign for the 3d racing game tailored to Unity and Roblox players.",
         "after": [
-          "game",
-          "voice"
+          "game"
         ],
         "under": null
       },
       {
-        "id": "campaign",
-        "module": "campaign",
-        "label": "Produce ad campaign",
-        "prompt": "Make an ad campaign for the 3d racing game where humanoids fight while racing, tailored to Unity and Roblox players.",
+        "id": "host",
+        "module": "host",
+        "label": "Browser hosting",
+        "prompt": "Host the 3d racing game on browser.",
         "after": [
-          "game",
-          "voice"
+          "game"
         ],
         "under": null
       },
       {
         "id": "verify",
         "module": "verify",
-        "label": "Verify all outputs",
-        "prompt": "Check all builds, the browser hosted game, the game trailer, the ad campaign tailored to Unity and Roblox players, and the process video against the request and make no mistakes.",
+        "label": "Quality verification",
+        "prompt": "Check all results against the request, run builds and tests, open the hosted browser game, and make no mistakes.",
         "after": [
           "game",
-          "host",
           "trailer",
           "campaign",
-          "recorder"
+          "host"
         ],
         "under": null
       }

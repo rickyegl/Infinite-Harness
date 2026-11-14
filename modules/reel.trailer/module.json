@@ -1,0 +1,27 @@
+{
+  "id": "reel.trailer",
+  "label": "Trailer",
+  "icon": "film",
+  "kind": "tool",
+  "summary": "A beat-cut launch trailer of the run's own game (about 30 s, 9:16 and 16:9) in the studio's trailer recipe: fresh gameplay recorded from the game, the author's track, cuts on the beat that speed up into the drop, captions and a logo ending. Needs a game built in the run first.",
+  "accepts": [
+    "text",
+    "video"
+  ],
+  "produces": [
+    "frames",
+    "chart",
+    "image",
+    "video"
+  ],
+  "runtime": "script",
+  "needs": [
+    "unity"
+  ],
+  "mock": true,
+  "allow": {
+    "write": [
+      "$NODE"
+    ]
+  }
+}

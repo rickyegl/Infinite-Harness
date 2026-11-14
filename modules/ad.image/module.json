@@ -1,0 +1,23 @@
+{
+  "id": "ad.image",
+  "label": "Ad Image",
+  "icon": "megaphone",
+  "kind": "tool",
+  "summary": "One ad image for one audience at platform sizes (feed 1:1, story 9:16, optional link 1.91:1): a picture from Image plus a headline and a call to action set as text.",
+  "accepts": [
+    "text"
+  ],
+  "produces": [
+    "image"
+  ],
+  "runtime": "script",
+  "needs": [
+    "proxy"
+  ],
+  "mock": true,
+  "allow": {
+    "write": [
+      "$NODE"
+    ]
+  }
+}

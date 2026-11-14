@@ -1,0 +1,20 @@
+{
+  "id": "approve",
+  "label": "Approve",
+  "icon": "check",
+  "kind": "tool",
+  "summary": "The author's go-ahead on a script that is waiting for approval in a reel or campaign cell (\"go\", \"approved\", \"looks good, voice it\"). Runs under the cell it approves; its prompt may name which script (the explainer, the premise, the Roblox one).",
+  "accepts": [
+    "text"
+  ],
+  "produces": [
+    "doc"
+  ],
+  "runtime": "script",
+  "mock": true,
+  "allow": {
+    "write": [
+      "$RUN"
+    ]
+  }
+}

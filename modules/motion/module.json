@@ -1,0 +1,28 @@
+{
+  "id": "motion",
+  "label": "Motion",
+  "icon": "play",
+  "kind": "agent",
+  "summary": "Motion graphics: turns a short brief (a title card, kinetic type, a number count-up, a logo sting, a lower third) into an HTML/GSAP composition and renders it to an mp4. Default 3 s at 1920x1080; say vertical or 9:16 for a 1080x1920 clip, or give a length in seconds. Shows storyboard stills, then the clip.",
+  "accepts": [
+    "text",
+    "image"
+  ],
+  "produces": [
+    "frames",
+    "video"
+  ],
+  "runtime": "cli-agent",
+  "needs": [
+    "hyperframes"
+  ],
+  "mock": true,
+  "allow": {
+    "tools": [
+      "harness.report_step"
+    ],
+    "write": [
+      "$NODE"
+    ]
+  }
+}

@@ -43,6 +43,7 @@ namespace HarnessEditor
         public string outDir, target, frames;
         public string from = "";   // play_capture: start recording a little before this feature (loop, twist, drop)
         public bool autopilot = true;
+        public bool hud = true;    // play_capture: false hides the HUD canvases (clean trailer footage)
         public string rider = "";  // play ops: pick this rider class on the pick screen first (volt, sniper, shrink, thrower)
         // track_export: a TrackSpec as JSON
         public string spec = "";
@@ -666,7 +667,7 @@ namespace HarnessEditor
             var it = EnterPlay(op);
             while (it.MoveNext()) yield return null;
             var cap = new GameObject("HarnessCapture").AddComponent<Capture>();
-            cap.outDir = dir; cap.fps = op.fps; cap.seconds = op.seconds; cap.width = op.width; cap.height = op.height; cap.warmup = op.warmup;
+            cap.outDir = dir; cap.fps = op.fps; cap.seconds = op.seconds; cap.width = op.width; cap.height = op.height; cap.warmup = op.warmup; cap.hud = op.hud;
             if (!string.IsNullOrEmpty(op.from) && Enum.TryParse(op.from, true, out FeatureKind kind) && GameBoot.Main.race.path)
             {
                 float m = GameBoot.Main.race.path.FeatureMid(kind);
