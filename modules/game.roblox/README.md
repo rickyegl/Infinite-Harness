@@ -28,6 +28,13 @@ Luau in a Rojo project.
   still waiting for an upload to `uploads.json`, and the build report lists which slots are part-built.
   - The place cannot read an inserted model's vertices, so the orchestrator finds the rider's seat in the kart
     from its OBJ (`lib/seat.ts`, the same method as the Unity game) and writes it into `Config.models.kart.seat`.
+- **Banners:** six track-side boards like the Unity game's (four or more, where the road is plain). The design's
+  generated pictures go on them by Roblox image id (`Config.banners`); without one a board has a plain accent or
+  blue face. Each picture is uploaded once as a Decal, with the author's go-ahead, and the asset map keeps the
+  image id the Decal points at (a `Decal.Texture` needs that id, not the Decal's; read it in Studio with
+  `InsertService:LoadAsset(decalId)`). Pictures still waiting are staged in `runs/.cache/roblox-upload` and listed
+  in `uploads.json`. Look at a picture before uploading it: the image model sometimes paints real sponsor logos
+  in the background, so upload only the banner panel.
 - **Scenery:** `src/server/Scenery.luau` fills the world round the circuit like the Unity game, seeded from the
   track: terrain mountains with snow on the tall ones, rocks, bushes, flower beds, flags and a grandstand on the
   ground; hot-air balloons, floating islands, Roblox clouds plus low puffs, a blimp and arches in the air. The

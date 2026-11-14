@@ -19,5 +19,6 @@ return {
 	hud = { title = "Brawl Karts", accent = "#ffd23c", minimap = true },
 	look = { sky = "#7fb4e6", ground = "#5f9e4a" },
 	models = {},
+	banners = {},
 	built = { track = true, karts = true, riders = true, combat = true, hud = true },
 }

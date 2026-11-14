@@ -58,8 +58,6 @@ remove the line when it is answered. See `AGENTS.md` rule 5.
   script, checked on the mock bridge), but a clean recording costs one more short script of credits.
 - (plan 04) **The chosen song is 2.06 s long** (`video/makeasong.mp3`, 45 KB). Music cells hand it over as it
   is; the games loop it. Put a longer version in `assets/music/` if you have one (USER-TODO 17).
-- (plan 04) **Pictures in Roblox:** generated art reaches the Unity game; in Roblox a picture needs an uploaded
-  image id, so Roblox keeps its built-in look until you approve uploading the art.
 
 ## Verified
 
@@ -177,6 +175,13 @@ remove the line when it is answered. See `AGENTS.md` rule 5.
   again about 3.5 h later). `imageCall` now retries short waits (5 to 45 s, up to 6 tries) and fails at once
   with "the image model's quota is used up; it is free again in about ..." when the wait is longer than 2 min
   (checked live on run `20261113-234452`). Three pictures at once could not be re-tested while the quota is out.
+- **Pictures in Roblox (approved 2026-11-13):** the Roblox place now has six track-side boards like the Unity
+  game (`Config.banners`, image ids; plain faces without). The "Hover Arrows" banner of run `20261113-224654` is
+  uploaded to the game account as a Decal (passed moderation), cropped to the banner panel because the
+  picture's background had real sponsor logos; its image id is in `runs/.cache/roblox-assets.json`. The rebuilt
+  place, with the scripts copied into the game account's place through the MCP plugin (not saved or published),
+  showed the banner on 4 boards in play (`artifacts/game.roblox.build/studio-board.jpg`). That run's eight new
+  3D models are not uploaded (not part of this approval), so its karts were part-built.
 
 ## The games (plan 03)
 

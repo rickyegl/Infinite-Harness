@@ -18,8 +18,8 @@ export type GameState = {
     metres?: number;
     build?: { target: string; dir: string; seconds: number; href?: string; flags: string };
   };
-  /** models: which generated model slots load as Roblox assets, and which still wait for an upload */
-  roblox?: { project: string; node: string; place?: string; models?: { loaded: string[]; waiting: string[] } };
+  /** models / banners: which generated models and pictures load as Roblox assets, and which still wait for an upload */
+  roblox?: { project: string; node: string; place?: string; models?: { loaded: string[]; waiting: string[] }; banners?: { loaded: number; waiting: string[] } };
   /** live flags written so far (night, realistic, music, relay) */
   flags?: Record<string, unknown>;
 };

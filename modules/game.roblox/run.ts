@@ -8,7 +8,7 @@ import { patchState, readState, runDirOf } from "../game/lib/state.ts";
 import { designOf } from "../game.unity/lib/parts.ts";
 import { writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { modelAssets } from "./lib/assets.ts";
+import { modelAssets, pictureAssets } from "./lib/assets.ts";
 import { PARTS } from "./lib/parts.ts";
 import { hasTool, placeFor } from "./lib/roblox.ts";
 import { seatOf } from "./lib/seat.ts";
@@ -31,11 +31,20 @@ export default async function run(ctx: ModuleContext, input: ModuleInput): Promi
   const seat = ids.kart && models.kart ? seatOf(join(runDir, dirname(models.kart), "obj", "model.obj")) : null;
   place.patchConfig({ models: seat ? { ...ids, kart: { ...ids.kart, seat } } : ids });
   if (Object.keys(ids).length) ctx.step(`${Object.keys(ids).length} 3D models as Roblox assets`, Object.keys(ids).join(", "), "cube");
-  if (waiting.length) {
-    ctx.step(`${waiting.length} 3D models not uploaded to Roblox yet`, `${waiting.map((w) => w.slot).join(", ")}: part-built until the author approves the upload`, "cube");
-    writeFileSync(join(ctx.dir, "uploads.json"), JSON.stringify(waiting, null, 1));
-  }
-  patchState(runDir, { roblox: { project: place.project, node: ctx.node, models: { loaded: Object.keys(ids), waiting: waiting.map((w) => w.slot) } } });
+  if (waiting.length) ctx.step(`${waiting.length} 3D models not uploaded to Roblox yet`, `${waiting.map((w) => w.slot).join(", ")}: part-built until the author approves the upload`, "cube");
+  // generated banner pictures go on the track-side boards by Roblox image id, like the Unity game's boards
+  const art = (input.params?.art as Record<string, string> | undefined) ?? readState(runDir).art ?? {};
+  const pics = pictureAssets(
+    runDir,
+    d.art.filter((a) => a.kind === "image" && art[a.name]).map((a) => ({ name: a.name, uri: art[a.name] })),
+  );
+  place.patchConfig({ banners: pics.ids });
+  if (pics.ids.length) ctx.step(`${pics.ids.length} banner${pics.ids.length > 1 ? "s" : ""} on the track-side boards`, "uploaded Roblox images", "image");
+  if (pics.waiting.length) ctx.step(`${pics.waiting.length} banner${pics.waiting.length > 1 ? "s" : ""} not uploaded to Roblox yet`, `${pics.waiting.map((w) => w.slot).join(", ")}: the boards stay plain until the author approves the upload`, "image");
+  if (waiting.length || pics.waiting.length) writeFileSync(join(ctx.dir, "uploads.json"), JSON.stringify([...waiting, ...pics.waiting], null, 1));
+  patchState(runDir, {
+    roblox: { project: place.project, node: ctx.node, models: { loaded: Object.keys(ids), waiting: waiting.map((w) => w.slot) }, banners: { loaded: pics.ids.length, waiting: pics.waiting.map((w) => w.slot) } },
+  });
 
   const done: string[] = [];
   for (const p of PARTS) {

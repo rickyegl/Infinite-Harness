@@ -8,6 +8,7 @@
 --   thrower  throws an item forward on its own every 3 s; the item hits the first kart in its lane
 -- Generated 3D models (Config.models: Roblox asset ids) replace the part-built kart body, riders, and add
 -- landmarks and a trophy; a slot without an id keeps its parts. The rider sits in the generated kart's seat.
+-- Six track-side boards show the generated banners (Config.banners: uploaded image ids), else a plain colour.
 -- Scenery.luau fills the world round the circuit (mountains, rocks, bushes, flowers, flags, a grandstand,
 -- balloons, floating islands, clouds, a blimp, arches).
 -- With the crossplay flag on it also posts its karts to the relay and shows the other engine's karts as ghosts.
@@ -385,9 +386,75 @@ local function setPieces()
 	end
 end
 
+-- six track-side boards, like the Unity game. Config.banners lists uploaded image ids (generated banners); a board
+-- shows banners[i % #banners] on its face toward the road, or a plain accent/blue face when there are none.
+local function boards()
+	local folder = make("Folder", { Name = "Boards" }, world)
+	local banners = Config.banners or {}
+	local accent = hex(Config.hud and Config.hud.accent, Color3.fromRGB(255, 210, 60))
+	local frame = Color3.fromRGB(31, 31, 36)
+	local function plain(d: number): boolean
+		for k = -3, 3 do
+			local dd = (d + k * 6 * S) % L
+			if Track.hover(dd) > 0.3 or Track.poseAt(dd, 0).UpVector.Y < 0.96 then
+				return false
+			end
+		end
+		return true
+	end
+	local count = 6
+	for i = 0, count - 1 do
+		local d = L * (i + 0.25) / count
+		for _ = 1, 12 do
+			if plain(d) then
+				break
+			end
+			d = (d + 15 * S) % L
+		end
+		if not plain(d) then
+			continue
+		end
+		local side = if i % 2 == 0 then -1 else 1
+		local p = Track.poseAt(d, side * (HW + 6 * S)).Position
+		local centre = Track.poseAt(d, 0).Position
+		-- the board's front (-Z) faces the road
+		local base = CFrame.lookAt(p, Vector3.new(centre.X, p.Y, centre.Z))
+		local m = make("Model", { Name = "Board" .. i }, folder)
+		make("Part", {
+			Name = "Frame",
+			Size = Vector3.new(8.4 * S, 3.4 * S, 0.3 * S),
+			CFrame = base * CFrame.new(0, 2.2 * S, 0),
+			Color = frame,
+			Material = Enum.Material.SmoothPlastic,
+		}, m)
+		for _, x in { -3.6, 3.6 } do
+			make("Part", {
+				Name = "Leg",
+				Size = Vector3.new(0.25 * S, 1.2 * S, 0.25 * S),
+				CFrame = base * CFrame.new(x * S, 0.4 * S, 0),
+				Color = frame,
+				Material = Enum.Material.Metal,
+			}, m)
+		end
+		local id = if #banners > 0 then banners[i % #banners + 1] else nil
+		local face = make("Part", {
+			Name = "Face",
+			Size = Vector3.new(8 * S, 3 * S, 0.1),
+			CFrame = base * CFrame.new(0, 2.2 * S, -0.15 * S - 0.05),
+			Color = if id then Color3.new(1, 1, 1) elseif i % 2 == 0 then accent else Color3.fromRGB(51, 115, 230),
+			Material = Enum.Material.SmoothPlastic,
+			CanCollide = false,
+		}, m)
+		if id then
+			make("Decal", { Texture = "rbxassetid://" .. tostring(id), Face = Enum.NormalId.Front }, face)
+		end
+	end
+end
+
 if built.track then
 	setPieces()
-	-- scenery round the circuit, clear of the road, the landmarks and the trophy
+	boards()
+	-- scenery round the circuit, clear of the road, the landmarks, the trophy and the boards
 	local groundY = math.huge
 	for _, p in Track.points do
 		groundY = math.min(groundY, p.Y)
@@ -401,6 +468,9 @@ if built.track then
 	end
 	if trophy then
 		table.insert(taken, { pos = trophy:GetPivot().Position, r = 6 * S })
+	end
+	for _, b in world.Boards:GetChildren() do
+		table.insert(taken, { pos = b:GetPivot().Position, r = 6 * S })
 	end
 	Scenery.build(world, groundY - 3, taken)
 end
