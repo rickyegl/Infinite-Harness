@@ -1,0 +1,14 @@
+{
+  "id": "forecast",
+  "label": "Forecast",
+  "icon": "chart",
+  "kind": "tool",
+  "maker": "timesfm",
+  "summary": "Forecast future demand and quantile uncertainty bands from a historical demand series.",
+  "accepts": ["text", "doc"],
+  "produces": ["chart"],
+  "runtime": "script",
+  "needs": ["python"],
+  "mock": true,
+  "allow": { "tools": [], "write": ["$NODE"], "network": [] }
+}

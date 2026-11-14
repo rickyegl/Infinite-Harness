@@ -1,0 +1,16 @@
+{
+  "paths": {
+    "python": "python",
+    "forecast": "modules/forecast/forecast.py",
+    "forecastPackageDir": "<directory containing the installed forecast package>",
+    "forecastCheckpoint": "<local checkpoint file from a pinned revision>"
+  },
+  "forecast": {
+    "backendModule": "<package import name from plan/LOCAL.md>",
+    "backendClass": "<architecture class from plan/LOCAL.md>",
+    "device": "cpu",
+    "maxContext": 512,
+    "historyWindow": 48,
+    "horizon": 16
+  }
+}

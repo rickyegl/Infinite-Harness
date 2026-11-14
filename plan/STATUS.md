@@ -53,6 +53,22 @@ what the next agent should know. Keep it short; replace stale lines instead of a
 - **Next:** plan 07, then plan 08 replaces fixtures with recorded takes and finalises the
   draft direction files (S37-S40, S42-S47).
 
+## Forecast (plan 07)
+
+- **Real:** Forecast, run `20261114-151306` in `modules/forecast/out/runs/`; the real fixture is
+  `modules/forecast/fixtures/default.jsonl` (6 events, one chart JSON). CPU load/configure 1.452 s,
+  inference 0.214 s; no GPU, remote runtime or paid credits.
+- **Verified:** 417 monthly retail-sales observations, 48 displayed history points and 16 forecast points;
+  all 16 quantile bands finite, aligned and containing their medians; chart metadata matches the artifact;
+  fixture replay, four malformed CSV/date tests, typecheck, all 89 workspace tests and module brand lint pass.
+  `pnpm film:rough` exits 0: 140.625 s, 48 shots on beat; renderer reports 20 missing-resource (404) warnings
+  in the existing stage data. Reproduction and provenance: `modules/forecast/NOTES.md`.
+- **ASSUMED (Forecast):** public retail-sales revenue is the demand proxy (author allowed any CSV),
+  16-month horizon, trailing 48 observations displayed, 10th-to-90th quantile band. Runtime paths and
+  architecture live in local config; inference reads the pinned local checkpoint without installs/downloads.
+- **Open / next:** no Forecast blocker. This completes only the Forecast row; plan 08 selects the real
+  take for S39. Anomaly detection is separate work.
+
 ## Waiting on the author
 
 Agents write here what they stopped for (a program to open, a runtime to start, a sign-in, a question) and
@@ -642,7 +658,7 @@ before falling back to the fixture (checked: the full film has 20, one per take,
 | 04 | done, video on mock | runs 20261113-222539 (house chain), 20261113-223714 (song), 20261113-223729 (voice), 20261113-224654 (full game with real assets), fixtures, mock replay, tests, test:bridge, typecheck, lint:brand, forge stopped (`colab ls`: no sessions) | Video waits for its runtime; `assets.image` with `transparent` not run live; image quota out at the end. See "The assets". |
 | 05 | done | trailer re-cut with the camera director (`trailer`, `trailer-2`, `trailer-3`: steady cameras, 9 angles, fights on screen, karts no longer twitch), test captures measured, contact sheets looked at, `reel.trailer` fixture re-recorded, typecheck, tests (protocol 13, web 7, bridge 63, reels 25 of them), lint:brand; premise picture day and night, the night re-render live through the cell (`premise-night`: Studio take, assembly, before/after), the recast (`premise-day`, `premise-night-2` recorded; `premise-night-3` reused the take), contact sheets looked at, `reel.premise` fixture re-recorded, typecheck, tests (protocol 13, web 7, bridge 59, reels 21 of them), lint:brand; earlier: tests (bridge 56, reels 18), campaign replayed from its fixture in mock mode, router re-record, test:bridge, test:live, determinism 96/96, film:rough (140.6 s, every cut on a beat), lint:brand, motion run + fixture, campaign live run end to end (trailer, explainer, premise narration, ads, publish dry run), fixtures for every reel module, HUD capture in Unity | Nothing published. See "The reels". |
 | 06 | done, Unity browser build waiting on WebGL | `pnpm test:host` (public address answers, the page draws through it, tunnel closed with the bridge); the Verifier on a real run through `pnpm cell` (file deleted, marked failed, one fix, passed) and its 3 tests; Recorder 24 s video on run 20261113-224654; site deployed, replay with no bridge seen on pages.dev, tunnel + CORS + token checked from the shell; `pnpm stop` closed a detached tunnel; typecheck, tests (protocol 13, web 10, bridge 66), test:bridge, test:live, determinism 96/96, film:rough, lint:brand (and the built site) | Phone and second-device checks are the author's. See "Hosting, checking, recording". |
-| 07 | not started | | |
+| 07 | Forecast row complete; other rows not assessed here | real run 20261114-151306, fixture replay, JSON contract, input checks, typecheck, module brand lint | See "Forecast (plan 07)"; real S39 take selection belongs to plan 08. |
 | 08 | not started | | |
 | 09 | not started | | |
 | 10 | not started | | |
